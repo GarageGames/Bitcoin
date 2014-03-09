@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+# Visual C# Express 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CentralMine.NET", "CentralMine.NET.csproj", "{B2C32204-8EBC-4EED-B3ED-50BF19161EF4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bitnet.Client", "..\bitnet-code\Bitnet.Client\Bitnet.Client.csproj", "{90D3E431-02DF-432F-9F09-ED6E934BACD2}"

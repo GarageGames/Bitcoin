@@ -20,6 +20,8 @@ namespace CentralMine.NET
         public string strHash1;
         public string strTarget;
 
+        public HashManager mHashMan;
+
         public Block(JObject obj)
         {            
             strMidstate = obj["midstate"].ToString();
@@ -41,6 +43,8 @@ namespace CentralMine.NET
             data64 = new byte[64];
             Buffer.BlockCopy(data, 64, data64, 0, 64);
 
+            mHashMan = new HashManager();
+
             //IntSwapArray(midstate);
             //IntSwapArray(data64);
             //IntSwapArray(target);
@@ -54,6 +58,14 @@ namespace CentralMine.NET
             data[76] = (byte)((solution & 0xFF000000) >> 24);
 
             return ArrayToHexString(data);
+        }
+
+        public override string ToString()
+        {
+            string str = "{\n\tmidstate: " + strMidstate + "\n";
+            str += "\tdata: " + strData + "\n";
+            str += "\ttarget: " + strTarget + "\n}\n";
+            return str;
         }
 
         void IntSwapArray(byte[] array)

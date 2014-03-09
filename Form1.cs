@@ -20,11 +20,11 @@ namespace CentralMine.NET
         public Form1()
         {
             InitializeComponent();
-
+            
             mStartTime = DateTime.Now;
             mTheMan = new ClientManager();
         }
-
+        
         private void timer1_Tick(object sender, EventArgs e)
         {
             // Update block info
@@ -39,20 +39,20 @@ namespace CentralMine.NET
             lblClients.Text = "Clients: " + mTheMan.mClients.Count;
 
 
-            float percent = ((float)mTheMan.mHashMan.mHashesDone / (float)mTheMan.mHashMan.mHashesTotal) * 100;
+            float percent = ((float)mTheMan.mBlock.mHashMan.mHashesDone / (float)mTheMan.mBlock.mHashMan.mHashesTotal) * 100;
             progressBar1.Value = (int)percent;
 
-            lblProgress.Text = String.Format("{0:N0} / {1:N0} ({2}%)", mTheMan.mHashMan.mHashesDone, mTheMan.mHashMan.mHashesTotal, percent);
-            
+            lblProgress.Text = String.Format("{0:N0} / {1:N0} ({2}%)", mTheMan.mBlock.mHashMan.mHashesDone, mTheMan.mBlock.mHashMan.mHashesTotal, percent);
 
-            uint hashesSinceLast = (mTheMan.mHashMan.mHashesDone - mPrevHashes);
+            uint hashesDone = mTheMan.GetHashesDone();
+            uint hashesSinceLast = (hashesDone - mPrevHashes);
             mHashesDone += hashesSinceLast;            
             TimeSpan span = DateTime.Now - mStartTime;
             double hashesPerSecond = mHashesDone / span.TotalSeconds;
-  
-            mPrevHashes = mTheMan.mHashMan.mHashesDone;
 
-            uint hashesRemaining = mTheMan.mHashMan.mHashesTotal - mTheMan.mHashMan.mHashesDone;
+            mPrevHashes = hashesDone;
+
+            uint hashesRemaining = mTheMan.mBlock.mHashMan.mHashesTotal - mTheMan.mBlock.mHashMan.mHashesDone;
             double secondsRemaining = (double)hashesRemaining / hashesPerSecond;
 
             int hoursRemaining = (int)(secondsRemaining / 3600);
@@ -61,6 +61,12 @@ namespace CentralMine.NET
             secondsRemaining -= (minutesRemaining * 60);
 
             lblHashrate.Text = String.Format("Hashrate: {0:N} / second  Time Remaining: {1}:{2}:{3}", hashesPerSecond, hoursRemaining, minutesRemaining, (int)secondsRemaining);
+
+            if (span.TotalSeconds > 30)
+            {
+                mStartTime = DateTime.Now;
+                mHashesDone = 0;
+            }
         }
     }
 }

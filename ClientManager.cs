@@ -19,15 +19,19 @@ namespace CentralMine.NET
         Mutex mClientListMutex;
 
         Thread mUpdateThread;
-
-        public HashManager mHashMan;
-
+        Email mMailer;
+        
         bool mDoingBlock;
-        public Block mBlock;
-        //uint mHashStart;
+        int mPrevBlockIndex;
+        public Block[] mPrevBlocks;
+        public Block mBlock = null;
 
         public ClientManager()
         {
+            mPrevBlocks = new Block[5];
+            mPrevBlockIndex = 0;
+
+            mMailer = new Email();
             mClients = new List<Client>();
             mClientListMutex = new Mutex();
             mListener = new Listener(555, this);
@@ -50,64 +54,84 @@ namespace CentralMine.NET
 
         void BeginBlock()
         {
-            if (!mDoingBlock)
+            // Put the current block in the previous list
+            if (mBlock != null)
             {
-                // Get block from bitcoin
-                BitnetClient bc = new BitnetClient("http://127.0.0.1:8332");
-                bc.Credentials = new NetworkCredential("rpcuser", "rpcpass");
-                JObject obj = bc.GetWork();
-                Console.WriteLine("starting block: " + obj.ToString());
-                mBlock = new Block(obj);
-
-                // Set the hash start to 0
-                mHashMan = new HashManager();
-
-                // Set in block
-                mDoingBlock = true;
+                mPrevBlocks[mPrevBlockIndex++] = mBlock;
+                if (mPrevBlockIndex >= mPrevBlocks.Length)
+                    mPrevBlockIndex = 0;
             }
+
+            // Get block from bitcoin
+            BitnetClient bc = new BitnetClient("http://127.0.0.1:8332");
+            bc.Credentials = new NetworkCredential("rpcuser", "rpcpass");
+            JObject obj = bc.GetWork();
+            Console.WriteLine("starting block: " + obj.ToString());
+            mBlock = new Block(obj);                  
         }
 
         void AssignWork(Client c)
         {
-            if (mDoingBlock)
+            if (mBlock != null)
             {
-                HashManager.HashBlock hashes = mHashMan.Allocate(c.mDesiredHashes, c);
-                if( hashes != null )
+                HashManager.HashBlock hashes = mBlock.mHashMan.Allocate(c.mDesiredHashes, c);
+                if (hashes != null)
                     c.SendWork(hashes, mBlock);
             }
         }
 
         public void WorkComplete(Client solver, bool solutionFound, uint solution)
         {
-            mHashMan.FinishBlock(solver.mHashBlock);
+            Block block = solver.mCurrentBlock;
+            block.mHashMan.FinishBlock(solver.mHashBlock);
             solver.mHashBlock = null;
 
             if (solutionFound)
             {
                 // Submit this solution to bitcoin
-                string data = mBlock.GetSolutionString(solution);
+                string data = block.GetSolutionString(solution);
                 Console.WriteLine("Trying solution: " + data);
                 BitnetClient bc = new BitnetClient("http://127.0.0.1:8332");
                 bc.Credentials = new NetworkCredential("rpcuser", "rpcpass");
                 bool success = bc.GetWork(data);
 
-                // Get a new block
-                mDoingBlock = false;
+                // Send email notification about this found solution
+                TimeSpan span = DateTime.Now - block.mHashMan.mStartTime;
+                string hashrate = string.Format("{0:N}", block.mHashMan.mHashesDone / span.TotalSeconds);
+                string body = "Found solution for block: \n" + block.ToString() + "\n\n";
+                body += "Solution string: " + data + "\n";
+                body += "Block Accepted: " + success.ToString() + "\n";
+                body += "Hashes Done: " + block.mHashMan.mHashesDone + "\n";
+                body += "Time Spent: " + span.ToString() + "\n";
+                body += "Hashrate: " + hashrate + "\n";
+                body += "Clients: " + mClients.Count + "\n";
+                body += "\n\n";
+                mMailer.SendEmail(body);
+
+                // Start a new block
                 BeginBlock();
             }
+        }
+
+        public uint GetHashesDone()
+        {
+            uint hashesDone = mBlock.mHashMan.mHashesDone;
+            foreach (Block b in mPrevBlocks)
+            {
+                if (b != null)
+                    hashesDone += b.mHashMan.mHashesDone;
+            }
+            return hashesDone;
         }
 
         void Update()
         {
             while (true)
             {
-                if (mDoingBlock)
+                if (mBlock.mHashMan.IsComplete() || mBlock.mHashMan.IsExpired())
                 {
-                    if (mHashMan.IsComplete())
-                    {
-                        mDoingBlock = false;
-                        BeginBlock();
-                    }
+                    // Start work on a new block
+                    BeginBlock();
                 }
 
                 mClientListMutex.WaitOne();
@@ -116,16 +140,13 @@ namespace CentralMine.NET
                     bool stillAlive = c.Update();
                     if (!stillAlive)
                     {
-                        mHashMan.FreeBlock(c.mHashBlock);
+                        c.mCurrentBlock.mHashMan.FreeBlock(c.mHashBlock);
                         mClients.Remove(c);
                         break;
                     }
 
                     if (c.mState == Client.State.Ready)
                         AssignWork(c);
-
-                    if (c.mState == Client.State.Busy && c.mCurrentBlock != mBlock)
-                        c.StopWork(); // Not doing the current block, stop
                 }
                 mClientListMutex.ReleaseMutex();
                 Thread.Sleep(50);

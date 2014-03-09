@@ -22,9 +22,11 @@ namespace CentralMine.NET
         public uint mHashesDone = 0;
         public uint mHashesTotal = 0xFFFFFFFF;
         public uint mHashrate = 0;
+
+        public DateTime mStartTime;
         
         public HashManager()
-        {
+        {            
             mFreeBlocks = new List<HashBlock>();
             mBusyBlocks = new List<HashBlock>();
             mDoneBlocks = new List<HashBlock>();
@@ -35,6 +37,8 @@ namespace CentralMine.NET
             block.Start = 0;
             block.Count = mHashesTotal;
             mFreeBlocks.Add(block);
+
+            mStartTime = DateTime.Now;
         }
 
         HashBlock FindFreeBlock(uint desiredSize)
@@ -123,6 +127,12 @@ namespace CentralMine.NET
         public bool IsComplete()
         {
             return mFreeBlocks.Count == 0 && mBusyBlocks.Count == 0;
+        }
+
+        public bool IsExpired()
+        {
+            TimeSpan span = DateTime.Now - mStartTime;
+            return (span.TotalSeconds > 30);
         }
     }
 }
