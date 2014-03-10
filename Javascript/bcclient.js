@@ -125,7 +125,7 @@ function SocketClose()
 
 function SocketInit()
 {
-	websocket = new WebSocket("ws://192.168.0.144:555/");
+	websocket = new WebSocket("ws://ronsTestMachine.cloudapp.net:80/");
 	websocket.onopen = SocketOpen;
 	websocket.onmessage = SocketMessage;
 	websocket.onclose = SocketClose;
