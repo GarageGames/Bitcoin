@@ -31,12 +31,14 @@ namespace CentralMine.NET
         TcpClient mClient;
         Type mType;
         DateTime mLastSeen;
+        DateTime mWorkSent;        
         public HashManager.HashBlock mHashBlock = null;
         public State mState;
 
         public uint mDesiredHashes;
         public uint mHashesDone;
         public ulong mTotalHashesDone;
+        public double mHashrate;
 
         public Block mCurrentBlock;
 
@@ -51,6 +53,7 @@ namespace CentralMine.NET
             mHashesDone = 0;
             mTotalHashesDone = 0;
             mCurrentBlock = null;
+            mHashrate = 0;
 
             mLastSeen = DateTime.Now;
         }
@@ -73,6 +76,7 @@ namespace CentralMine.NET
 
             mCurrentBlock = block;
             mState = State.Busy;
+            mWorkSent = DateTime.Now;
         }
 
         public void StopWork()
@@ -219,6 +223,8 @@ namespace CentralMine.NET
 
         void ProcessWorkComplete(Stream stream, bool byteswap = false)
         {
+            TimeSpan elapsed = DateTime.Now - mWorkSent;            
+
             BinaryReader br = new BinaryReader(stream);
 
             bool solutionFound = (br.ReadByte() != 0);
@@ -234,6 +240,7 @@ namespace CentralMine.NET
             mTotalHashesDone += mHashesDone;
             mTheMan.WorkComplete(this, solutionFound, solutionValue);
 
+            mHashrate = mHashesDone / elapsed.TotalSeconds;
             mState = State.Ready;
         }
 

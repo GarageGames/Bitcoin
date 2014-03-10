@@ -21,7 +21,7 @@ namespace CentralMine.NET
         Thread mUpdateThread;
         Email mMailer;
         
-        bool mDoingBlock;
+        public double mHashrate;
         int mPrevBlockIndex;
         public Block[] mPrevBlocks;
         public Block mBlock = null;
@@ -34,11 +34,11 @@ namespace CentralMine.NET
             mMailer = new Email();
             mClients = new List<Client>();
             mClientListMutex = new Mutex();
-            mListener = new Listener(555, this);
+            mListener = new Listener(80, this);
 
             mUpdateThread = new Thread(new ThreadStart(Update));
 
-            mDoingBlock = false;
+            mHashrate = 0;
             BeginBlock();
 
             mUpdateThread.Start();
@@ -128,6 +128,7 @@ namespace CentralMine.NET
         {
             while (true)
             {
+                mHashrate = 0;
                 if (mBlock.mHashMan.IsComplete() || mBlock.mHashMan.IsExpired())
                 {
                     // Start work on a new block
@@ -144,6 +145,8 @@ namespace CentralMine.NET
                         mClients.Remove(c);
                         break;
                     }
+
+                    mHashrate += c.mHashrate;
 
                     if (c.mState == Client.State.Ready)
                         AssignWork(c);

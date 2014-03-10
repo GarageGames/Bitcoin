@@ -13,15 +13,11 @@ namespace CentralMine.NET
     public partial class Form1 : Form
     {
         ClientManager mTheMan;
-        double mHashesDone = 0;
-        uint mPrevHashes = 0;
-        DateTime mStartTime;
 
         public Form1()
         {
             InitializeComponent();
-            
-            mStartTime = DateTime.Now;
+           
             mTheMan = new ClientManager();
         }
         
@@ -44,14 +40,7 @@ namespace CentralMine.NET
 
             lblProgress.Text = String.Format("{0:N0} / {1:N0} ({2}%)", mTheMan.mBlock.mHashMan.mHashesDone, mTheMan.mBlock.mHashMan.mHashesTotal, percent);
 
-            uint hashesDone = mTheMan.GetHashesDone();
-            uint hashesSinceLast = (hashesDone - mPrevHashes);
-            mHashesDone += hashesSinceLast;            
-            TimeSpan span = DateTime.Now - mStartTime;
-            double hashesPerSecond = mHashesDone / span.TotalSeconds;
-
-            mPrevHashes = hashesDone;
-
+            double hashesPerSecond = mTheMan.mHashrate;
             uint hashesRemaining = mTheMan.mBlock.mHashMan.mHashesTotal - mTheMan.mBlock.mHashMan.mHashesDone;
             double secondsRemaining = (double)hashesRemaining / hashesPerSecond;
 
@@ -62,11 +51,7 @@ namespace CentralMine.NET
 
             lblHashrate.Text = String.Format("Hashrate: {0:N} / second  Time Remaining: {1}:{2}:{3}", hashesPerSecond, hoursRemaining, minutesRemaining, (int)secondsRemaining);
 
-            if (span.TotalSeconds > 30)
-            {
-                mStartTime = DateTime.Now;
-                mHashesDone = 0;
-            }
+            
         }
     }
 }
