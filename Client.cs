@@ -157,7 +157,9 @@ namespace CentralMine.NET
                 if (stream.DataAvailable)
                 {
                     mLastSeen = DateTime.Now;
+                    Console.WriteLine("Read");
                     int command = stream.ReadByte();
+                    Console.WriteLine("Read: " + command);
                     switch (command)
                     {
                         case 1:
@@ -179,15 +181,17 @@ namespace CentralMine.NET
                             mClient.Close();
                             return false;
                         default:
-                            byte[] temp = new byte[4096];
+                            byte[] temp = new byte[16 * 1024];
                             int read = stream.Read(temp, 0, (int)temp.Length);
                             Console.WriteLine("Read unknown bytes(" + (read + 1) + ")");
+                            /*
                             Console.Write((char)command);
                             for (int i = 0; i < read; i++)
                             {
                                 Console.Write((char)temp[i]);
                             }
                             Console.WriteLine("");
+                            */
                             break;
                     }
                 }
@@ -252,7 +256,7 @@ namespace CentralMine.NET
             int read = stream.Read(temp, 1, (int)temp.Length - 1) + 1;
 
             int length = temp[1] & 127;
-            //Console.WriteLine("Websocket packet length: " + length);
+            Console.WriteLine(read + ": Websocket packet length: " + length);
 
             byte[] dataBytes = new byte[length];
             for (int i = 6, j = 0; i < read && j < length; i++, j++)
@@ -285,17 +289,15 @@ namespace CentralMine.NET
             StreamReader reader = new StreamReader(memstream);
 
             var headers = new Dictionary<string, string>();
-            string line;
-            while ((line = reader.ReadLine()) != string.Empty)
+            string line = reader.ReadLine();
+            while( !string.IsNullOrEmpty(line) )
             {
-                if (!string.IsNullOrEmpty(line))
+                var tokens = line.Split(new char[] { ':' }, 2);
+                if (!string.IsNullOrWhiteSpace(line) && tokens.Length > 1)
                 {
-                    var tokens = line.Split(new char[] { ':' }, 2);
-                    if (!string.IsNullOrWhiteSpace(line) && tokens.Length > 1)
-                    {
-                        headers[tokens[0]] = tokens[1].Trim();
-                    }
+                    headers[tokens[0]] = tokens[1].Trim();
                 }
+                line = reader.ReadLine();
             }
 
             String secWebSocketAccept = ComputeWebSocketHandshakeSecurityHash09(headers["Sec-WebSocket-Key"]);

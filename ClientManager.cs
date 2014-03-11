@@ -137,7 +137,6 @@ namespace CentralMine.NET
 
                 if (mClientListMutex.WaitOne(1))
                 {
-                    Console.WriteLine("Starting Client Update");
                     foreach (Client c in mClients)
                     {
                         bool stillAlive = c.Update();
@@ -148,14 +147,12 @@ namespace CentralMine.NET
                             mClients.Remove(c);
                             break;
                         }
-
                         mHashrate += c.mHashrate;
 
                         if (c.mState == Client.State.Ready)
                             AssignWork(c);
                     }
                     mClientListMutex.ReleaseMutex();
-                    Console.WriteLine("Done Client Update");
                     Thread.Sleep(50);
                 }
                 else
