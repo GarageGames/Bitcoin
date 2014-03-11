@@ -241,6 +241,7 @@ namespace CentralMine.NET
             mTheMan.WorkComplete(this, solutionFound, solutionValue);
 
             mHashrate = mHashesDone / elapsed.TotalSeconds;
+            //Console.WriteLine("Hashes: {0}  Time: {1}  Hashrate: {0:N}", mHashesDone, elapsed.TotalSeconds, mHashrate);
             mState = State.Ready;
         }
 
@@ -268,7 +269,7 @@ namespace CentralMine.NET
                     ProcessIdentity(str, true);
                     break;
                 case 2:
-                    ProcessWorkComplete(str);
+                    ProcessWorkComplete(str, true);
                     break;
                 case 5: // Ping
                     break;

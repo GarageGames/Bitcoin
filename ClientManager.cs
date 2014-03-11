@@ -135,24 +135,33 @@ namespace CentralMine.NET
                     BeginBlock();
                 }
 
-                mClientListMutex.WaitOne();
-                foreach (Client c in mClients)
+                if (mClientListMutex.WaitOne(1))
                 {
-                    bool stillAlive = c.Update();
-                    if (!stillAlive)
+                    Console.WriteLine("Starting Client Update");
+                    foreach (Client c in mClients)
                     {
-                        c.mCurrentBlock.mHashMan.FreeBlock(c.mHashBlock);
-                        mClients.Remove(c);
-                        break;
+                        bool stillAlive = c.Update();
+                        if (!stillAlive)
+                        {
+                            if (c.mCurrentBlock != null)
+                                c.mCurrentBlock.mHashMan.FreeBlock(c.mHashBlock);
+                            mClients.Remove(c);
+                            break;
+                        }
+
+                        mHashrate += c.mHashrate;
+
+                        if (c.mState == Client.State.Ready)
+                            AssignWork(c);
                     }
-
-                    mHashrate += c.mHashrate;
-
-                    if (c.mState == Client.State.Ready)
-                        AssignWork(c);
+                    mClientListMutex.ReleaseMutex();
+                    Console.WriteLine("Done Client Update");
+                    Thread.Sleep(50);
                 }
-                mClientListMutex.ReleaseMutex();
-                Thread.Sleep(50);
+                else
+                {
+                    Thread.Sleep(1);
+                }
             }
         }
     }
