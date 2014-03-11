@@ -94,6 +94,11 @@ namespace CentralMine.NET
                 BitnetClient bc = new BitnetClient("http://127.0.0.1:8332");
                 bc.Credentials = new NetworkCredential("rpcuser", "rpcpass");
                 bool success = bc.GetWork(data);
+                if (!success)
+                {
+                    data = block.GetSolutionString((uint)IPAddress.HostToNetworkOrder((int)solution));
+                    success = bc.GetWork(data);
+                }
 
                 // Send email notification about this found solution
                 TimeSpan span = DateTime.Now - block.mHashMan.mStartTime;
@@ -109,7 +114,8 @@ namespace CentralMine.NET
                 mMailer.SendEmail(body);
 
                 // Start a new block
-                BeginBlock();
+                if( success )
+                    BeginBlock();
             }
         }
 
