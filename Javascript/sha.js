@@ -361,7 +361,7 @@ function DoHashes(n, count, midstate, data, target)
 
 		if (state[7] == 0)
 		{
-			console.log("state: " + state[0] + ", " + state[1] + ", " + state[2] + ", " + state[3] + ", " + state[4] + ", " + state[5] + ", " + state[6] + ", " + state[7]);
+			//console.log("state: " + state[0] + ", " + state[1] + ", " + state[2] + ", " + state[3] + ", " + state[4] + ", " + state[5] + ", " + state[6] + ", " + state[7]);
 			for (var i = 6; i >= 0; i--)
 			{
 				var hashval = swap32(state[i]);
@@ -393,11 +393,11 @@ function TestHashes()
 
 	var end = new Date().getTime();
 	var hashesPerSecond = numHashes / ((end - start) / 1000);
-	console.log(numHashes + " hashes took " + (end - start) + " milliseconds");
-	console.log(hashesPerSecond + "hashes per second");
+	//console.log(numHashes + " hashes took " + (end - start) + " milliseconds");
+	//console.log(hashesPerSecond + "hashes per second");
 
 	var secondsTotal = 4294967296 / hashesPerSecond;
-	console.log(secondsTotal + " seconds for the entire hash space");
+	//console.log(secondsTotal + " seconds for the entire hash space");
 }
 
 function DoWork()
@@ -422,7 +422,7 @@ onmessage = function (event)
 		midstate = event.data.work[2];
 		data64 = event.data.work[3];
 		target = event.data.work[4];
-		console.log("DoWork: " + hashStart + ", " + hashCount);
+		//console.log("DoWork: " + hashStart + ", " + hashCount);
 		DoWork();
 		postMessage({ "done": [workResult, hashCount] });
 	}

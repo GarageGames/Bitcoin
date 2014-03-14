@@ -40,6 +40,10 @@ namespace CentralMine.NET
         public ulong mTotalHashesDone;
         public double mHashrate;
 
+        public string mAgent;
+        public string mPlatform;
+        public string mLocation;
+
         public Block mCurrentBlock;
 
         public Client(TcpClient tcp, ClientManager manager)
@@ -157,9 +161,7 @@ namespace CentralMine.NET
                 if (stream.DataAvailable)
                 {
                     mLastSeen = DateTime.Now;
-                    Console.WriteLine("Read");
                     int command = stream.ReadByte();
-                    Console.WriteLine("Read: " + command);
                     switch (command)
                     {
                         case 1:
@@ -205,9 +207,29 @@ namespace CentralMine.NET
             return true; // still alive
         }
 
+        string ReadStr(BinaryReader br)
+        {
+            string str = "";
+
+            while (br.BaseStream.Position < br.BaseStream.Length)
+            {
+                byte c = br.ReadByte();
+                if (c == 0)
+                    break;
+
+                str += (char)c;
+            }
+
+            return str;
+        }
+
         void ProcessIdentity(Stream stream, bool byteswap = false)
         {
-            BinaryReader br = new BinaryReader(stream);
+            byte[] buffer = new byte[8 * 1024];
+            int bytesRead = stream.Read(buffer, 0, buffer.Length);
+
+            MemoryStream mem = new MemoryStream(buffer);
+            BinaryReader br = new BinaryReader(mem);
 
             byte clientType = br.ReadByte();
             switch (clientType)
@@ -221,6 +243,10 @@ namespace CentralMine.NET
 
             if (byteswap)
                 mDesiredHashes = (uint)IPAddress.NetworkToHostOrder((int)mDesiredHashes);
+
+            mAgent = ReadStr(br);
+            mPlatform = ReadStr(br);
+            mLocation = ReadStr(br);
 
             mState = State.Ready;
         }
@@ -255,14 +281,28 @@ namespace CentralMine.NET
             temp[0] = 130;
             int read = stream.Read(temp, 1, (int)temp.Length - 1) + 1;
 
-            int length = temp[1] & 127;
+            int lengthBytes = 1;
+            long length = temp[1] & 127;
+            if (length == 126)
+            {
+                length = (temp[2] << 8);
+                length = length | temp[3];
+                lengthBytes += 2;
+            }
+            else if (length == 127)
+            {
+                length = (temp[2] << 56) | (temp[3] << 48) | (temp[4] << 40) | (temp[5] << 32) | (temp[6] << 24) | (temp[7] << 16) | (temp[8] << 8) | temp[9];
+                lengthBytes += 8;
+            }
+
             Console.WriteLine(read + ": Websocket packet length: " + length);
 
             byte[] dataBytes = new byte[length];
-            for (int i = 6, j = 0; i < read && j < length; i++, j++)
+            for (int i = 5 + lengthBytes, j = 0; i < read && j < length; i++, j++)
             {
                 int mask = j % 4;
-                dataBytes[j] = (byte)(temp[i] ^ temp[2 + mask]);
+                byte maskByte = temp[1 + lengthBytes + mask];
+                dataBytes[j] = (byte)(temp[i] ^ maskByte);
             }
 
             MemoryStream str = new MemoryStream(dataBytes);
@@ -328,6 +368,6 @@ namespace CentralMine.NET
             secWebSocketAccept = Convert.ToBase64String(sha1Hash);
 
             return secWebSocketAccept;
-        }        
+        }
     }
 }

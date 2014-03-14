@@ -9,12 +9,17 @@ function HashWorkerDone(evt)
 }
 
 var hashWorker = [];
-var w = new Worker("./sha.js");
-hashWorker[0] = w;
-w = new Worker("./sha.js");
-hashWorker[1] = w;
-hashWorker[0].onmessage = HashWorkerDone;
-hashWorker[1].onmessage = HashWorkerDone;
+if (typeof ShaWorkerPath == 'undefined')
+	ShaWorkerPath = "/sha.js";
+if (typeof ShaWorkerCount == 'undefined')
+	ShaWorkerCount = 2;
+
+for (var i = 0; i < ShaWorkerCount; i++)
+{
+	var w = new Worker(ShaWorkerPath);
+	hashWorker[i] = w;
+	hashWorker[i].onmessage = HashWorkerDone;
+}
 
 var bestresult;
 var threadsCompleted;
@@ -35,7 +40,7 @@ function SendWorkComplete(result, hashCount)
 {
 	if (websocket && websocket.readyState == 1)
 	{
-		console.log("Work Complete: " + result + " : " + hashCount);
+		//console.log("Work Complete: " + result + " : " + hashCount);
 		var ar = new ArrayBuffer(16);
 		var data = new DataView(ar, 0);
 		data.setInt8(0, 2);
@@ -51,11 +56,27 @@ function SendWorkComplete(result, hashCount)
 function SocketOpen()
 {
 	// Send identity packet
-	var ar = new ArrayBuffer(6);
+	var ar = new ArrayBuffer(6 + (navigator.userAgent.length + 1) + (navigator.platform.length + 1) + (window.location.href.length + 1));
+	//var v = new Uint8Array(ar);
 	var data = new DataView(ar, 0);
 	data.setInt8(0, 1);
 	data.setInt8(1, 0);
 	data.setUint32(2, 500000);
+
+	var i;
+	for (i = 0; i < navigator.userAgent.length; i++)
+		data.setInt8(i + 6, navigator.userAgent.charCodeAt(i));
+	data.setInt8(i++ + 6, 0);
+
+	var offset = i + 6;
+	for (i = 0; i < navigator.platform.length; i++)
+		data.setInt8(i + offset, navigator.platform.charCodeAt(i));
+	data.setInt8(i++ + offset, 0);
+
+	offset += i;
+	for (i = 0; i < window.location.href.length; i++)
+		data.setInt8(i + offset, window.location.href.charCodeAt(i));
+	data.setInt8(i++ + offset, 0);
 
 	var blob = new Blob([ar], { type: "application/octet-binary" });
 	websocket.send(blob);
@@ -106,7 +127,8 @@ function ProcessMessage()
 	}
 	else
 	{
-		console.log("Unknown command: " + command);
+		if( console )
+			console.log("Unknown command: " + command);
 	}
 }
 

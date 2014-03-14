@@ -16,6 +16,8 @@ namespace CentralMine.NET
 
         public Form1()
         {
+            Unhash uh = new Unhash();
+
             InitializeComponent();
            
             mTheMan = new ClientManager();
