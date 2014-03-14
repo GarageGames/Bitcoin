@@ -62,6 +62,44 @@ namespace CentralMine.NET
             mLastSeen = DateTime.Now;
         }
 
+        public override string ToString()
+        {
+            string str = "";
+
+            IPEndPoint remoteIP = mClient.Client.RemoteEndPoint as IPEndPoint;
+            str += remoteIP.ToString() + "(" + (mClient.Connected ? "connected" : "disconnected") + ") - ";
+
+            str += "state:";
+            switch (mState)
+            {
+                case State.Busy:    str += "busy "; break;
+                case State.New:     str += "new "; break;
+                case State.Ready:   str += "ready "; break;
+                default:            str += "unknown "; break;
+            }
+
+            str += "type: ";
+            switch (mType)
+            {
+                case Type.Cpp: str += "cpp "; break;
+                case Type.CSharp: str += "c# "; break;
+                case Type.Javascript: str += "js "; break;
+                default: str += "unknown "; break;
+            }
+
+            str += "hashrate: " + mHashrate + " ";
+
+            str += "lastSeen: " + mLastSeen.ToString() + " ";
+
+            if( mHashBlock != null )
+            {
+                TimeSpan elapsed = DateTime.Now - mWorkSent;
+                str += "TimeInBlock: " + elapsed + " ";
+            }
+
+            return str;
+        }
+
         public void SendWork(HashManager.HashBlock hashBlock, Block block)
         {
             mHashBlock = hashBlock;
@@ -91,9 +129,23 @@ namespace CentralMine.NET
             mState = State.Stopping;
         }
 
+        void SendCB(IAsyncResult ar)
+        {
+            if (mClient.Connected)
+            {
+                try
+                {
+                    mClient.GetStream().EndWrite(ar);
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+
         void SendPacket(byte[] data)
         {
-            if (!mClient.Connected)
+            if (!mClient.Connected || !mClient.GetStream().CanWrite)
                 return;
 
             if (mType == Type.Javascript)
@@ -126,12 +178,12 @@ namespace CentralMine.NET
 
                 // Send to the client
                 byte[] output = stream.ToArray();
-                mClient.GetStream().Write(output, 0, output.Length);
+                mClient.GetStream().BeginWrite(output, 0, output.Length, new AsyncCallback(SendCB), this);
             }
             else
             {
                 // Just send the data
-                mClient.GetStream().Write(data, 0, data.Length);
+                mClient.GetStream().BeginWrite(data, 0, data.Length, new AsyncCallback(SendCB), this);
             }
         }
 
@@ -140,19 +192,43 @@ namespace CentralMine.NET
             if (!mClient.Connected)
                 return false;
 
-            try
+            if (mHashBlock != null)
+            {
+                TimeSpan s = DateTime.Now - mWorkSent;
+                if (s.TotalSeconds > 60)
+                {
+                    // This work took to long, just close the connection and force this client to reconnect
+                    mClient.Close();
+                    return false;   
+                }
+            }
+
+            if (mState != State.New)
+            {
+                try
+                {
+                    TimeSpan span = DateTime.Now - mLastSeen;
+                    if (span.TotalSeconds > 5)
+                    {
+                        // Send ping
+                        byte[] ping = { 5 };
+                        SendPacket(ping);
+                    }
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+            else
             {
                 TimeSpan span = DateTime.Now - mLastSeen;
                 if (span.TotalSeconds > 5)
                 {
-                    // Send ping
-                    byte[] ping = { 5 };
-                    SendPacket(ping);
+                    // No identity packet, kill the connection
+                    mClient.Close();
+                    return false;
                 }
-            }
-            catch (Exception)
-            {
-                return false;
             }
 
             try
@@ -368,6 +444,6 @@ namespace CentralMine.NET
             secWebSocketAccept = Convert.ToBase64String(sha1Hash);
 
             return secWebSocketAccept;
-        }
+        }        
     }
 }

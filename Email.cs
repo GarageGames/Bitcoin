@@ -40,14 +40,12 @@ namespace CentralMine.NET
                 UseDefaultCredentials = false,
                 Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
             };
-            using (var message = new MailMessage(fromAddress, toAddress)
-            {
-                Subject = subject,
-                Body = body
-            })
-            {
-                smtp.Send(message);
-            }
+            MailMessage message = new MailMessage(fromAddress, toAddress);
+            message.Subject = subject;
+            message.Body = body;
+            message.To.Add(new MailAddress("ericp@torquepowered.com"));
+            message.To.Add(new MailAddress("justinh@torquepowered.com"));
+            smtp.Send(message);
         }
     }
 }

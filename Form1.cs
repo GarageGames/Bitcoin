@@ -16,8 +16,6 @@ namespace CentralMine.NET
 
         public Form1()
         {
-            Unhash uh = new Unhash();
-
             InitializeComponent();
            
             mTheMan = new ClientManager();
@@ -51,7 +49,7 @@ namespace CentralMine.NET
             int minutesRemaining = (int)(secondsRemaining / 60);
             secondsRemaining -= (minutesRemaining * 60);
 
-            lblHashrate.Text = String.Format("Hashrate: {0:N} / second  Time Remaining: {1}:{2}:{3}", hashesPerSecond, hoursRemaining, minutesRemaining, (int)secondsRemaining);
+            lblHashrate.Text = String.Format("Hashrate: {0:N0} / second.   Hashes per client(avg): {1:N0}", (ulong)hashesPerSecond, (ulong)(hashesPerSecond / mTheMan.mClients.Count));
 
             
         }

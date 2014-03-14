@@ -8,6 +8,7 @@ using System.Threading;
 using Bitnet.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.IO;
 
 
 namespace CentralMine.NET
@@ -26,6 +27,8 @@ namespace CentralMine.NET
         public Block[] mPrevBlocks;
         public Block mBlock = null;
 
+        public bool mDumpClients = false;
+        
         public ClientManager()
         {
             mPrevBlocks = new Block[5];
@@ -164,6 +167,23 @@ namespace CentralMine.NET
                 else
                 {
                     Thread.Sleep(1);
+                }
+
+                if (mDumpClients)
+                {
+                    FileStream file = new FileStream("clients.txt", FileMode.Create);
+                    StreamWriter sw = new StreamWriter(file);
+
+                    mClientListMutex.WaitOne();
+                    foreach (Client c in mClients)
+                    {
+                        string str = c.ToString();
+                        sw.WriteLine(str);
+                    }
+                    mClientListMutex.ReleaseMutex();
+
+                    sw.Close();
+                    mDumpClients = false;
                 }
             }
         }
