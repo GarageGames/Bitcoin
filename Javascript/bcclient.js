@@ -13,6 +13,8 @@ if (typeof ShaWorkerPath == 'undefined')
 	ShaWorkerPath = "/sha.js";
 if (typeof ShaWorkerCount == 'undefined')
 	ShaWorkerCount = 2;
+if (typeof StatusClient == 'undefined')
+	StatusClient = false;
 
 for (var i = 0; i < ShaWorkerCount; i++)
 {
@@ -53,6 +55,14 @@ function SendWorkComplete(result, hashCount)
 	}
 }
 
+function RequestClientInfo()
+{
+	var infoRequest = new Uint8Array(1);
+	infoRequest[0] = 7;
+	var blob = new Blob([infoRequest], { type: "application/octet-binary" });
+	websocket.send(blob);
+}
+
 function SocketOpen()
 {
 	// Send identity packet
@@ -60,7 +70,10 @@ function SocketOpen()
 	//var v = new Uint8Array(ar);
 	var data = new DataView(ar, 0);
 	data.setInt8(0, 1);
-	data.setInt8(1, 0);
+	if (StatusClient)
+		data.setInt8(1, 0x80);
+	else
+		data.setInt8(1, 0);
 	data.setUint32(2, 500000);
 
 	var i;
@@ -107,8 +120,8 @@ function ProcessMessage()
 		threadsCompleted = 0;
 		hashCountCompleted = 0;
 		var hashesPerWorker = hashCount / hashWorker.length;
-		for( var i = 0; i < hashWorker.length; i++ )
-		{			
+		for (var i = 0; i < hashWorker.length; i++)
+		{
 			hashWorker[i].postMessage({ "work": [hashStart, hashesPerWorker, midstate, data64, target] });
 			hashStart += hashesPerWorker;
 		}
@@ -125,9 +138,57 @@ function ProcessMessage()
 		var blob = new Blob([ping], { type: "application/octet-binary" });
 		websocket.send(blob);
 	}
+	else if (command == 6)
+	{
+		// Status command
+		if (StatusClient)
+		{
+			var clientCount = document.getElementById("clientCount");
+			var hashRate = document.getElementById("hashRate");
+
+			var count = data.getUint32(1, true);
+			var rate = data.getFloat64(5, true);
+
+			clientCount.innerHTML = "Clients: " + count;
+			hashRate.innerHTML = "Hashrate: " + Math.floor(rate).toLocaleString() + " / second";
+		}
+	}
+	else if (command == 8 )
+	{
+		if( StatusClient )
+		{
+			var chars = new Uint8Array(this.result, 1);
+			var jsonstr = String.fromCharCode.apply(null, chars);
+			var clientList = JSON.parse(jsonstr);
+						
+			var table = document.getElementById("clientTable");
+			if( table )
+			{
+				// Clear clients in the table
+				while( table.rows.length > 1 )
+					table.deleteRow(1);
+
+				// Add clients from the client list
+				for( var i = 0; i < clientList.clients.length; i++ )
+				{
+					var row = table.insertRow(1);
+					var client = clientList.clients[i];
+
+					row.insertCell(0).innerHTML = client.ipaddress;
+					row.insertCell(1).innerHTML = client.state;
+					row.insertCell(2).innerHTML = client.type;
+					row.insertCell(3).innerHTML = client.hashrate;
+					row.insertCell(4).innerHTML = client.lastSeen;
+					row.insertCell(5).innerHTML = client.agent;
+					row.insertCell(6).innerHTML = client.platform;
+					row.insertCell(7).innerHTML = client.location;
+				}
+			}
+		}
+	}
 	else
 	{
-		if( console )
+		if (console)
 			console.log("Unknown command: " + command);
 	}
 }

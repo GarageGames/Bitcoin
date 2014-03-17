@@ -18,6 +18,7 @@ namespace CentralMine.NET
         Listener mListener;
         public List<Client> mClients;
         Mutex mClientListMutex;
+        ulong mClientID;
 
         Thread mUpdateThread;
         Email mMailer;
@@ -31,13 +32,15 @@ namespace CentralMine.NET
         
         public ClientManager()
         {
+            mClientID = 0;
+
             mPrevBlocks = new Block[5];
             mPrevBlockIndex = 0;
 
             mMailer = new Email();
             mClients = new List<Client>();
             mClientListMutex = new Mutex();
-            mListener = new Listener(80, this);
+            mListener = new Listener(8555, this);
 
             mUpdateThread = new Thread(new ThreadStart(Update));
 
@@ -49,7 +52,7 @@ namespace CentralMine.NET
 
         public void AcceptClient(TcpClient client)
         {
-            Client c = new Client(client, this);
+            Client c = new Client(client, this, mClientID++);
             mClientListMutex.WaitOne();
             mClients.Add(c);
             mClientListMutex.ReleaseMutex();
@@ -137,6 +140,7 @@ namespace CentralMine.NET
         {
             while (true)
             {
+                double oldHashrate = mHashrate;                
                 mHashrate = 0;
                 if (mBlock.mHashMan.IsComplete() || mBlock.mHashMan.IsExpired())
                 {
@@ -144,8 +148,11 @@ namespace CentralMine.NET
                     BeginBlock();
                 }
 
+                Client clientThatWantsInfo = null;
+
                 if (mClientListMutex.WaitOne(1))
                 {
+                    int clientsOnline = mClients.Count;
                     foreach (Client c in mClients)
                     {
                         bool stillAlive = c.Update();
@@ -160,7 +167,29 @@ namespace CentralMine.NET
 
                         if (c.mState == Client.State.Ready)
                             AssignWork(c);
+
+                        if (c.mStatusClient)
+                            c.SendStatus(clientsOnline, oldHashrate);
+
+                        if (c.mClientInfoRequested && clientThatWantsInfo == null)
+                        {
+                            clientThatWantsInfo = c;
+                            c.mClientInfoRequested = false;
+                        }
                     }
+
+                    if (clientThatWantsInfo != null)
+                    {
+                        string info = "{\"clients\":[";
+                        foreach (Client c in mClients)
+                        {
+                            info += c.ToJSON() + ",";
+                        }
+                        info = info.Substring(0, info.Length - 1);
+                        info += "]}";
+                        clientThatWantsInfo.SendClientInfo(info);
+                    }
+
                     mClientListMutex.ReleaseMutex();
                     Thread.Sleep(50);
                 }

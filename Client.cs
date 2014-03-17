@@ -43,16 +43,20 @@ namespace CentralMine.NET
         public string mAgent;
         public string mPlatform;
         public string mLocation;
+        public ulong mID;
+        public bool mStatusClient;
+        public bool mClientInfoRequested = false;
 
         public Block mCurrentBlock;
 
-        public Client(TcpClient tcp, ClientManager manager)
+        public Client(TcpClient tcp, ClientManager manager, ulong id)
         {
             mTheMan = manager;
             mClient = tcp;
             mClient.NoDelay = true;
             mState = State.New;
             mType = Type.Unknown;
+            mID = id;
 
             mHashesDone = 0;
             mTotalHashesDone = 0;
@@ -100,6 +104,25 @@ namespace CentralMine.NET
             return str;
         }
 
+        public string ToJSON()
+        {
+            string json = "{";
+
+            IPEndPoint remoteIP = mClient.Client.RemoteEndPoint as IPEndPoint;
+            json += "\"ipaddress\": \"" + remoteIP.ToString() + "\",";
+
+            json += "\"state\": \"" + mState.ToString() +  "\",";
+            json += "\"type\": \"" + mType.ToString() + "\",";
+            json += "\"hashrate\": \"" + mHashrate + "\",";
+            json += "\"lastSeen\": \"" + mLastSeen.ToString() + "\",";
+            json += "\"agent\": \"" + mAgent + "\",";
+            json += "\"platform\": \"" + mPlatform + "\",";
+            json += "\"location\": \"" + mLocation + "\"";
+
+            json += "}";
+            return json;
+        }
+
         public void SendWork(HashManager.HashBlock hashBlock, Block block)
         {
             mHashBlock = hashBlock;
@@ -127,6 +150,27 @@ namespace CentralMine.NET
             data[1] = 4;
             SendPacket(data);
             mState = State.Stopping;
+        }
+
+        public void SendStatus(int clients, double hashrate)
+        {
+            MemoryStream stream = new MemoryStream();
+            BinaryWriter bw = new BinaryWriter(stream);
+            bw.Write((byte)6);
+            bw.Write(clients);
+            bw.Write(hashrate);
+            SendPacket(stream.ToArray());
+            bw.Close();
+        }
+
+        public void SendClientInfo(string info)
+        {
+            MemoryStream stream = new MemoryStream();
+            BinaryWriter bw = new BinaryWriter(stream);
+            bw.Write((byte)8);
+            bw.Write(System.Text.Encoding.ASCII.GetBytes(info));
+            SendPacket(stream.ToArray());
+            bw.Close();
         }
 
         void SendCB(IAsyncResult ar)
@@ -248,6 +292,9 @@ namespace CentralMine.NET
                             break;
                         case 5: // Ping
                             break;
+                        case 7:
+                            mClientInfoRequested = true;
+                            break;
                         case 71:
                             ProcessWebsocketConnect(stream);
                             break;
@@ -308,6 +355,8 @@ namespace CentralMine.NET
             BinaryReader br = new BinaryReader(mem);
 
             byte clientType = br.ReadByte();
+            mStatusClient = ((clientType & 0x80) == 0x80);
+            clientType &= 0x7F;
             switch (clientType)
             {
                 case 0: mType = Type.Javascript; break;
@@ -392,6 +441,9 @@ namespace CentralMine.NET
                     ProcessWorkComplete(str, true);
                     break;
                 case 5: // Ping
+                    break;
+                case 7:
+                    mClientInfoRequested = true;
                     break;
             }
         }
