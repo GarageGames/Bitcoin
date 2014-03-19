@@ -192,42 +192,50 @@ namespace CentralMine.NET
             if (!mClient.Connected || !mClient.GetStream().CanWrite)
                 return;
 
-            if (mType == Type.Javascript)
+            try
             {
-                // Encode the data for websocket
-                MemoryStream stream = new MemoryStream();
-                BinaryWriter bw = new BinaryWriter(stream);
+                if (mType == Type.Javascript)
+                {
+                    // Encode the data for websocket
+                    MemoryStream stream = new MemoryStream();
+                    BinaryWriter bw = new BinaryWriter(stream);
 
-                // Write the data type
-                bw.Write((byte)130);
-                
-                // Write the length
-                if (data.Length <= 125)
-                {
-                    bw.Write((byte)data.Length);
-                }
-                else if (data.Length >= 126 && data.Length <= 65535)
-                {
-                    bw.Write((byte)126);
-                    bw.Write((ushort)IPAddress.NetworkToHostOrder((short)data.Length));
+                    // Write the data type
+                    bw.Write((byte)130);
+
+                    // Write the length
+                    if (data.Length <= 125)
+                    {
+                        bw.Write((byte)data.Length);
+                    }
+                    else if (data.Length >= 126 && data.Length <= 65535)
+                    {
+                        bw.Write((byte)126);
+                        bw.Write((ushort)IPAddress.NetworkToHostOrder((short)data.Length));
+                    }
+                    else
+                    {
+                        bw.Write((byte)127);
+                        bw.Write((ulong)IPAddress.NetworkToHostOrder(data.LongLength));
+                    }
+
+                    // Write the data
+                    bw.Write(data);
+
+                    // Send to the client
+                    byte[] output = stream.ToArray();
+                    mClient.GetStream().BeginWrite(output, 0, output.Length, new AsyncCallback(SendCB), this);
                 }
                 else
                 {
-                    bw.Write((byte)127);
-                    bw.Write((ulong)IPAddress.NetworkToHostOrder(data.LongLength));
+                    // Just send the data
+                    mClient.GetStream().BeginWrite(data, 0, data.Length, new AsyncCallback(SendCB), this);
                 }
-
-                // Write the data
-                bw.Write(data);
-
-                // Send to the client
-                byte[] output = stream.ToArray();
-                mClient.GetStream().BeginWrite(output, 0, output.Length, new AsyncCallback(SendCB), this);
             }
-            else
+            catch (Exception e)
             {
-                // Just send the data
-                mClient.GetStream().BeginWrite(data, 0, data.Length, new AsyncCallback(SendCB), this);
+                Console.WriteLine(e.Message);
+                mClient.Close();
             }
         }
 
@@ -420,7 +428,7 @@ namespace CentralMine.NET
                 lengthBytes += 8;
             }
 
-            Console.WriteLine(read + ": Websocket packet length: " + length);
+            //Console.WriteLine(read + ": Websocket packet length: " + length);
 
             byte[] dataBytes = new byte[length];
             for (int i = 5 + lengthBytes, j = 0; i < read && j < length; i++, j++)

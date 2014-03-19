@@ -15,6 +15,8 @@ namespace CentralMine.NET
 {
     public class ClientManager
     {
+        Dictionary<uint, bool> mBlacklist;
+
         Listener mListener;
         public List<Client> mClients;
         Mutex mClientListMutex;
@@ -32,6 +34,10 @@ namespace CentralMine.NET
         
         public ClientManager()
         {
+            mBlacklist = new Dictionary<uint, bool>();
+            mBlacklist[0xC425E50F] = true;
+
+
             mClientID = 0;
 
             mPrevBlocks = new Block[5];
@@ -40,7 +46,7 @@ namespace CentralMine.NET
             mMailer = new Email();
             mClients = new List<Client>();
             mClientListMutex = new Mutex();
-            mListener = new Listener(8555, this);
+            mListener = new Listener(80, this);
 
             mUpdateThread = new Thread(new ThreadStart(Update));
 
@@ -52,10 +58,16 @@ namespace CentralMine.NET
 
         public void AcceptClient(TcpClient client)
         {
-            Client c = new Client(client, this, mClientID++);
-            mClientListMutex.WaitOne();
-            mClients.Add(c);
-            mClientListMutex.ReleaseMutex();
+            IPEndPoint ep = client.Client.RemoteEndPoint as IPEndPoint;
+            byte[] bytes = ep.Address.GetAddressBytes();
+            uint addr = (uint)(bytes[0] << 24) | (uint)(bytes[1] << 16) | (uint)(bytes[2] << 8) | bytes[3];
+            if (!mBlacklist.ContainsKey(addr))
+            {
+                Client c = new Client(client, this, mClientID++);
+                mClientListMutex.WaitOne();
+                mClients.Add(c);
+                mClientListMutex.ReleaseMutex();
+            }
         }
 
         void BeginBlock()
