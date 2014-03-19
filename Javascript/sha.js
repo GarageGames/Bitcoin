@@ -402,12 +402,12 @@ function TestHashes()
 
 function DoWork()
 {
-	var start = new Date().getTime();
+	//var start = new Date().getTime();
 
 	workResult = DoHashes(hashStart, hashCount, midstate, data64, target);
 
-	var end = new Date().getTime();
-	var hashesPerSecond = hashCount / ((end - start) / 1000);
+	//var end = new Date().getTime();
+	//var hashesPerSecond = hashCount / ((end - start) / 1000);
 	//console.log(hashCount + " hashes took " + (end - start) + " milliseconds");
 	//console.log(hashesPerSecond + "hashes per second");
 

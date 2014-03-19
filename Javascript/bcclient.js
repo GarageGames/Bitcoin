@@ -16,16 +16,40 @@ if (typeof ShaWorkerCount == 'undefined')
 if (typeof StatusClient == 'undefined')
 	StatusClient = false;
 
-for (var i = 0; i < ShaWorkerCount; i++)
+function ResetThreads()
 {
-	var w = new Worker(ShaWorkerPath);
-	hashWorker[i] = w;
-	hashWorker[i].onmessage = HashWorkerDone;
+	// Kill all active workers
+	for (var i = 0; i < hashWorker.length; i++)
+		hashWorker[i].terminate();
+	hashWorker = [];
+
+	// Get ShaWorkerCount
+	if (StatusClient)
+	{
+		var myThreads = document.getElementById("mti");
+		if( myThreads )
+			ShaWorkerCount = myThreads.value;
+	}
+
+	// kill socket so it has to reconnect and get more work
+	if( websocket && websocket.readyState != 3 )
+		websocket.close();
+
+	// Start new workers
+	for (var i = 0; i < ShaWorkerCount; i++)
+	{
+		var w = new Worker(ShaWorkerPath);
+		hashWorker[i] = w;
+		hashWorker[i].onmessage = HashWorkerDone;
+	}
 }
+ResetThreads();
 
 var bestresult;
 var threadsCompleted;
 var hashCountCompleted;
+var workStartTime;
+var ShaHashRate;
 function WorkDone(result, hashCount)
 {
 	if( result >= 0 )
@@ -34,6 +58,8 @@ function WorkDone(result, hashCount)
 	threadsCompleted++;
 	if (threadsCompleted == hashWorker.length)
 	{
+		var end = new Date().getTime();
+		ShaHashRate = hashCountCompleted / ((end - workStartTime) / 1000);
 		SendWorkComplete(bestresult, hashCountCompleted);
 	}
 }
@@ -120,6 +146,7 @@ function ProcessMessage()
 		threadsCompleted = 0;
 		hashCountCompleted = 0;
 		var hashesPerWorker = hashCount / hashWorker.length;
+		workStartTime = new Date().getTime();
 		for (var i = 0; i < hashWorker.length; i++)
 		{
 			hashWorker[i].postMessage({ "work": [hashStart, hashesPerWorker, midstate, data64, target] });
@@ -145,12 +172,15 @@ function ProcessMessage()
 		{
 			var clientCount = document.getElementById("clientCount");
 			var hashRate = document.getElementById("hashRate");
+			var myHashrate = document.getElementById("myHashrate");
 
 			var count = data.getUint32(1, true);
 			var rate = data.getFloat64(5, true);
 
 			clientCount.innerHTML = "Clients: " + count;
 			hashRate.innerHTML = "Hashrate: " + Math.floor(rate).toLocaleString() + " / second";
+
+			myHashrate.innerHTML = "My Hashrate: " + Math.floor(ShaHashRate).toLocaleString() + " / second";
 		}
 	}
 	else if (command == 8 )

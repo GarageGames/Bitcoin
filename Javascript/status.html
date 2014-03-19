@@ -49,8 +49,8 @@
         <script type="application/javascript" src="jquery.tablesorter.js"></script>
         
         <script type="application/javascript">
-            var ShaWorkerPath = "/bc/sha.js";
-            var ShaWorkerCount = 4;
+            var ShaWorkerPath = "/sha.js";
+            var ShaWorkerCount = 2;
             var StatusClient = true;
         </script>
         <script type="application/javascript" src= "./bcclient.js"></script>
@@ -62,6 +62,11 @@
     <body>
         <div id="clientCount">Clients:</div>
         <div id="hashRate">Hashrate:</div>
+        <br />
+        <br />
+        <div id="myThreads">My Threads: <input id="mti" value="2"/></div>
+        <div id="myHashrate">My Hashrate:</div>
+        <button onclick=ResetThreads()>Reset</button>
         <br />
         <br />
         <button onclick=RequestClientInfo()>Get Client Info</button>
@@ -78,35 +83,7 @@
                     <th>Location</th>
                 </tr> 
             </thead> 
-            <tbody> 
-                <tr> 
-                    <td>Smith</td> 
-                    <td>John</td> 
-                    <td>jsmith@gmail.com</td> 
-                    <td>$50.00</td> 
-                    <td>http://www.jsmith.com</td> 
-                </tr> 
-                <tr> 
-                    <td>Bach</td> 
-                    <td>Frank</td> 
-                    <td>fbach@yahoo.com</td> 
-                    <td>$50.00</td> 
-                    <td>http://www.frank.com</td> 
-                </tr> 
-                <tr> 
-                    <td>Doe</td> 
-                    <td>Jason</td> 
-                    <td>jdoe@hotmail.com</td> 
-                    <td>$100.00</td> 
-                    <td>http://www.jdoe.com</td> 
-                </tr> 
-                <tr> 
-                    <td>Conway</td> 
-                    <td>Tim</td> 
-                    <td>tconway@earthlink.net</td> 
-                    <td>$50.00</td> 
-                    <td>http://www.timconway.com</td> 
-                </tr> 
+            <tbody>                 
             </tbody> 
         </table> 
     </body>
