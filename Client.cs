@@ -25,6 +25,7 @@ namespace CentralMine.NET
             Ready,
             Busy,
             Stopping,
+            Old,
         };
 
         ClientManager mTheMan;
@@ -134,7 +135,12 @@ namespace CentralMine.NET
             bw.Write(block.midstate);
             bw.Write(block.data64);
             bw.Write(block.target);
-            bw.Write((int)block.mCurrency);
+
+            if (mVersion > 0)
+            {
+                bw.Write((int)block.mCurrency);
+                bw.Write(block.data);
+            }
 
             SendPacket(stream.ToArray());
             bw.Close();
@@ -365,7 +371,7 @@ namespace CentralMine.NET
             byte clientType = 0;
             mVersion = br.ReadByte();
             if( mVersion > 0 )
-                clientType = br.ReadByte();
+                clientType = br.ReadByte();                
             mStatusClient = ((clientType & 0x80) == 0x80);
             clientType &= 0x7F;
             switch (clientType)
@@ -384,7 +390,10 @@ namespace CentralMine.NET
             mPlatform = ReadStr(br);
             mLocation = ReadStr(br);
 
-            mState = State.Ready;
+            if (mVersion == 1)
+                mState = State.Ready;
+            else
+                mState = State.Old;
         }
 
         void ProcessWorkComplete(Stream stream, bool byteswap = false)

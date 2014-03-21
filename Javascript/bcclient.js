@@ -68,7 +68,7 @@ function SendWorkComplete(result, hashCount)
 {
 	if (websocket && websocket.readyState == 1)
 	{
-		//console.log("Work Complete: " + result + " : " + hashCount);
+		console.log("Work Complete: " + result + " : " + hashCount);
 		var ar = new ArrayBuffer(16);
 		var data = new DataView(ar, 0);
 		data.setInt8(0, 2);
@@ -92,22 +92,23 @@ function RequestClientInfo()
 function SocketOpen()
 {
 	// Send identity packet
-	var ar = new ArrayBuffer(6 + (navigator.userAgent.length + 1) + (navigator.platform.length + 1) + (window.location.href.length + 1));
+	var ar = new ArrayBuffer(7 + (navigator.userAgent.length + 1) + (navigator.platform.length + 1) + (window.location.href.length + 1));
 	//var v = new Uint8Array(ar);
 	var data = new DataView(ar, 0);
 	data.setInt8(0, 1);
+	data.setInt8(1, 1);	// ver1
 	if (StatusClient)
-		data.setInt8(1, 0x80);
+		data.setInt8(2, 0x80);
 	else
-		data.setInt8(1, 0);
-	data.setUint32(2, 500000);
+		data.setInt8(2, 0);
+	data.setUint32(3, 500);
 
 	var i;
 	for (i = 0; i < navigator.userAgent.length; i++)
-		data.setInt8(i + 6, navigator.userAgent.charCodeAt(i));
-	data.setInt8(i++ + 6, 0);
+		data.setInt8(i + 7, navigator.userAgent.charCodeAt(i));
+	data.setInt8(i++ + 7, 0);
 
-	var offset = i + 6;
+	var offset = i + 7;
 	for (i = 0; i < navigator.platform.length; i++)
 		data.setInt8(i + offset, navigator.platform.charCodeAt(i));
 	data.setInt8(i++ + offset, 0);
@@ -134,6 +135,7 @@ function ProcessMessage()
 		var midstate = new Uint32Array(8);
 		var data64 = new Uint32Array(16);
 		var target = new Uint32Array(8);
+		var dataFull = new Uint32Array(32);
 
 		for (var i = 0; i < 8; i++)
 			midstate[i] = data.getUint32(9 + (i * 4), true);
@@ -142,6 +144,13 @@ function ProcessMessage()
 		for (var i = 0; i < 8; i++)
 			target[i] = data.getUint32(105 + (i * 4), true);
 
+		var currency = data.getUint32(137, true);
+		for( var i = 0; i < 32; i++ )
+			dataFull[i] = data.getUint32(141 + (i * 4), true);
+
+		//var result = DoScrypt(hashStart, 1, dataFull, data64, target);
+		console.log("Starting work: " + hashStart + " - " + (hashStart + hashCount));
+
 		bestresult = -1;
 		threadsCompleted = 0;
 		hashCountCompleted = 0;
@@ -149,7 +158,7 @@ function ProcessMessage()
 		workStartTime = new Date().getTime();
 		for (var i = 0; i < hashWorker.length; i++)
 		{
-			hashWorker[i].postMessage({ "work": [hashStart, hashesPerWorker, midstate, data64, target] });
+			hashWorker[i].postMessage({ "work": [hashStart, hashesPerWorker, midstate, data64, target, dataFull, currency] });
 			hashStart += hashesPerWorker;
 		}
 	}

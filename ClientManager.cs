@@ -28,7 +28,6 @@ namespace CentralMine.NET
         Listener mListener;
         public List<Client> mClients;
         Mutex mClientListMutex;
-        ulong mClientID;
 
         Thread mUpdateThread;
         Email mMailer;
@@ -52,15 +51,13 @@ namespace CentralMine.NET
             mCurrencyProviders[Currency.Feathercoin] = "http://127.0.0.1:9667";
             mCurrencyProviders[Currency.Novacoin] = "http://127.0.0.1:7332";
 
-            mClientID = 0;
-
             mPrevBlocks = new Block[5];
             mPrevBlockIndex = 0;
 
             mMailer = new Email();
             mClients = new List<Client>();
             mClientListMutex = new Mutex();
-            mListener = new Listener(805, this);
+            mListener = new Listener(80, this);
 
             mUpdateThread = new Thread(new ThreadStart(Update));
 
@@ -85,7 +82,7 @@ namespace CentralMine.NET
             uint addr = (uint)(bytes[0] << 24) | (uint)(bytes[1] << 16) | (uint)(bytes[2] << 8) | bytes[3];
             if (!mBlacklist.ContainsKey(addr))
             {
-                Client c = new Client(client, this, mClientID++);
+                Client c = new Client(client, this);
                 mClientListMutex.WaitOne();
                 mClients.Add(c);
                 mClientListMutex.ReleaseMutex();

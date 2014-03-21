@@ -34,6 +34,9 @@ namespace CentralMine.NET
             //strData = "000000010000000000000000000000000000000000000000000000000000000000000000fdeda33bb2127b7a3e2cc77a618f7667c31bc87f32518a88aab89f3a4a5e1e4b495fab291d00ffff7c2bac1d000000800000000000000000000000000000000000000000000000000000000000000000000000000000000080020000";
             //strTarget = "0000000000000000000000000000000000000000000000000000ffff00000000";
             // 2,083,236,893
+                      
+            //strData = "000000022a34cf18f3e954a376d84bfb9665b4f9602e7fc0a90a934b9aa31b1abf7b9d63ade27f84f9d067e70428d2e72d58405fdb42626fe166e0d245efaae46390dbd9532a27ed1c011b0d6bb20500000000800000000000000000000000000000000000000000000000000000000000000000000000000000000080020000";
+            //strTarget = "000000000000000000000000000000000000000000000000000d1b0100000000";
 
             midstate = HexStringToByteArray(strMidstate);
             data = HexStringToByteArray(strData);
@@ -53,10 +56,10 @@ namespace CentralMine.NET
 
         public string GetSolutionString(uint solution)
         {
-            data[79] = (byte)(solution & 0xFF);
-            data[78] = (byte)((solution & 0xFF00) >> 8);
-            data[77] = (byte)((solution & 0xFF0000) >> 16);
-            data[76] = (byte)((solution & 0xFF000000) >> 24);
+            data[76] = (byte)(solution & 0xFF);
+            data[77] = (byte)((solution & 0xFF00) >> 8);
+            data[78] = (byte)((solution & 0xFF0000) >> 16);
+            data[79] = (byte)((solution & 0xFF000000) >> 24);
 
             return ArrayToHexString(data);
         }
