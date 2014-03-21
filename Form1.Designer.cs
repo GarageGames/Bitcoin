@@ -30,19 +30,20 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.lblMidstate = new System.Windows.Forms.Label();
-            this.lblData = new System.Windows.Forms.Label();
-            this.lblHash1 = new System.Windows.Forms.Label();
             this.lblTarget = new System.Windows.Forms.Label();
+            this.lblHash1 = new System.Windows.Forms.Label();
+            this.lblData = new System.Windows.Forms.Label();
+            this.lblMidstate = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.lblClients = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.lblProgress = new System.Windows.Forms.Label();
             this.lblHashrate = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.protocol = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -63,32 +64,37 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Block Info";
             // 
-            // label1
+            // lblTarget
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 20);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(49, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "midstate:";
+            this.lblTarget.Location = new System.Drawing.Point(61, 95);
+            this.lblTarget.Name = "lblTarget";
+            this.lblTarget.Size = new System.Drawing.Size(876, 13);
+            this.lblTarget.TabIndex = 7;
+            this.lblTarget.Text = "label8";
             // 
-            // label2
+            // lblHash1
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 40);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(31, 13);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "data:";
+            this.lblHash1.Location = new System.Drawing.Point(61, 75);
+            this.lblHash1.Name = "lblHash1";
+            this.lblHash1.Size = new System.Drawing.Size(876, 13);
+            this.lblHash1.TabIndex = 6;
+            this.lblHash1.Text = "label7";
             // 
-            // label3
+            // lblData
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 75);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(39, 13);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "hash1:";
+            this.lblData.Location = new System.Drawing.Point(61, 40);
+            this.lblData.Name = "lblData";
+            this.lblData.Size = new System.Drawing.Size(876, 35);
+            this.lblData.TabIndex = 5;
+            this.lblData.Text = "lblData";
+            // 
+            // lblMidstate
+            // 
+            this.lblMidstate.Location = new System.Drawing.Point(61, 20);
+            this.lblMidstate.Name = "lblMidstate";
+            this.lblMidstate.Size = new System.Drawing.Size(876, 13);
+            this.lblMidstate.TabIndex = 4;
+            this.lblMidstate.Text = "lblMidstate";
             // 
             // label4
             // 
@@ -99,37 +105,32 @@
             this.label4.TabIndex = 3;
             this.label4.Text = "target:";
             // 
-            // lblMidstate
+            // label3
             // 
-            this.lblMidstate.Location = new System.Drawing.Point(61, 20);
-            this.lblMidstate.Name = "lblMidstate";
-            this.lblMidstate.Size = new System.Drawing.Size(876, 13);
-            this.lblMidstate.TabIndex = 4;
-            this.lblMidstate.Text = "lblMidstate";
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(6, 75);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(39, 13);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "hash1:";
             // 
-            // lblData
+            // label2
             // 
-            this.lblData.Location = new System.Drawing.Point(61, 40);
-            this.lblData.Name = "lblData";
-            this.lblData.Size = new System.Drawing.Size(876, 35);
-            this.lblData.TabIndex = 5;
-            this.lblData.Text = "lblData";
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 40);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(31, 13);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "data:";
             // 
-            // lblHash1
+            // label1
             // 
-            this.lblHash1.Location = new System.Drawing.Point(61, 75);
-            this.lblHash1.Name = "lblHash1";
-            this.lblHash1.Size = new System.Drawing.Size(876, 13);
-            this.lblHash1.TabIndex = 6;
-            this.lblHash1.Text = "label7";
-            // 
-            // lblTarget
-            // 
-            this.lblTarget.Location = new System.Drawing.Point(61, 95);
-            this.lblTarget.Name = "lblTarget";
-            this.lblTarget.Size = new System.Drawing.Size(876, 13);
-            this.lblTarget.TabIndex = 7;
-            this.lblTarget.Text = "label8";
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 20);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(49, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "midstate:";
             // 
             // lblClients
             // 
@@ -171,11 +172,21 @@
             this.timer1.Enabled = true;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // protocol
+            // 
+            this.protocol.FormattingEnabled = true;
+            this.protocol.Location = new System.Drawing.Point(834, 138);
+            this.protocol.Name = "protocol";
+            this.protocol.Size = new System.Drawing.Size(121, 21);
+            this.protocol.TabIndex = 5;
+            this.protocol.SelectedIndexChanged += new System.EventHandler(this.protocol_SelectedIndexChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(967, 234);
+            this.Controls.Add(this.protocol);
             this.Controls.Add(this.lblHashrate);
             this.Controls.Add(this.lblProgress);
             this.Controls.Add(this.progressBar1);
@@ -207,6 +218,7 @@
         private System.Windows.Forms.Label lblProgress;
         private System.Windows.Forms.Label lblHashrate;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.ComboBox protocol;
     }
 }
 

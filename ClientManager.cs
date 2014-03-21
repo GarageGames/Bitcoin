@@ -15,7 +15,15 @@ namespace CentralMine.NET
 {
     public class ClientManager
     {
+        public enum Currency
+        {
+            Bitcoin,
+            Feathercoin,
+            Novacoin
+        };
+
         Dictionary<uint, bool> mBlacklist;
+        Dictionary<Currency, string> mCurrencyProviders;
 
         Listener mListener;
         public List<Client> mClients;
@@ -31,12 +39,18 @@ namespace CentralMine.NET
         public Block mBlock = null;
 
         public bool mDumpClients = false;
+        public Currency mCurrency;
         
         public ClientManager()
         {
             mBlacklist = new Dictionary<uint, bool>();
             mBlacklist[0xC425E50F] = true;
 
+            mCurrency = Currency.Bitcoin;
+            mCurrencyProviders = new Dictionary<Currency, string>();
+            mCurrencyProviders[Currency.Bitcoin] = "http://127.0.0.1:8332";
+            mCurrencyProviders[Currency.Feathercoin] = "http://127.0.0.1:9667";
+            mCurrencyProviders[Currency.Novacoin] = "http://127.0.0.1:7332";
 
             mClientID = 0;
 
@@ -46,7 +60,7 @@ namespace CentralMine.NET
             mMailer = new Email();
             mClients = new List<Client>();
             mClientListMutex = new Mutex();
-            mListener = new Listener(80, this);
+            mListener = new Listener(805, this);
 
             mUpdateThread = new Thread(new ThreadStart(Update));
 
@@ -54,6 +68,14 @@ namespace CentralMine.NET
             BeginBlock();
 
             mUpdateThread.Start();
+        }
+
+        public void SetCurrency(Currency c)
+        {
+            if (mCurrency != c)
+            {
+                mCurrency = c;
+            }
         }
 
         public void AcceptClient(TcpClient client)
@@ -72,20 +94,35 @@ namespace CentralMine.NET
 
         void BeginBlock()
         {
-            // Put the current block in the previous list
-            if (mBlock != null)
+            JObject obj = null;
+            try
             {
-                mPrevBlocks[mPrevBlockIndex++] = mBlock;
-                if (mPrevBlockIndex >= mPrevBlocks.Length)
-                    mPrevBlockIndex = 0;
+                // Get block from bitcoin
+                BitnetClient bc = new BitnetClient(mCurrencyProviders[mCurrency]);
+                bc.Credentials = new NetworkCredential("rpcuser", "rpcpass");
+                obj = bc.GetWork();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed to get work!");
+                Console.WriteLine(e.Message);
             }
 
-            // Get block from bitcoin
-            BitnetClient bc = new BitnetClient("http://127.0.0.1:8332");
-            bc.Credentials = new NetworkCredential("rpcuser", "rpcpass");
-            JObject obj = bc.GetWork();
-            Console.WriteLine("starting block: " + obj.ToString());
-            mBlock = new Block(obj);                  
+            if (obj != null)
+            {
+
+                // Put the current block in the previous list
+                if (mBlock != null)
+                {
+                    mPrevBlocks[mPrevBlockIndex++] = mBlock;
+                    if (mPrevBlockIndex >= mPrevBlocks.Length)
+                        mPrevBlockIndex = 0;
+                }
+
+                Console.WriteLine("starting " + mCurrency + " block: " + obj.ToString());
+                mBlock = new Block(obj);
+                mBlock.mCurrency = mCurrency;
+            }
         }
 
         void AssignWork(Client c)
@@ -109,7 +146,7 @@ namespace CentralMine.NET
                 // Submit this solution to bitcoin
                 string data = block.GetSolutionString(solution);
                 Console.WriteLine("Trying solution: " + data);
-                BitnetClient bc = new BitnetClient("http://127.0.0.1:8332");
+                BitnetClient bc = new BitnetClient(mCurrencyProviders[block.mCurrency]);
                 bc.Credentials = new NetworkCredential("rpcuser", "rpcpass");
                 bool success = bc.GetWork(data);
                 if (!success)
@@ -121,7 +158,7 @@ namespace CentralMine.NET
                 // Send email notification about this found solution
                 TimeSpan span = DateTime.Now - block.mHashMan.mStartTime;
                 string hashrate = string.Format("{0:N}", block.mHashMan.mHashesDone / span.TotalSeconds);
-                string body = "Found solution for block: \n" + block.ToString() + "\n\n";
+                string body = "Found solution for " + block.mCurrency + " block: \n" + block.ToString() + "\n\n";
                 body += "Solution string: " + data + "\n";
                 body += "Block Accepted: " + success.ToString() + "\n";
                 body += "Hashes Done: " + block.mHashMan.mHashesDone + "\n";
@@ -154,7 +191,7 @@ namespace CentralMine.NET
             {
                 double oldHashrate = mHashrate;                
                 mHashrate = 0;
-                if (mBlock.mHashMan.IsComplete() || mBlock.mHashMan.IsExpired())
+                if (mBlock == null || mBlock.mHashMan.IsComplete() || mBlock.mHashMan.IsExpired())
                 {
                     // Start work on a new block
                     BeginBlock();

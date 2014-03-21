@@ -21,6 +21,7 @@ namespace CentralMine.NET
         public string strTarget;
 
         public HashManager mHashMan;
+        public ClientManager.Currency mCurrency;
 
         public Block(JObject obj)
         {            

@@ -281,7 +281,7 @@ function Maj(x,y,z)
 
 var K256 = [ 0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5, 0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5, 0xd807aa98,0x12835b01,0x243185be,0x550c7dc3, 0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174, 0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc, 0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da, 0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7, 0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967, 0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13, 0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85, 0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3, 0xd192e819,0xd6990624,0xf40e3585,0x106aa070, 0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5, 0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3, 0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208, 0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2 ];
 
-function sha256_block_data_order(output, state, input)
+function sha256_block(output, state, input)
 {
 	var s0,s1;
 	var X = new Uint32Array(16);
@@ -347,17 +347,18 @@ function swap32(val)
 	return v;
 }
 
+var staticHash = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+
 function DoHashes(n, count, midstate, data, target)
 {
-	var hash1 = [0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x80000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000100];
-	var staticHash = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+	var hash1 = [0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x80000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000100];	
 	var state = new Uint32Array(16);
 	var end = n + count;
 	for (n; n < end; n++)
 	{
 		data[3] = swap32(n);
-		sha256_block_data_order(hash1, midstate, data);
-		sha256_block_data_order(state, staticHash, hash1);
+		sha256_block(hash1, midstate, data);
+		sha256_block(state, staticHash, hash1);
 
 		if (state[7] == 0)
 		{
@@ -376,6 +377,205 @@ function DoHashes(n, count, midstate, data, target)
 	}
 
 	return -1;
+}
+
+
+function xor_salsa8(B, Bx)
+{
+	var x00,x01,x02,x03,x04,x05,x06,x07,x08,x09,x10,x11,x12,x13,x14,x15;
+	var i;
+
+	x00 = (B[ 0] ^= Bx[ 0]);
+	x01 = (B[ 1] ^= Bx[ 1]);
+	x02 = (B[ 2] ^= Bx[ 2]);
+	x03 = (B[ 3] ^= Bx[ 3]);
+	x04 = (B[ 4] ^= Bx[ 4]);
+	x05 = (B[ 5] ^= Bx[ 5]);
+	x06 = (B[ 6] ^= Bx[ 6]);
+	x07 = (B[ 7] ^= Bx[ 7]);
+	x08 = (B[ 8] ^= Bx[ 8]);
+	x09 = (B[ 9] ^= Bx[ 9]);
+	x10 = (B[10] ^= Bx[10]);
+	x11 = (B[11] ^= Bx[11]);
+	x12 = (B[12] ^= Bx[12]);
+	x13 = (B[13] ^= Bx[13]);
+	x14 = (B[14] ^= Bx[14]);
+	x15 = (B[15] ^= Bx[15]);
+	for (i = 0; i < 8; i += 2) {
+		/* Operate on columns. */
+		x04 ^= ROTATE(x00 + x12,  7);  x09 ^= ROTATE(x05 + x01,  7);
+		x14 ^= ROTATE(x10 + x06,  7);  x03 ^= ROTATE(x15 + x11,  7);
+
+		x08 ^= ROTATE(x04 + x00,  9);  x13 ^= ROTATE(x09 + x05,  9);
+		x02 ^= ROTATE(x14 + x10,  9);  x07 ^= ROTATE(x03 + x15,  9);
+
+		x12 ^= ROTATE(x08 + x04, 13);  x01 ^= ROTATE(x13 + x09, 13);
+		x06 ^= ROTATE(x02 + x14, 13);  x11 ^= ROTATE(x07 + x03, 13);
+
+		x00 ^= ROTATE(x12 + x08, 18);  x05 ^= ROTATE(x01 + x13, 18);
+		x10 ^= ROTATE(x06 + x02, 18);  x15 ^= ROTATE(x11 + x07, 18);
+
+		/* Operate on rows. */
+		x01 ^= ROTATE(x00 + x03,  7);  x06 ^= ROTATE(x05 + x04,  7);
+		x11 ^= ROTATE(x10 + x09,  7);  x12 ^= ROTATE(x15 + x14,  7);
+
+		x02 ^= ROTATE(x01 + x00,  9);  x07 ^= ROTATE(x06 + x05,  9);
+		x08 ^= ROTATE(x11 + x10,  9);  x13 ^= ROTATE(x12 + x15,  9);
+
+		x03 ^= ROTATE(x02 + x01, 13);  x04 ^= ROTATE(x07 + x06, 13);
+		x09 ^= ROTATE(x08 + x11, 13);  x14 ^= ROTATE(x13 + x12, 13);
+
+		x00 ^= ROTATE(x03 + x02, 18);  x05 ^= ROTATE(x04 + x07, 18);
+		x10 ^= ROTATE(x09 + x08, 18);  x15 ^= ROTATE(x14 + x13, 18);
+	}
+	B[ 0] += x00;
+	B[ 1] += x01;
+	B[ 2] += x02;
+	B[ 3] += x03;
+	B[ 4] += x04;
+	B[ 5] += x05;
+	B[ 6] += x06;
+	B[ 7] += x07;
+	B[ 8] += x08;
+	B[ 9] += x09;
+	B[10] += x10;
+	B[11] += x11;
+	B[12] += x12;
+	B[13] += x13;
+	B[14] += x14;
+	B[15] += x15;
+}
+
+function XorScramble(bp)
+{
+	var Xbuff = new ArrayBuffer(128);
+	var X = new Uint32Array(Xbuff, 0);
+	var Xb = new Uint32Array(Xbuff, 64);
+	var V = new ArrayBuffer(131072);
+	var VI = new Uint32Array(V);
+
+	for (var i = 0; i < 32; i++)
+        X[i] = swap32(bp[i]);
+
+	for (var i = 0; i < 1024; i++) 
+	{
+		var vview = new Uint32Array(V, i * 128);
+		for( var j = 0; j < 32; j++ )
+			vview[j] = X[j];
+
+		xor_salsa8(X, Xb);
+		xor_salsa8(Xb, X);
+	}
+	for (var i = 0; i < 1024; i++) 
+	{
+		var j = 32 * (X[16] & 1023);
+		for (var k = 0; k < 32; k++)
+		{
+			var v = ((j + k) & 0xFFFFFFFF) >>> 0;
+			X[k] ^= VI[v];
+		}
+		xor_salsa8(X, Xb);
+		xor_salsa8(Xb, X);
+	}
+
+    for (var i = 0; i < 32; i++)
+        bp[i] = swap32(X[i]);
+}
+
+var pad36 = [0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x36363636, 0x36363636, 0x36363636, 0x36363636, 0x36363636, 0x36363636, 0x36363636, 0x36363636];	
+var pad5c = [0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x5c5c5c5c, 0x5c5c5c5c, 0x5c5c5c5c, 0x5c5c5c5c, 0x5c5c5c5c, 0x5c5c5c5c, 0x5c5c5c5c, 0x5c5c5c5c];
+var dataBuffer2 = [0x00000001, 0x80000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000620];	
+var tempHash = [0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x80000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000300];
+function scrypt(inputA, inputB, inputB2, output)
+{
+	var inner = new Uint32Array(8);
+    var outer = new Uint32Array(8);
+    sha256_block(inner, staticHash, inputA);
+    sha256_block(inner, inner, inputB);
+    	
+    for( var i = 0; i < 8; i++ )
+    {
+        pad36[i] = inner[i] ^ 0x36363636;
+        pad5c[i] = inner[i] ^ 0x5c5c5c5c;
+    }
+    sha256_block(inner, staticHash, pad36);
+    sha256_block(outer, staticHash, pad5c);
+
+    var salted = new Uint32Array(8);
+    sha256_block(salted, inner, inputA);
+
+    var bpArr = new ArrayBuffer(128);
+    var bp = new Uint32Array(bpArr);
+    for( var i = 0; i < 4; i++ )
+    {
+        inputB2[4] = (i + 1);
+		var bpx = new Uint32Array(bpArr, i * 32);
+
+        sha256_block(tempHash, salted, inputB2);
+        sha256_block(bpx, outer, tempHash);
+    }
+	
+	XorScramble(bp);
+    
+    sha256_block(salted, inner, bp);
+	bp = new Uint32Array(bpArr, 64);
+    sha256_block(salted, salted, bp);
+
+    sha256_block(tempHash, salted, dataBuffer2);
+    sha256_block(output, outer, tempHash);
+}
+
+function TestScrypt()
+{
+	var inputA = [0x00000002, 0x2a34cf18, 0xf3e954a3, 0x76d84bfb, 0x9665b4f9, 0x602e7fc0, 0xa90a934b, 0x9aa31b1a, 0xbf7b9d63, 0xade27f84, 0xf9d067e7, 0x0428d2e7, 0x2d58405f, 0xdb42626f, 0xe166e0d2, 0x45efaae4];
+	var inputB = [0x6390dbd9, 0x532A27ED, 0x1c011b0d, 0x6BB20500, 0x00000080, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x80020000];
+	var inputB2 = [0x6390dbd9, 0x532A27ED, 0x1c011b0d, 0x6BB20500, 0x00000080, 0x00000080, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xA0040000];
+	var target =  [0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x000d1b01, 0x00000000];
+	var output = new Uint32Array(8);
+
+	for (var i = 0; i < 16; i++)
+	{
+		inputA[i] = swap32(inputA[i]);
+		inputB[i] = swap32(inputB[i]);
+		inputB2[i] = swap32(inputB2[i]);
+
+		if( i < 8 )
+			target[i] = swap32(target[i]);
+	}
+	
+	console.log("working\n");
+	var start = new Date().getTime();
+	var startSeed = 360000;
+	var nonce = startSeed;
+
+	while (true)
+	{
+		inputB[3] = nonce;
+		inputB2[3] = nonce;
+
+		scrypt(inputA, inputB, inputB2, output);
+
+		if (output[7] == 0)
+		{
+			for (var i = 6; i >= 0; i++)
+			{
+				var swapped = swap32(output[i]);
+				if (swapped > target[i])
+					break;
+				if (swapped < target[i])
+				{
+					var end = new Date().getTime();
+					var seconds = ((end - start) / 1000);
+					var hashes = nonce - startSeed;
+					var hashesPerSecond = hashes / seconds;
+					console.log("hashes: " + hashes + ", seconds: " + seconds + ", hashrate: " + Math.floor(hashesPerSecond).toLocaleString());
+					return;
+				}
+			}
+		}
+
+		nonce++;
+	}
 }
 
 function TestHashes()

@@ -40,23 +40,22 @@ namespace CentralMine.NET
         public ulong mTotalHashesDone;
         public double mHashrate;
 
+        public int mVersion;
         public string mAgent;
         public string mPlatform;
         public string mLocation;
-        public ulong mID;
         public bool mStatusClient;
         public bool mClientInfoRequested = false;
 
         public Block mCurrentBlock;
 
-        public Client(TcpClient tcp, ClientManager manager, ulong id)
+        public Client(TcpClient tcp, ClientManager manager)
         {
             mTheMan = manager;
             mClient = tcp;
             mClient.NoDelay = true;
             mState = State.New;
             mType = Type.Unknown;
-            mID = id;
 
             mHashesDone = 0;
             mTotalHashesDone = 0;
@@ -114,7 +113,7 @@ namespace CentralMine.NET
             json += "\"state\": \"" + mState.ToString() +  "\",";
             json += "\"type\": \"" + mType.ToString() + "\",";
             json += "\"hashrate\": \"" + mHashrate + "\",";
-            json += "\"lastSeen\": \"" + mLastSeen.ToString() + "\",";
+            json += "\"currency\": \"" + mCurrentBlock.mCurrency.ToString() + "\",";
             json += "\"agent\": \"" + mAgent + "\",";
             json += "\"platform\": \"" + mPlatform + "\",";
             json += "\"location\": \"" + mLocation + "\"";
@@ -135,6 +134,7 @@ namespace CentralMine.NET
             bw.Write(block.midstate);
             bw.Write(block.data64);
             bw.Write(block.target);
+            bw.Write((int)block.mCurrency);
 
             SendPacket(stream.ToArray());
             bw.Close();
@@ -362,7 +362,10 @@ namespace CentralMine.NET
             MemoryStream mem = new MemoryStream(buffer);
             BinaryReader br = new BinaryReader(mem);
 
-            byte clientType = br.ReadByte();
+            byte clientType = 0;
+            mVersion = br.ReadByte();
+            if( mVersion > 0 )
+                clientType = br.ReadByte();
             mStatusClient = ((clientType & 0x80) == 0x80);
             clientType &= 0x7F;
             switch (clientType)
