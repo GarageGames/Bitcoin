@@ -68,7 +68,7 @@ function SendWorkComplete(result, hashCount)
 {
 	if (websocket && websocket.readyState == 1)
 	{
-		console.log("Work Complete: " + result + " : " + hashCount);
+		//console.log("Work Complete: " + result + " : " + hashCount);
 		var ar = new ArrayBuffer(16);
 		var data = new DataView(ar, 0);
 		data.setInt8(0, 2);
@@ -149,7 +149,7 @@ function ProcessMessage()
 			dataFull[i] = data.getUint32(141 + (i * 4), true);
 
 		//var result = DoScrypt(hashStart, 1, dataFull, data64, target);
-		console.log("Starting work: " + hashStart + " - " + (hashStart + hashCount));
+		//console.log("Starting work: " + hashStart + " - " + (hashStart + hashCount));
 
 		bestresult = -1;
 		threadsCompleted = 0;
@@ -216,7 +216,7 @@ function ProcessMessage()
 					row.insertCell(0).innerHTML = client.ipaddress;
 					row.insertCell(1).innerHTML = client.state;
 					row.insertCell(2).innerHTML = client.type;
-					row.insertCell(3).innerHTML = client.hashrate;
+					row.insertCell(3).innerHTML = Math.floor(client.hashrate).toLocaleString();
 					row.insertCell(4).innerHTML = client.lastSeen;
 					row.insertCell(5).innerHTML = client.agent;
 					row.insertCell(6).innerHTML = client.platform;
