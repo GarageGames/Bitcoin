@@ -101,7 +101,7 @@ function SocketOpen()
 		data.setInt8(2, 0x80);
 	else
 		data.setInt8(2, 0);
-	data.setUint32(3, 500);
+	data.setUint32(3, 50);
 
 	var i;
 	for (i = 0; i < navigator.userAgent.length; i++)

@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MinerLib_cpp", "MinerLib_cpp.vcxproj", "{D5AEFA84-A80E-4801-90BC-48B7E7C9F8E7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestClient_cpp", "..\TestClient_cpp\TestClient_cpp.vcxproj", "{FF6410C9-932B-403E-BA04-F28CAD80F9E7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D5AEFA84-A80E-4801-90BC-48B7E7C9F8E7} = {D5AEFA84-A80E-4801-90BC-48B7E7C9F8E7}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D5AEFA84-A80E-4801-90BC-48B7E7C9F8E7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D5AEFA84-A80E-4801-90BC-48B7E7C9F8E7}.Debug|Win32.Build.0 = Debug|Win32
+		{D5AEFA84-A80E-4801-90BC-48B7E7C9F8E7}.Release|Win32.ActiveCfg = Release|Win32
+		{D5AEFA84-A80E-4801-90BC-48B7E7C9F8E7}.Release|Win32.Build.0 = Release|Win32
+		{FF6410C9-932B-403E-BA04-F28CAD80F9E7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FF6410C9-932B-403E-BA04-F28CAD80F9E7}.Debug|Win32.Build.0 = Debug|Win32
+		{FF6410C9-932B-403E-BA04-F28CAD80F9E7}.Release|Win32.ActiveCfg = Release|Win32
+		{FF6410C9-932B-403E-BA04-F28CAD80F9E7}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
