@@ -22,7 +22,7 @@ namespace CentralMine.NET
             protocol.Items.Add(ClientManager.Currency.Bitcoin);
             protocol.Items.Add(ClientManager.Currency.Feathercoin);
             protocol.Items.Add(ClientManager.Currency.Novacoin);
-            protocol.SelectedIndex = 0;           
+            protocol.SelectedIndex = 2;           
         }
         
         private void timer1_Tick(object sender, EventArgs e)

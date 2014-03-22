@@ -45,7 +45,7 @@ namespace CentralMine.NET
             mBlacklist = new Dictionary<uint, bool>();
             mBlacklist[0xC425E50F] = true;
 
-            mCurrency = Currency.Bitcoin;
+            mCurrency = Currency.Novacoin;
             mCurrencyProviders = new Dictionary<Currency, string>();
             mCurrencyProviders[Currency.Bitcoin] = "http://127.0.0.1:8332";
             mCurrencyProviders[Currency.Feathercoin] = "http://127.0.0.1:9667";
@@ -188,7 +188,7 @@ namespace CentralMine.NET
             {
                 double oldHashrate = mHashrate;                
                 mHashrate = 0;
-                if (mBlock == null || mBlock.mHashMan.IsComplete() || mBlock.mHashMan.IsExpired())
+                if (mBlock == null || mBlock.mHashMan.IsComplete() || mBlock.mHashMan.IsExpired() || mBlock.mCurrency != mCurrency)
                 {
                     // Start work on a new block
                     BeginBlock();

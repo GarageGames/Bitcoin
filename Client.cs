@@ -114,7 +114,7 @@ namespace CentralMine.NET
             json += "\"state\": \"" + mState.ToString() +  "\",";
             json += "\"type\": \"" + mType.ToString() + "\",";
             json += "\"hashrate\": \"" + mHashrate + "\",";
-            json += "\"currency\": \"" + mCurrentBlock.mCurrency.ToString() + "\",";
+            json += "\"currency\": \"" + ((mCurrentBlock == null) ? "unknown" : mCurrentBlock.mCurrency.ToString()) + "\",";
             json += "\"agent\": \"" + mAgent + "\",";
             json += "\"platform\": \"" + mPlatform + "\",";
             json += "\"location\": \"" + mLocation + "\"";
@@ -253,9 +253,11 @@ namespace CentralMine.NET
             if (mHashBlock != null)
             {
                 TimeSpan s = DateTime.Now - mWorkSent;
-                if (s.TotalSeconds > 60)
+                if (s.TotalSeconds > 120)
                 {
                     // This work took to long, just close the connection and force this client to reconnect
+                    IPEndPoint remoteIP = mClient.Client.RemoteEndPoint as IPEndPoint;
+                    Console.WriteLine(remoteIP.ToString() + " took more than 120 seconds for work");
                     mClient.Close();
                     return false;   
                 }
@@ -416,6 +418,7 @@ namespace CentralMine.NET
             mTheMan.WorkComplete(this, solutionFound, solutionValue);
 
             mHashrate = mHashesDone / elapsed.TotalSeconds;
+            mDesiredHashes = Math.Max((uint)mHashrate * 5, 50);            
             //Console.WriteLine("Hashes: {0}  Time: {1}  Hashrate: {0:N}", mHashesDone, elapsed.TotalSeconds, mHashrate);
             mState = State.Ready;
         }
