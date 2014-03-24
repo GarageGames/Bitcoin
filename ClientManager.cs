@@ -18,7 +18,7 @@ namespace CentralMine.NET
         public enum Currency
         {
             Bitcoin,
-            Feathercoin,
+            Xencoin,
             Novacoin
         };
 
@@ -48,7 +48,7 @@ namespace CentralMine.NET
             mCurrency = Currency.Novacoin;
             mCurrencyProviders = new Dictionary<Currency, string>();
             mCurrencyProviders[Currency.Bitcoin] = "http://127.0.0.1:8332";
-            mCurrencyProviders[Currency.Feathercoin] = "http://127.0.0.1:9667";
+            mCurrencyProviders[Currency.Xencoin] = "http://127.0.0.1:4335";
             mCurrencyProviders[Currency.Novacoin] = "http://127.0.0.1:7332";
 
             mPrevBlocks = new Block[5];

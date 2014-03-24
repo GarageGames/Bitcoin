@@ -20,7 +20,7 @@ namespace CentralMine.NET
             mTheMan = new ClientManager();
 
             protocol.Items.Add(ClientManager.Currency.Bitcoin);
-            protocol.Items.Add(ClientManager.Currency.Feathercoin);
+            protocol.Items.Add(ClientManager.Currency.Xencoin);
             protocol.Items.Add(ClientManager.Currency.Novacoin);
             protocol.SelectedIndex = 2;           
         }

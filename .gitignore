@@ -1,3 +1,7 @@
 *.suo
+*.sdf
 bin/
 obj/
+MinerLib_cpp/Release/
+MinerLib_cpp/ipch/
+TestClient_cpp/Release/
