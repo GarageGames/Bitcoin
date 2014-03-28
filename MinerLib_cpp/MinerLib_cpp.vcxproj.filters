@@ -5,36 +5,54 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{d3b4505e-1222-4355-960d-ce05f765378e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="targetver.h">
+    <ClCompile Include="src\F2M_MinerConnection.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stdafx.h">
+    </ClCompile>
+    <ClCompile Include="src\F2M_Net_win32.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MinerConnection.h">
+    </ClCompile>
+    <ClCompile Include="src\F2M_MiningThreadManager.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Work.h">
+    </ClCompile>
+    <ClCompile Include="src\F2M_WorkThread.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Hash.h">
+    </ClCompile>
+    <ClCompile Include="src\F2M_WorkThread_win32.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
+    </ClCompile>
+    <ClCompile Include="src\F2M_ScryptSSE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\F2M_Scrypt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MinerConnection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Scrypt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sha256SSE.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClInclude Include="include\F2M_MinerConnection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\F2M_Work.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\F2M_Sockets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\F2M_Net.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\F2M_Hash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\F2M_MiningThreadManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\F2M_WorkThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
