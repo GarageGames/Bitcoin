@@ -1,7 +1,10 @@
 *.suo
 *.sdf
+*.opensdf
 bin/
 obj/
+MinerLib_cpp/Debug/
 MinerLib_cpp/Release/
 MinerLib_cpp/ipch/
+TestClient_cpp/Debug/
 TestClient_cpp/Release/
