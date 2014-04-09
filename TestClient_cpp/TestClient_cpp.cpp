@@ -33,7 +33,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
     int threadCount = sysinfo.dwNumberOfProcessors - 1;
     //threadCount = 1;
-    F2M_MiningThreadManager* threadManager = new F2M_MiningThreadManager(threadCount, sse);
+    F2M_MiningThreadManager* threadManager = new F2M_MiningThreadManager(threadCount, sse, 50);
 
     
     // Call F2M_NetInit here to initialize winsock so gethostname/gethostbyname work

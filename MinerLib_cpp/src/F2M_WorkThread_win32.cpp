@@ -30,7 +30,7 @@ void ScryptHashes(F2M_WorkThread* tinfo)
                 break;
             }
         }
-        _aligned_free(scryptData);
+        F2M_ScryptCleanupSSE(scryptData);
     }
     else
     {
@@ -49,7 +49,7 @@ void ScryptHashes(F2M_WorkThread* tinfo)
                 break;
             }
         }
-        delete scryptData;
+        F2M_ScryptCleanup(scryptData);
     }
 
     tinfo->mHashesDone = hashesDone;    

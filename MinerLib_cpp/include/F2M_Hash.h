@@ -2,6 +2,7 @@
 #define _F2M_HASH_H_
 
 #include <emmintrin.h>
+struct F2M_Work;
 
 struct F2M_ScryptData
 {
@@ -29,10 +30,12 @@ struct F2M_ScryptDataSSE
 };
 
 F2M_ScryptData* F2M_ScryptInit(F2M_Work* work);
+void F2M_ScryptCleanup(F2M_ScryptData* scryptData);
 bool F2M_ScryptHash(unsigned int nonce, F2M_Work* work, F2M_ScryptData* data);
 
 
 F2M_ScryptDataSSE* F2M_ScryptInitSSE(F2M_Work* work);
+void F2M_ScryptCleanupSSE(F2M_ScryptDataSSE* scryptData);
 int F2M_ScryptHashSSE(__m128i nonce,  F2M_Work* work, F2M_ScryptDataSSE* data);
 
 #endif 

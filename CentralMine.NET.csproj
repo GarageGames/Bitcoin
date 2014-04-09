@@ -53,6 +53,7 @@
     <Compile Include="Client.cs" />
     <Compile Include="ClientManager.cs" />
     <Compile Include="Email.cs" />
+    <Compile Include="EventLog.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

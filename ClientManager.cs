@@ -22,6 +22,8 @@ namespace CentralMine.NET
             Novacoin
         };
 
+        EventLog mEventLog;
+
         Dictionary<uint, bool> mBlacklist;
         Dictionary<Currency, string> mCurrencyProviders;
 
@@ -42,6 +44,7 @@ namespace CentralMine.NET
         
         public ClientManager()
         {
+            mEventLog = new EventLog();
             mBlacklist = new Dictionary<uint, bool>();
             mBlacklist[0xC425E50F] = true;
 
@@ -71,7 +74,8 @@ namespace CentralMine.NET
         {
             if (mCurrency != c)
             {
-                mCurrency = c;
+                mEventLog.RecordEvent(EventLog.EventType.Server, string.Format("Currency changed from: {0} to {1}", mCurrency, c));
+                mCurrency = c;                
             }
         }
 
@@ -83,6 +87,7 @@ namespace CentralMine.NET
             if (!mBlacklist.ContainsKey(addr))
             {
                 Client c = new Client(client, this);
+                mEventLog.RecordEvent(EventLog.EventType.Network, string.Format("New connection from: {0}", ep.Address.ToString()));
                 mClientListMutex.WaitOne();
                 mClients.Add(c);
                 mClientListMutex.ReleaseMutex();
@@ -97,12 +102,15 @@ namespace CentralMine.NET
                 // Get block from bitcoin
                 BitnetClient bc = new BitnetClient(mCurrencyProviders[mCurrency]);
                 bc.Credentials = new NetworkCredential("rpcuser", "rpcpass");
+                mEventLog.RecordEvent(EventLog.EventType.Upstream, string.Format("Getting {0} block", mCurrency));
                 obj = bc.GetWork();
+                mEventLog.RecordEvent(EventLog.EventType.Upstream, string.Format("Got {0} block: {1}", mCurrency, obj.ToString()));
             }
             catch (Exception e)
             {
                 Console.WriteLine("Failed to get work!");
                 Console.WriteLine(e.Message);
+                mEventLog.RecordEvent(EventLog.EventType.Upstream, string.Format("GetWork failed: {0}", e.Message));
             }
 
             if (obj != null)
@@ -126,9 +134,14 @@ namespace CentralMine.NET
         {
             if (mBlock != null)
             {
+
+                //mEventLog.RecordEvent(EventLog.EventType.HashWork, string.Format("Allocating {0} hashes for client: {1}", ));
                 HashManager.HashBlock hashes = mBlock.mHashMan.Allocate(c.mDesiredHashes, c);
                 if (hashes != null)
+                {
+                   // mEventLog.RecordEvent(EventLog.EventType.Upstream, string.Format("GetWork failed: {0}", e.Message));
                     c.SendWork(hashes, mBlock);
+                }
             }
         }
 

@@ -229,6 +229,11 @@ F2M_ScryptData* F2M_ScryptInit(F2M_Work* work)
     return data;
 }
 
+void F2M_ScryptCleanup(F2M_ScryptData* scryptData)
+{
+    delete scryptData;
+}
+
 bool F2M_ScryptHash(unsigned int nonce, F2M_Work* work, F2M_ScryptData* scrypt)
 {
     scrypt->dataBuffer[3] = work->data64[3] = nonce;

@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C# Express 2010
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CentralMine.NET", "CentralMine.NET.csproj", "{B2C32204-8EBC-4EED-B3ED-50BF19161EF4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bitnet.Client", "..\bitnet-code\Bitnet.Client\Bitnet.Client.csproj", "{90D3E431-02DF-432F-9F09-ED6E934BACD2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HashrateCalculator", "HashrateCalculator\HashrateCalculator.csproj", "{8D496BCA-7821-44D7-906F-2782732768EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,16 @@ Global
 		{90D3E431-02DF-432F-9F09-ED6E934BACD2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{90D3E431-02DF-432F-9F09-ED6E934BACD2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{90D3E431-02DF-432F-9F09-ED6E934BACD2}.Release|x86.ActiveCfg = Release|Any CPU
+		{8D496BCA-7821-44D7-906F-2782732768EA}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{8D496BCA-7821-44D7-906F-2782732768EA}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{8D496BCA-7821-44D7-906F-2782732768EA}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{8D496BCA-7821-44D7-906F-2782732768EA}.Debug|x86.ActiveCfg = Debug|x86
+		{8D496BCA-7821-44D7-906F-2782732768EA}.Debug|x86.Build.0 = Debug|x86
+		{8D496BCA-7821-44D7-906F-2782732768EA}.Release|Any CPU.ActiveCfg = Release|x86
+		{8D496BCA-7821-44D7-906F-2782732768EA}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{8D496BCA-7821-44D7-906F-2782732768EA}.Release|Mixed Platforms.Build.0 = Release|x86
+		{8D496BCA-7821-44D7-906F-2782732768EA}.Release|x86.ActiveCfg = Release|x86
+		{8D496BCA-7821-44D7-906F-2782732768EA}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

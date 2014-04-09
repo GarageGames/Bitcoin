@@ -11,20 +11,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\F2M_GPUThread.cpp" />
     <ClCompile Include="src\F2M_MinerConnection.cpp" />
     <ClCompile Include="src\F2M_MiningThreadManager.cpp" />
     <ClCompile Include="src\F2M_Net_win32.cpp" />
+    <ClCompile Include="src\F2M_Timer_win32.cpp" />
+    <ClCompile Include="src\F2M_Utils.cpp" />
     <ClCompile Include="src\F2M_WorkThread.cpp" />
     <ClCompile Include="src\F2M_WorkThread_win32.cpp" />
     <ClCompile Include="src\F2M_Scrypt.cpp" />
     <ClCompile Include="src\F2M_ScryptSSE.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\F2M_GPUThread.h" />
     <ClInclude Include="include\F2M_Hash.h" />
     <ClInclude Include="include\F2M_MinerConnection.h" />
     <ClInclude Include="include\F2M_MiningThreadManager.h" />
     <ClInclude Include="include\F2M_Net.h" />
     <ClInclude Include="include\F2M_Sockets.h" />
+    <ClInclude Include="include\F2M_Timer.h" />
+    <ClInclude Include="include\F2M_Utils.h" />
     <ClInclude Include="include\F2M_Work.h" />
     <ClInclude Include="include\F2M_WorkThread.h" />
   </ItemGroup>
@@ -62,13 +68,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>wsock32.lib</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;OpenCL.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>include/CL</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -92,7 +100,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>wsock32.lib</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;OpenCL.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>include/CL</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

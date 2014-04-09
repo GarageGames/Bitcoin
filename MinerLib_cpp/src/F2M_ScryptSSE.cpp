@@ -457,6 +457,11 @@ F2M_ScryptDataSSE* F2M_ScryptInitSSE(F2M_Work* work)
     return data;
 }
 
+void F2M_ScryptCleanupSSE(F2M_ScryptDataSSE* scryptData)
+{
+    _aligned_free(scryptData);
+}
+
 int F2M_ScryptHashSSE(__m128i nonce,  F2M_Work* work, F2M_ScryptDataSSE* data)
 {
     data->inputB[3] = data->inputB2[3] = nonce;

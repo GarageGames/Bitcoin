@@ -3,12 +3,13 @@
 
 class F2M_MinerConnection;
 class F2M_WorkThread;
+class F2M_GPUThread;
 struct F2M_Work;
 
 class F2M_MiningThreadManager
 {
 public:
-    F2M_MiningThreadManager(int threadCount, bool useSSE);
+    F2M_MiningThreadManager(int threadCount, bool useSSE, float gpuPercentage);
     ~F2M_MiningThreadManager();
 
 
@@ -18,6 +19,7 @@ public:
 
 protected:
     int                 mThreadCount;
+    F2M_GPUThread*      mGPUThread;
     F2M_WorkThread**    mThreads;
     F2M_Work*           mCurrentWork;
 };
