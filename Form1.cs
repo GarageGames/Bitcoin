@@ -21,7 +21,7 @@ namespace CentralMine.NET
 
             protocol.Items.Add(ClientManager.Currency.Bitcoin);
             protocol.Items.Add(ClientManager.Currency.Xencoin);
-            protocol.Items.Add(ClientManager.Currency.Novacoin);
+            protocol.Items.Add(ClientManager.Currency.Gamerscoin);
             protocol.SelectedIndex = 2;           
         }
         

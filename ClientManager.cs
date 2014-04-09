@@ -19,7 +19,7 @@ namespace CentralMine.NET
         {
             Bitcoin,
             Xencoin,
-            Novacoin
+            Gamerscoin
         };
 
         Dictionary<uint, bool> mBlacklist;
@@ -45,11 +45,11 @@ namespace CentralMine.NET
             mBlacklist = new Dictionary<uint, bool>();
             mBlacklist[0xC425E50F] = true;
 
-            mCurrency = Currency.Novacoin;
+            mCurrency = Currency.Gamerscoin;
             mCurrencyProviders = new Dictionary<Currency, string>();
             mCurrencyProviders[Currency.Bitcoin] = "http://127.0.0.1:8332";
             mCurrencyProviders[Currency.Xencoin] = "http://127.0.0.1:4335";
-            mCurrencyProviders[Currency.Novacoin] = "http://127.0.0.1:7332";
+            mCurrencyProviders[Currency.Gamerscoin] = "http://127.0.0.1:7332";
 
             mPrevBlocks = new Block[5];
             mPrevBlockIndex = 0;
@@ -152,22 +152,26 @@ namespace CentralMine.NET
                     success = bc.GetWork(data);
                 }
 
-                // Send email notification about this found solution
-                TimeSpan span = DateTime.Now - block.mHashMan.mStartTime;
-                string hashrate = string.Format("{0:N}", block.mHashMan.mHashesDone / span.TotalSeconds);
-                string body = "Found solution for " + block.mCurrency + " block: \n" + block.ToString() + "\n\n";
-                body += "Solution string: " + data + "\n";
-                body += "Block Accepted: " + success.ToString() + "\n";
-                body += "Hashes Done: " + block.mHashMan.mHashesDone + "\n";
-                body += "Time Spent: " + span.ToString() + "\n";
-                body += "Hashrate: " + hashrate + "\n";
-                body += "Clients: " + mClients.Count + "\n";
-                body += "\n\n";
-                mMailer.SendEmail(body);
+                
 
                 // Start a new block
-                if( success )
+                if (success)
+                {
+                    // Send email notification about this found solution
+                    TimeSpan span = DateTime.Now - block.mHashMan.mStartTime;
+                    string hashrate = string.Format("{0:N}", block.mHashMan.mHashesDone / span.TotalSeconds);
+                    string body = "Found solution for " + block.mCurrency + " block: \n" + block.ToString() + "\n\n";
+                    body += "Solution string: " + data + "\n";
+                    body += "Block Accepted: " + success.ToString() + "\n";
+                    body += "Hashes Done: " + block.mHashMan.mHashesDone + "\n";
+                    body += "Time Spent: " + span.ToString() + "\n";
+                    body += "Hashrate: " + hashrate + "\n";
+                    body += "Clients: " + mClients.Count + "\n";
+                    body += "\n\n";
+                    mMailer.SendEmail(body);
+
                     BeginBlock();
+                }
             }
         }
 
