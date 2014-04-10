@@ -134,12 +134,11 @@ namespace CentralMine.NET
         {
             if (mBlock != null)
             {
-
-                //mEventLog.RecordEvent(EventLog.EventType.HashWork, string.Format("Allocating {0} hashes for client: {1}", ));
+                //mEventLog.RecordEvent(EventLog.EventType.HashWork, string.Format("Allocating {0} hashes for client: {1}", c.mDesiredHashes, c.ToLogString()));
                 HashManager.HashBlock hashes = mBlock.mHashMan.Allocate(c.mDesiredHashes, c);
                 if (hashes != null)
                 {
-                   // mEventLog.RecordEvent(EventLog.EventType.Upstream, string.Format("GetWork failed: {0}", e.Message));
+                    //mEventLog.RecordEvent(EventLog.EventType.HashWork, string.Format("Sending hash range ({0} - {1}) to client: {2}", hashes.Start, hashes.Start + hashes.Count, c.ToLogString()));
                     c.SendWork(hashes, mBlock);
                 }
             }
@@ -147,6 +146,8 @@ namespace CentralMine.NET
 
         public void WorkComplete(Client solver, bool solutionFound, uint solution)
         {
+            //mEventLog.RecordEvent(EventLog.EventType.HashWork, string.Format("Client ({0}) finished work. Solution:{1}", solver.ToLogString(), solution));
+            mEventLog.RecordClientWork(solver);
             Block block = solver.mCurrentBlock;
             block.mHashMan.FinishBlock(solver.mHashBlock);
             solver.mHashBlock = null;
@@ -163,9 +164,7 @@ namespace CentralMine.NET
                 {
                     data = block.GetSolutionString((uint)IPAddress.HostToNetworkOrder((int)solution));
                     success = bc.GetWork(data);
-                }
-
-                
+                }                
 
                 // Start a new block
                 if (success)
@@ -183,7 +182,13 @@ namespace CentralMine.NET
                     body += "\n\n";
                     mMailer.SendEmail(body);
 
+                    mEventLog.RecordEvent(EventLog.EventType.Upstream, string.Format("Work accepted! solution: {0}, dataString: {1}", solution, data));
+
                     BeginBlock();
+                }
+                else
+                {
+                    mEventLog.RecordEvent(EventLog.EventType.Upstream, string.Format("Work not accepted. solution: {0}, dataString: {1}", solution, data));
                 }
             }
         }
