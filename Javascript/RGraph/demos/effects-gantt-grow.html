@@ -1,0 +1,38 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="../libraries/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.gantt.js" ></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    
+    <title>A Gantt chart Grow effect</title>
+    
+    <meta name="description" content="A Gantt chart Grow" />
+    
+</head>
+<body>
+
+    <h1>A Gantt chart Grow effect</h1>
+
+    <canvas id="cvs" width="500" height="250">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var data = [[0,10,null,'Fred','red'],[10,10,null,'Barney','#0f0'],[20,10,null,'Jerry','blue']];
+
+            var gantt = new RGraph.Gantt('cvs', data)
+                .Set('xmax', 30)
+                .grow();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

@@ -70,6 +70,24 @@ namespace CentralMine.NET
             mUpdateThread.Start();
         }
 
+        public void Close()
+        {
+            // Kill the listener
+            mListener.Close();
+
+            // Kill the update thread
+            mUpdateThread.Abort();
+
+            // Close all clients
+            foreach (Client c in mClients)
+            {
+                c.Close();
+            }
+
+            // Close the event log
+            mEventLog.Close();
+        }
+
         public void SetCurrency(Currency c)
         {
             if (mCurrency != c)

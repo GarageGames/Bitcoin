@@ -1,0 +1,45 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="../libraries/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Bar chart with 3D effect</title>
+    
+    <meta name="description" content="A Bar chart with a 3D effect" />
+    
+
+</head>
+<body>
+
+    <h1>A Bar chart with a 3D effect</h1>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var bar4 = new RGraph.Bar('cvs', [[21,31],[13, 43],[42, 25],[42, 29],[59, 28],[40, 10]])
+                .set('colors', ['#2A17B1', '#98ED00'])
+                .set('labels', ['2007', '2008', '2009', '2010', '2011', '2012'])
+                .set('numyticks', 5)
+                .set('ylabels.count', 5)
+                .set('gutter.left', 35)
+                .set('variant', '3d')
+                .set('strokestyle', 'transparent')
+                .set('hmargin.grouped', 0)
+                .set('scale.round', true)
+                .draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>A basic example of JSON/AJAX</title>
+
+    <meta name="description" content=" A basic example of a chart created using JSON/AJAX. It shows a simple example and there is little happening on the page so the source is easy to navigate." />
+    <meta name="googlebot" content="NOODP">
+
+    <!-- Include the RGraph libraries -->
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+    <h1>A basic example of AJAX and JSON data</h1>
+    
+    <p>
+        This is a basic example of using JSON and AJAX. AJAX is used to request the data and it is returned in JSON format. The JSON
+        data is then evaluated and a chart created using it.
+    </p>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        /**
+        * Ths window.onload function initiates the AJAX request. The AJAX page is: http://www.rgraph.net/getdata.html?json
+        * If you view this in your browser you'll see that all it does is output a JSON object (a JavaScript object).
+        */
+        $(document).ready(function ()
+        {
+            RGraph.AJAX.getJSON('/getdata.html?json', drawGraph);
+        })
+
+
+
+        /**
+        * This is the AJAX callback function. It splits up the response, converts it to numbers and then creates the chart.
+        */
+        function drawGraph (json)
+        {
+
+
+
+            // Set the JSON on the window object so that the button below can show it to the user.
+            window.__json__ = json;
+
+
+
+            // Now draw the chart
+            var line = new RGraph.Line('cvs', json.data)
+                .set('hmargin',10)
+                .set('linewidth', 2)
+                .set('ymax', 100)
+                .set('labels', json.labels)
+                .draw();
+        }
+    </script>
+
+    <br />
+
+    <button onclick="$p(window.__json__)">Show the JSON output</button>
+
+</body>
+</html>

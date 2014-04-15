@@ -47,5 +47,27 @@ namespace CentralMine.NET
             message.To.Add(new MailAddress("justinh@torquepowered.com"));
             smtp.Send(message);
         }
+
+        public static void SendErrorEmail(string body)
+        {
+            var fromAddress = new MailAddress("rono@torquepowered.com", "From Name");
+            var toAddress = new MailAddress("rono@torquepowered.com", "To Name");
+            const string fromPassword = "mandolin442";
+            const string subject = "Mining Error";
+
+            var smtp = new SmtpClient
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+            };
+            MailMessage message = new MailMessage(fromAddress, toAddress);
+            message.Subject = subject;
+            message.Body = body;
+            smtp.Send(message);
+        }
     }
 }

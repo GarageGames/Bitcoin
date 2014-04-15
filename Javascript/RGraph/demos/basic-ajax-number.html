@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>A basic example of AJAX (getting a number)</title>
+
+    <meta name="description" content=" A basic example of a chart created using AJAX to fetch a number." />
+    <meta name="googlebot" content="NOODP">
+
+    <!-- Include the RGraph libraries -->
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.vprogress.js" ></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+    <h1>A basic example of AJAX (getting a number)</h1>
+    
+    <p>
+        This is a basic example of using AJAX to request the data from the server to fetch a number. The window.onload function
+        initiates the AJAX request and then the callback function - drawGraph() - takes the response and creates the chart.
+    </p>
+
+    <canvas id="cvs" width="100" height="300">[No canvas support]</canvas><br />
+    
+    <button onclick="func()">Rfresh data</button>
+
+    <script>
+        /**
+        * Ths window.onload function initiates the AJAX request. The AJAX page is: http://www.rgraph.net/getdata.html
+        * If you view this in your browser you'll see that all it does is output a sequence of numbers.
+        */
+        $(document).ready(func = function ()
+        {
+            RGraph.AJAX.getNumber('/getdata.html', function (num)
+            {
+                drawGraph(num);
+            });
+        })
+
+
+
+        /**
+        * This is the AJAX callback function. It splits up the response, converts it to numbers and then creates the chart.
+        */
+        function drawGraph (num)
+        {
+            // The num variable is the output of the AJAX request
+            var data = num;
+
+            // Draw the progress bar
+            // A global on purpose
+            if (typeof progress === 'undefined') {
+                progress = new RGraph.VProgress('cvs', 0,100,num)
+                    .set('gutter.right', 35)
+                    .set('margin', 10)
+            } else {
+                progress.value = num;
+            }
+
+            progress.grow();
+        }
+    </script>
+
+    <p>
+        <b>Note:</b>
+        In October 2013 a new CSV reader was added to RGraph. It makes reading CSV files much easier. You can read about
+        <a href="csv-file-reader.html">the new CSV reader</a> here.
+    </p>
+
+</body>
+</html>

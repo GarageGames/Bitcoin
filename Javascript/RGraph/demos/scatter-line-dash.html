@@ -1,0 +1,48 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.scatter.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Scatter chart which shows the line dash setting (not available in all browsers)</title>
+
+    <meta name="description" content="A Scatter chart which shows the line dash setting (not available in all browsers)" />
+     
+
+    <script>
+        $(document).ready(function ()
+        {
+            var scatter = new RGraph.Scatter('cvs', [[1,8],[5,4],[6,3],[9,4],[18,5],[19,3],[20,5]])
+                .set('xmax', 20)
+                .set('labels', ['Jan','Feb','Mar'])
+                .set('ticksize', 5)
+                .set('line', true)
+                .set('line.dash', [5,5])
+                .set('line.colors', ['red'])
+                .draw();
+        })
+    </script>
+</head>
+<body>
+
+    <h1>A Scatter chart which shows the line dash setting (not available in all browsers)</h1>
+    
+    <p>
+        This Scatter chart shows the new line dash setting. It's not available in all browsers as of March 2014.
+    </p>
+
+    <canvas id="cvs" width="600" height="200">[No canvas support]</canvas>
+    
+
+
+
+    <p>        
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

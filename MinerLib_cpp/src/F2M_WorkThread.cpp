@@ -13,6 +13,7 @@ F2M_WorkThread::F2M_WorkThread(bool sse)
 F2M_WorkThread::~F2M_WorkThread(void)
 {
     InternalDestroy();
+    delete mWork;
 }
 
 void F2M_WorkThread::StartWork(unsigned int hashStart, unsigned int hashCount, F2M_Work* work)

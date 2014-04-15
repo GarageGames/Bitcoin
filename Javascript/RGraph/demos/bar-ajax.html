@@ -1,0 +1,52 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="../libraries/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Bar chart using AJAX</title>
+
+    <meta name="description" content="A Bar chart fetching its data via AJAX" />
+    
+</head>
+<body>
+
+    <h1>A Bar chart using AJAX</h1>
+    
+    <div style="background-color: #ffc; border: 2px solid #cc0; border-radius: 5px; padding: 5px;">
+        <b>Note:</b>
+        For browser security reasons the AJAX demos don't work offline. You can view the demos on the RGraph website here:
+        <a href="http://www.rgraph.net/demos/" target="_blank" rel="nofollow">http://www.rgraph.net/demos</a>
+    </div>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        drawGraph = function (data)
+        {
+            var bar = new RGraph.Bar('cvs', data)
+                .set('colors', ['red'])
+                .set('labels', ['John', 'Fred', 'Joe', 'Rich', 'Pete', 'Lilly', 'Fred', 'Joe', 'Rich', 'Pete'])
+                .set('numyticks', 5)
+                .set('ylabels.count', 5)
+                .set('gutter.left', 35)
+                .set('variant', '3d')
+                .set('strokestyle', 'transparent')
+                .set('hmargin.grouped', 0)
+                .set('scale.round', true)
+                .draw();
+        }
+        
+        RGraph.AJAX.getCSV('/getdata.html', drawGraph)
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.pie.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>Pie chart with custom border highlighting</title>
+    
+    <meta name="description" content="A Pie chart that has been exploded and drawn with a border and custom highlighting" />
+     
+    
+    <style>
+        .RGraph_tooltip {
+            background-color: white ! important;
+        }
+        
+        .RGraph_tooltip img {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Pie chart custom border highlighting</h1>
+    
+    <p>
+        Tooltips and other dynamic features may be affected by the redrawing.
+    </p>
+
+    <canvas id="cvs" width="450" height="300">[No canvas support]</canvas>
+    
+<script>
+    $(document).ready(function ()
+    {
+        // Create the Pie chart
+        var pie = new RGraph.Pie('cvs', [4,6,3,5,2,5,8])
+            .set('labels', ['Monday', 'Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])
+            .set('tooltips', ['Monday', 'Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])
+            .set('tooltips.event', 'mousemove')
+            .set('tooltips.highlight', false)
+            .set('text.color', '#aaa')
+            .set('strokestyle', 'rgba(0,0,0,0)')
+            .set('exploded', [,25])
+            .draw();
+        
+        pie.ontooltip = function (obj)
+        {
+            var co      = obj.context;
+            var tooltip = RGraph.Registry.Get('chart.tooltip');
+            var index   = tooltip.__index__;
+            var shape   = obj.angles[index];
+            var colors  = ['red','#ccc','#0f0','blue','pink','yellow','black'];
+            var color   = colors[index];
+
+            co.fillStyle = color;
+            co.beginPath();
+                co.arc(shape[2], shape[3], obj.radius, shape[0], shape[1], false)
+                co.arc(shape[2], shape[3], obj.radius + 5, shape[1], shape[0], true)
+            co.fill();
+            
+            // Set CSS on the tooltip
+            tooltip.style.border = '3px ' + color + ' solid';
+            tooltip.style.padding = '3px';
+        }
+    })
+</script>
+
+    <p>        
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

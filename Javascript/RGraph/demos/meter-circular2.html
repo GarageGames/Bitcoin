@@ -1,0 +1,52 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.meter.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <meta name="description" content="A circular and adjustable Meter chart" />
+     
+</head>
+<body>
+
+    <h1>A circular and adjustable Meter chart</h1>
+
+    <canvas id="cvs" width="400" height="250" style="border: 1px solid #ccc; border-radius: 15px">[No canvas support]</canvas>
+    <script>
+        $(document).ready(function ()
+        {
+            var meter = new RGraph.Meter('cvs', -100,100,-25)
+                .set('angles.start', RGraph.PI - 0.5)
+                .set('angles.end', RGraph.TWOPI + 0.5)
+                .set('linewidth.segments', 15)
+                .set('text.size', 16)
+                .set('strokestyle', 'white')
+                .set('segment.radius.start', 95)
+                .set('needle.radius', 75)
+                .set('border', 0)
+                .set('tickmarks.small.num', 0)
+                .set('tickmarks.big.num', 0)
+                .set('colors.ranges', [[-100,-70, 'red'],[-70,70, '#0f0'],[70,100, 'red']])
+                .set('centery', 155)
+                .set('radius', 125)
+                .set('adjustable', true)
+                .draw();
+
+            meter.onbeforedraw = function (obj)
+            {
+              RGraph.clear(obj.canvas, 'white');
+            }
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

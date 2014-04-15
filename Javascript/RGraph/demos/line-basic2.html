@@ -1,0 +1,46 @@
+<html>
+<head>
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A basic line chart</title>
+    
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <meta name="description" content="A basic Line chart" />
+     
+</head>
+<body>
+
+    <h1>A basic line chart</h1>
+    
+    <p>
+        A simple black and white Line chart with Trace2- defaults have been changed though so there is some configuration required.
+    </p>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var line = new RGraph.Line('cvs', [4,5,5,6,6,7,4,5,6,8,8,9,15,16,24,25, null, null])
+                .set('numxticks', 0)
+                .set('numyticks', 0)
+                .set('background.grid', false)
+                .set('colors', ['black'])
+                .set('linewidth', 5)
+                .set('hmargin', 5)
+                .set('ylabels', false)
+                .set('shadow', false)
+            RGraph.ISOLD ? line.draw() : line.trace2();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

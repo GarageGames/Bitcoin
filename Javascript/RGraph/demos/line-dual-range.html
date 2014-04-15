@@ -1,0 +1,78 @@
+<html>
+<head>
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Line chart showing two range charts</title>
+    
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <meta name="description" content="A chart with four Line chart objects - each of which is showing a range chart" />
+     
+</head>
+<body>
+
+    <h1>Two range charts</h1>
+    
+    <p>
+        This chart is using four Line chart objects - two of which are generating the ranges and two of which are
+        generating the black median lines.
+    </p>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var line1 = new RGraph.Line('cvs', [4,3,3,3,5,2,4],[8,5,6,8,9,7,8])
+                .set('filled', true)
+                .set('linewidth', 3)
+                .set('colors', ['red'])
+                .set('fillstyle', 'rgba(255,0,0,0.2)')
+                .set('filled.range', true)
+                .set('ymax', 10)
+                .set('labels', ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'])
+                .draw();
+            
+            var line2 = new RGraph.Line('cvs', [6,4,4.5,5.5,7,4.5,6])
+                .set('background.grid', false)
+                .set('ylabels', false)
+                .set('noaxes', true)
+                .set('colors', ['black'])
+                .set('linewidth', 3)
+                .set('ymax', 10)
+                .draw();
+
+            var line3 = new RGraph.Line('cvs', [1,2,4,2,2,4,3],[0,1,2,0,0,1,0])
+                .set('background.grid', false)
+                .set('ylabels', false)
+                .set('noaxes', true)
+                .set('filled', true)
+                .set('linewidth', 3)
+                .set('colors', ['blue'])
+                .set('fillstyle', 'rgba(0,0,255,0.2)')
+                .set('filled.range', true)
+                .set('ymax', 10)
+                .draw();
+            
+            var line4 = new RGraph.Line('cvs', [0.5,1.5,3,0.5,1,2.5,1.5])
+                .set('background.grid', false)
+                .set('ylabels', false)
+                .set('noaxes', true)
+                .set('colors', ['black'])
+                .set('linewidth', 3)
+                .set('ymax', 10)
+                .draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>
+

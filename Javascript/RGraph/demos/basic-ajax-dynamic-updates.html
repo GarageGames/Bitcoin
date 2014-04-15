@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>A basic example of dynamics updates with AJAX</title>
+    <meta name="description" content="A basic example of a chart created using dynamic updates and AJAX" />
+    <meta name="googlebot" content="NOODP">
+
+    <!-- Include the RGraph libraries -->
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+
+</head>
+
+<body>
+
+    <h1>A basic example of a chart created using dynamic updates and AJAX</h1>
+    
+    <p>
+        This is a basic example of dynamic updates using AJAX to request the data from the server. There are more examples here:
+    </p>
+    
+    <ul>
+        <li><a href="/demos/line-dynamic-updates-range.html">/demos/line-dynamic-updates-range.html</a></li>
+        <li><a href="/demos/line-dynamic-updates.html">/demos/line-dynamic-updates.html</a></li>
+    </ul>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+    
+        // Prefill the data array
+        for (i=0,data=[];i<60; ++i) data[i] = null;
+    
+        /**
+        * Ths window.onload function initiates the AJAX request. The AJAX page is: http://www.rgraph.net/getdata.html
+        * If you view this in your browser you'll see that all it does is output a sequence of numbers.
+        */
+        $(document).ready(ready = function ()
+        {
+            RGraph.AJAX.getNumber('/getdata.html', draw);
+            
+            setTimeout(ready, 1000)
+        })
+
+
+
+        /**
+        * This is the AJAX callback function. It adds the number retrieved via
+        * AJAX to the data array
+        */
+        function draw (num)
+        {
+            // Add the number to the array of data
+            data.push(num);
+            
+            // Get rid of the first value of the data array
+            data.shift();
+            
+            // Clear the canvas
+            RGraph.Reset(document.getElementById('cvs'));
+
+            var line = new RGraph.Line('cvs', data)
+                .set('labels', ['60s','55s','50s','45s','40s','35s','30s','25s','20s','15s','10s','5s','0s'])
+                .set('title', 'Last minutes updates')
+                .set('numxticks', 12)
+                .set('background.grid.autofit.numvlines', 12)
+                .set('ymax', 100)
+                .draw();
+        }
+    </script>
+
+</body>
+</html>

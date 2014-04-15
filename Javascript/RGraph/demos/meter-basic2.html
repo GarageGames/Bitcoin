@@ -1,0 +1,42 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.meter.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>Another  Meter chart</title>
+    
+    <meta name="description" content="A Meter chart" />
+     
+</head>
+<body>
+
+    <h1>A basic Meter chart</h1>
+
+    <canvas id="cvs" width="600" height="300">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var meter = new RGraph.Meter('cvs', 50, 100, 60)
+                .set('units.post', 'k')
+                .set('red.start', 85)
+                .set('red.end', 100)
+                .set('yellow.start', 65)
+                .set('yellow.end', 85)
+                .set('green.start', 50)
+                .set('green.end', 65)
+                .draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

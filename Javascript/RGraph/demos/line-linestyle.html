@@ -1,0 +1,50 @@
+<html>
+<head>
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>An adjustable range Line chart</title>
+    
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <meta name="description" content="A range Line chart which is adjustable - so you can drag the data points up and down" />
+     
+</head>
+<body>
+
+    <h1>Highlighting the Line chart</h1>
+    
+    <p>
+        By using two lines - the second with a smaller linewidth than the first, but using the same values as the first - the second is
+        drawn on top of the first.
+    </p>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var line = new RGraph.Line('cvs', [4,5,3,8,null,9,6,5,3], [4,5,3,8,null,9,6,5,3])
+                .set('labels', ['Mal', 'Barry', 'Gary', 'Neil', 'Kim', 'Pete', 'Lou', 'Fred', 'Jobe'])
+                .set('colors', ['black', 'white'])
+                .set('linewidth', [5, 2])
+                .set('hmargin', 5)
+                .set('shadow', true)
+                .set('shadow.offsetx', 0)
+                .set('shadow.offsety', 0)
+                .set('shadow.blur', 15)
+                .set('tickmarks', null)
+                .draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>
+

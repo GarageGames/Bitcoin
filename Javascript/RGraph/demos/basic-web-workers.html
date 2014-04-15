@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>A basic example of a chart updated via a Web Worker</title>
+
+    <meta name="description" content=" A basic example of a chart updated via a Web Worker" />
+    <meta name="googlebot" content="NOODP">
+
+    <!-- Include the RGraph libraries -->
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.gauge.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+
+</head>
+<body>
+    
+    <h1>A basic demo of Web Workers</h1>
+    
+    <p>
+        This is basic demo of using Web Workers (which are child threads) to generate a random value which is posted back to
+        the main thread (this page). The value is then used to update the Gauge. To make a useful example you could use the
+        child thread in conjunction with Web Sockets to retieve (for example) load values from your server(s).
+        Also, to retrieve data from your server you may find it easier and less involved to use AJAX.
+    </p>
+    
+    <canvas id="cvs" width="300" height="300">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            /**
+            * Create the worker child thread. The code that is used as the child thread is held
+            * in the /libraries/basic-web-workers.js file.
+            */
+            var worker = new Worker('/libraries/basic-web-workers.js');
+            
+            /**
+            * The message event is used to listen for messages from the worker thread. When it sends a message
+            * to the main thread (ie the main page) the message event is fired and this function runs. It simply updates
+            * the Gauge using the Grow effect.
+            */
+            worker.addEventListener('message', function (e)
+            {
+                // The data/message that is returned from the worker is a string - so
+                // it must be converted to a number
+                var value = (Number(e.data) * 0.2) + 0.4;
+                gauge.value = value;
+                gauge.grow();
+    
+            }, false);
+            
+            /**
+            * Create the Gauge chart. Initially it is set to have 0 value.
+            */
+            var gauge = new RGraph.Gauge('cvs',0,1,0)
+                .set('scale.decimals', 1)
+                .draw();
+        })
+    </script>
+
+    <p>
+        <b>See also:</b>
+    </p>
+
+    <ul>
+        <li><a href="http://www.html5rocks.com/en/tutorials/workers/basics/" target="_blank">Article about Web Workers on html5rocks.com</a></li>
+    </ul>
+</body>
+</html>

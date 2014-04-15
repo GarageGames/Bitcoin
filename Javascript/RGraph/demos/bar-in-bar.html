@@ -1,0 +1,61 @@
+
+<!DOCTYPE html >
+<html>
+<head>
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>An example of a Bar chart with bars-in-bars</title>
+    
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <meta name="description" content="An example of a Bar chart with bars-in-bars" />
+</head>
+<body>
+
+    <h1>An example of a Bar chart with bars-in-bars</h1>
+    
+    <p>
+        By using two bar chart objects you can achieve a bar-in-bar effect. Here it shows the total amount of cars produced versus
+        those sold. It's similar to a stacked or grouped Bar chart.
+    </p>
+
+    <canvas id="cvs" width="900" height="200" !style="border: 1px solid gray">[No canvas support]</canvas>
+    <script>
+        $(document).ready(function ()
+        {
+            var data = {}
+                data.shipped = [88000,88000,105000,105000,116000,116000,126000];
+                data.sold    = [30000,54000,54000,62000,63000,68000,68000];
+    
+            var bar1 = new RGraph.Bar('cvs', data.shipped)
+                .set('gutter.left', 50)
+                .set('colors', ['rgba(0,0,255,0.2)'])
+                .set('labels', ['Fred','Barney','Wilma','Betty','Dino','Bam-bam','Pebble'])
+                .set('labels.above', data.shipped)
+                .set('title', 'Total cars produced vs sold')
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .draw();
+    
+            var bar2 = new RGraph.Bar('cvs', data.sold)
+                .set('ymax', bar1.scale2.max)
+                .set('gutter.left', bar1.Get('gutter.left'))
+                .set('colors', ['pink'])
+                .set('noaxes', true)
+                .set('labels.above', true)
+                .set('hmargin', 20)
+                .set('ylabels', false)
+                .set('background.grid', 0)
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .draw();
+            })
+        </script>
+    
+    <br />
+    
+    <a href="./">&lt;Back</a><br />
+
+</body>
+</html>

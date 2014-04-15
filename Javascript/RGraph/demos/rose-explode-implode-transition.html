@@ -1,0 +1,88 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.rose.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+
+    <title>A Rose chart explode/implode transition</title>
+
+    <meta name="description" content="A Rose chart explode/implode transition effect" />
+     
+</head>
+<body>
+
+    <h1>A Rose chart explode/implode transition effect</h1>
+
+    <button onclick="transition();">Switch!</button>
+    
+    <canvas id="cvs" width="450" height="400">[No canvas support]</canvas>
+
+    <script>
+        function transition ()
+        {
+            var cvs = document.getElementById('cvs');
+
+            cvs.__object__.explode(null, function ()
+            {
+                visible === 1 ? drawRose2() : drawRose1();
+            });
+        }
+
+
+
+
+        /**
+        * Draws the first Rose chart
+        */
+        function drawRose1 ()
+        {
+            var cvs = document.getElementById("cvs");
+            RGraph.reset(cvs);
+            var rose = new RGraph.Rose('cvs', [4,8,6,5,3,2,9,4,2,8])
+                .set('background.grid', false)
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .set('margin', 3)
+                .implode();
+            
+            // A global
+            visible = 1;
+        }
+
+
+
+
+        /**
+        * Draws the second Rose chart
+        */
+        function drawRose2 ()
+        {
+            var cvs = document.getElementById("cvs");
+            RGraph.reset(cvs);
+            var rose = new RGraph.Rose('cvs', [1,8,8,8,4,6,3,2,5,6])
+                .set('colors.sequential', true)
+                .set('background.grid', false)
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .set('margin', 3)
+                .implode();
+            
+            // A global
+            visible = 2;
+        }
+
+        $(document).ready(function ()
+        {
+            drawRose1();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

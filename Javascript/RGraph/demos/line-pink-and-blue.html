@@ -1,0 +1,51 @@
+<html>
+<head>
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A pink and blue Line chart</title>
+    
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+
+    <meta name="description" content="A Line chart with little chrome around it thats colored pink and blue" />
+     
+</head>
+<body>
+
+    <h1>A pink(ish) and blue Line chart</h1>
+
+    <canvas id="cvs" width="300" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var l1 = new RGraph.Line('cvs', [0,20,12,43,11,41,34,56,31,39,15,56], [0,9,39,29,37,23,42,32,45,11,30,45])
+                .set('gutter.left', 5)
+                .set('gutter.right', 5)
+                .set('gutter.bottom', 5)
+                .set('gutter.top', 5)
+                .set('background.grid', true)
+                .set('background.grid.vlines', false)
+                .set('linewidth', 5)
+                .set('hmargin', 3)
+                .set('axis.linewidth', 5)
+                .set('numxticks', 0)
+                .set('numyticks', 0)
+                .set('colors', ['#F60091','#00ACDE'])
+                .set('filled.accumulative', true)
+                .set('filled', true)
+                .set('fillstyle', ['rgba(255,200,200,0.5)','rgba(200,200,255,0.5)'])
+                .set('drawcache', true) // It defaults to true anyway
+                .trace({frames: 60});
+        });
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>
+

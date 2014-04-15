@@ -1,0 +1,58 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="../libraries/RGraph.drawing.circle.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A basic example of the drawing API circle object</title>
+
+    <meta name="description" content="A basic example of the drawing API circle object" />
+     
+</head>
+<body>
+        
+    <h1>A basic example of the drawing API circle object</h1>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var line = new RGraph.Line('cvs', [5,8,6,4,3,5,2])
+                .set('hmargin', 5)
+                .set('labels', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])
+                .draw();
+            
+            var coords = line.coords[2];
+            
+            var circle = new RGraph.Drawing.Circle('cvs', coords[0], coords[1], 30)
+                .set('strokestyle', 'rgba(0,0,0,1)')
+                .set('fillstyle', 'rgba(0,0,0,0.2)')
+                .draw();
+            
+            circle.onclick = function (e, shape)
+            {
+                alert('[RGRAPH] The circle has been clicked!');
+            }
+            
+            circle.onmousemove = function (e, shape)
+            {
+                e.target.style.cursor = 'pointer';
+            }
+        })
+    </script>
+
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>Line chart with Trace effect</title>
+    
+    <meta name="description" content="A Line chart with Trace effect" />
+     
+</head>
+<body>
+
+    <h1>Line chart with Trace effect</h1>
+
+    <div>
+        <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+    </div>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var line = new RGraph.Line('cvs', [84,-5,-30,-26,-45,12,84,73,60])
+                .set('labels', ['Felicity','Gary','Neil','Jay','Helga','Ray','Kev','Luis','Pete'])
+                .set('colors', ['black'])
+                .set('shadow', true)
+                .set('shadow.offsetx', 1)
+                .set('shadow.offsety', 1)
+                .set('linewidth', 2)
+                .set('yaxispos', 'right')
+                .set('xaxispos', 'center')
+                .set('hmargin', 5)
+            RGraph.ISOLD ? line.draw() : line.trace()
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

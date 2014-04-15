@@ -23,6 +23,12 @@ namespace CentralMine.NET
             mThread.Start();
         }
 
+        public void Close()
+        {
+            mSocket.Stop();
+            mThread.Abort();
+        }
+
         void ListenLoop()
         {
             mSocket.Start();

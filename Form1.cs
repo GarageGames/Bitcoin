@@ -17,12 +17,21 @@ namespace CentralMine.NET
         public Form1()
         {
             InitializeComponent();
+            this.FormClosing += new FormClosingEventHandler(Form1_FormClosing);
+
             mTheMan = new ClientManager();
 
             protocol.Items.Add(ClientManager.Currency.Bitcoin);
             protocol.Items.Add(ClientManager.Currency.Xencoin);
             protocol.Items.Add(ClientManager.Currency.Gamerscoin);
             protocol.SelectedIndex = 2;           
+        }
+
+        void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            timer1.Enabled = false;
+            mTheMan.Close();
+            mTheMan = null;
         }
         
         private void timer1_Tick(object sender, EventArgs e)

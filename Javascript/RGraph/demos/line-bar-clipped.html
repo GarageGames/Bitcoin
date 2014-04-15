@@ -1,0 +1,76 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.bar.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A demo of a clipped Line/Bar chart</title>
+    
+    <meta name="description" content="A Line chart is drawn, then the canvas is clipped to the area under a line - then the bar chart is drawn." />
+     
+</head>
+<body>
+
+    <h1>A demo of a clipped Line/Bar chart</h1>
+    
+    <p>
+        This is a demo of first drawing a (curvy) Line chart and then using the coordinates to specify a clipping area to
+        then draw the Bar chart. The Bar charts background grid and axes are turned off so as not to appear over the Line
+        chart. The clipping areas height is slightly smaller than the coordinates (by half the linewidth) so the Bar chart
+        does not not appear over the parts of the Line where the bars are.
+    </p>
+
+    <canvas id="cvs" width="600" height="300">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var linewidth = 5;
+            var linedata  = [1,5,6,8,9,8,6,4,3,1];
+            var bardata   = [8,7,9,10,8,7,6,5,4];
+
+            var line = new RGraph.Line('cvs', linedata)
+                .set('spline', true)
+                .set('tickmarks', 'endcircle')
+                .set('linewidth', linewidth)
+                .set('shadow', false)
+                .draw();
+            
+            var ca = line.canvas;
+            var co = line.context;
+                
+            // Draw a area under the chart and clip to it
+            co.beginPath();
+                co.moveTo(0, ca.height)
+                for (var i=0,len=line.coordsSpline[0].length; i<len; ++i) {
+                    co.lineTo(line.coordsSpline[0][i][0], line.coordsSpline[0][i][1] + (linewidth / 2) - 0.5);
+                }
+                co.lineTo(ca.width, ca.height)
+                co.clip();
+
+            // Now draw the bar chart
+            var bar = new RGraph.Bar('cvs', bardata)
+                .set('labels', ['Rob','Lucy','Lynsey','Paul','Olga','Jerry','Kev','Luis','Hoolio'])
+                .set('background.grid', false)
+                .set('noxaxis', true)
+                .set('noyaxis', true)
+                .set('ylabels', false)
+                .set('colors', ['gradient(#eef:#01B4FF)'])
+                .set('shadow', false)
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .draw();
+            
+        });
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

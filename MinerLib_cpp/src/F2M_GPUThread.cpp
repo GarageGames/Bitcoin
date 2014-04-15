@@ -200,7 +200,8 @@ bool F2M_GPUThread::IsWorkDone()
             {
                 mSolutionFound = true;
                 mSolution = mPositivesArea[i];
-                mWorkDoneEvent = 0;                
+                mWorkDoneEvent = 0;
+                F2M_ScryptCleanup(mScryptData);
 
                 clFinish(mQ);
                 return true;

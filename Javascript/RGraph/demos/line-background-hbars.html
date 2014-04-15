@@ -1,0 +1,48 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Line chart with background horizontal bars</title>
+    
+    <meta name="description" content="A Line chart with background horizontal bars" />
+     
+</head>
+<body>
+
+    <h1>A Line chart with background horizontal bars</h1>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var line = new RGraph.Line('cvs', [26,4,-15.5,17,42.5,25])
+                .set('colors', ['black'])
+                .set('hmargin', 5)
+                .set('linewidth', 5)
+                .set('ymax', 60)
+                .set('xaxispos', 'center')
+                .set('labels', ['2007', '2008', '2009', '2010', '2011', '2012'])
+                .set('background.hbars', [
+                                          [-55,-5,'rgba(255,0,0,0.2)'],
+                                          [-45,-10,'rgba(255,255,0,0.2)'],
+                                          [-45,90,'rgba(0,255,0,0.2)'],
+                                          [45,10,'rgba(255,255,0,0.2)'],
+                                          [55,5,'rgba(255,0,0,0.2)']
+                                         ])
+                .draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

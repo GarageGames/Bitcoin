@@ -66,6 +66,11 @@ namespace CentralMine.NET
             mLastSeen = DateTime.Now;
         }
 
+        public void Close()
+        {
+            mClient.Close();
+        }
+
         public override string ToString()
         {
             string str = "";

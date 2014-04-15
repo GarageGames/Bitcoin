@@ -1,0 +1,78 @@
+
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.csv.js" ></script>
+    <script src="../libraries/RGraph.rose.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A stacked Rose chart using the CSV reader</title>
+
+    <meta name="description" content="A stacked Rose chart using the CSV reader" />
+    
+</head>
+<body>
+
+    <h1>A Rose chart using the CSV reader</h1>
+    
+    <p>
+        This chart demonstrates using the CSV reader to read the <a href="/sample.csv">sample.csv</a> file.
+    </p>
+    
+
+    <div style="background-color: #ffc; border: 2px solid #cc0; border-radius: 5px; padding: 5px;">
+        <b>Note:</b>
+        For browser security reasons the AJAX demos don't work offline. You can view the demos on the RGraph website here:
+        <a href="http://www.rgraph.net/demos/" target="_blank" rel="nofollow">http://www.rgraph.net/demos</a>
+    </div>
+    <canvas id="cvs" width="400" height="400">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            RGraph.CSV('/sample.csv', function (csv)
+            {
+                var data = [];
+
+
+
+
+                /**
+                * First column is the labels
+                */
+                var labels = csv.getCol(0);
+
+
+
+
+                /**
+                * Number of rows in the CSV file
+                */
+                var numrows = csv.numrows;
+                
+                for (var i=0; i<numrows; i+=1) {
+                    data.push(csv.getRow(i, 1));
+                }
+
+
+                
+                var bar = new RGraph.Rose('cvs', data)
+                    .set('labels.axes', 'n')
+                    .set('colors', ['red', 'green', '#aaf', 'mauve', 'cyan','#fca', 'pink'])
+                    .set('margin', 15)
+                    .set('colors.alpha', 0.5)
+                    .draw();
+            })
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

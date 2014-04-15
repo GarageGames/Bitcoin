@@ -1,0 +1,38 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="../libraries/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.bar.js" ></script>
+    
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    
+    <title>Bar chart Wave effect</title>
+    
+</head>
+<body>
+
+    <h1>Bar chart Wave effect</h1>
+
+    <canvas id="cvs" width="500" height="250">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var data = [1,2,4,5,5,8,9,10,12,15,11,9,9,5,5,4,3,2];
+
+            var bar = new RGraph.Bar('cvs', data)
+                .set('background.grid.vlines', false)
+                .set('background.grid.border', false)
+                .set('shadow', false)
+                .wave({frames: 10});
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

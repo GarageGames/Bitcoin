@@ -1,0 +1,120 @@
+<html>
+<head>
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.drawing.yaxis.js" ></script>
+    <script src="../libraries/RGraph.drawing.xaxis.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>An inverted quarter axis Line chart</title>
+    
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <meta name="description" content="A demonstration of how you can produce an inverted quarter axis chart" />
+     
+</head>
+<body>
+
+    <h1>An inverted quarter axis Line chart</h1>
+    
+    <p>
+        This quarter axis chart is inverted so that the small area is at the top.
+    </p>
+
+    <canvas id="cvs" width="600" height="370" !style="border: 1px solid gray">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var context = document.getElementById("cvs").getContext('2d');
+            
+            // Draw the background grid manually
+            context.beginPath();
+            context.strokeStyle = '#ddd';
+                // Vertical grid lines
+                for (var i=55; i<=576; i+=(520 / 6)) {
+                    context.rect(Math.round(i) + 0.5, 25, 0, 320);
+                }
+                
+                // Horizontal grid lines
+                for (var i=25; i<=345; i+=(320 / 8)) {
+                    context.rect(55, i + 0.5, 520, 0);
+                }
+            context.stroke();
+    
+
+            // Draw the top Y axis
+            var top_yaxis = new RGraph.Drawing.YAxis('cvs', 55)
+                .set('max', 10)
+                .set('numticks', 0)
+                .set('numlabels', 1)
+                .set('gutter.top', 25)
+                .set('gutter.bottom', 325)
+                .set('units.pre', '-')
+                .set('units.post', 'k')
+                .set('scale.zerostart', false)
+                .draw();
+
+
+
+            // Draw the bottom Y axis
+            var bottom_yaxis = new RGraph.Drawing.YAxis('cvs', 55)
+                .set('max', 150)
+                .set('gutter.top', 45)
+                .set('gutter.bottom', 25)
+                .set('scale.invert', true)
+                .set('numlabels', 15)
+                .set('numticks', 0)
+                .set('noendtick.top', true)
+                .set('units.pre', '-')
+                .set('units.post', 'k')
+                .draw();
+
+            // Draw the center X axis (which has no labels)
+            var xaxis = new RGraph.Drawing.XAxis('cvs', 45)
+                .set('labels', [])
+                .set('numticks', 0)
+                .set('hmargin', 25)
+                .set('gutter.left', 55)
+                .draw();
+
+            // Draw the bottom X axis (which is transparent but does have labels)
+            var xaxis = new RGraph.Drawing.XAxis('cvs', 345)
+                .set('xaxispos', 'center')
+                .set('labels', ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'])
+                .set('labels.position', 'edge')
+                .set('numticks', 7)
+                .set('hmargin', 0)
+                .set('colors', ['rgba(0,0,0,0)'])
+                .set('text.color', '#666')
+                .set('gutter.left', 55)
+                .draw();
+
+
+            // Draw the line chart
+            var line = new RGraph.Line('cvs', [0,-10000,150000,0,50000,0,40000])
+                .set('hmargin', 0)
+                .set('gutter.left', 55)
+                .set('gutter.top', 45)
+                .set('outofbounds', true)
+                .set('linewidth', 3)
+                .set('ylabels', false)
+                .set('noaxes', true)
+                .set('background.grid', false)
+                .set('colors', ['red'])
+                .set('ymax', 150000)
+                .set('scale.invert', true)
+                .set('tickmarks', 'endcircle')
+                .draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>
+

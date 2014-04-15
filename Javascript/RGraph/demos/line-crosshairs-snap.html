@@ -1,0 +1,65 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Line chart demonstrating the crosshairs snap option</title>
+    
+    <meta name="description" content="The crosshairs has a snap option to 'lock' it to points - this demonstrates it" />
+     
+</head>
+<body>
+
+    <h1>A Line chart demonstrating  the crosshairs snap option</h1>
+    
+    <p>
+        This line chart demonstrates how you can extract the Line charts dataset and index from the variables set on the canvas tag
+        by RGraph.
+    </p>
+
+    <canvas id="cvs" width="600" height="400">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var line = new RGraph.Line('cvs', [61.5,84.2,74.1,95.3], [1,25,14,85])
+                .set('ymax', 100)
+                .set('xmax', 365)
+                .set('labels', ['Jan','Feb','Mar','Apr'])
+                .set('xaxispos', 'center')
+                .set('gutter.bottom', 45)
+                .set('hmargin', 5)
+                .set('linewidth', 3)
+                .set('shadow', true)
+                .set('crosshairs', true)
+                .set('crosshairs.snap', true)
+                .draw();
+            
+            line.oncrosshairs = function (obj)
+            {
+                document.getElementById("dataset").value =  obj.canvas.__crosshairs_snap_dataset__;
+                document.getElementById("point").value =  obj.canvas.__crosshairs_snap_point__;
+            }
+        })
+    </script>
+    
+    <p />
+    
+    Dataset:<br />
+    <input id="dataset" type="text" /><br /><br />
+
+    Point:<br />
+    <input id="point" type="text" />
+
+    <p>        
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

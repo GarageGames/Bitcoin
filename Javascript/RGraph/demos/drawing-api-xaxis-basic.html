@@ -1,0 +1,59 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.drawing.xaxis.js" ></script>
+    <script src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>An example of the drawing API X axis</title>
+    
+    <meta name="description" content="An example of the drawing API X axis object" />
+     
+</head>
+<body>
+        
+    <h1>An example of the drawing API X axis</h1>
+
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var bar = new RGraph.Bar('cvs', [4,6,8,4,5,3,7,5,4,9])
+                .set('noaxes', true)
+                .set('ylabels', false)
+                .set('labels.above', true)
+                .set('colors.sequential', true)
+                .set('colors', ['blue','blue','blue','blue','blue','red','red','red','red','red'])
+                .draw();
+            
+            var xaxes = new RGraph.Drawing.XAxis('cvs', bar.canvas.height - 25)
+                .set('labels', ['Team A','Team B'])
+                .draw();
+                
+            xaxes.onclick = function (e, obj)
+            {
+                alert('The X axis has been clicked!');
+            }
+                
+            xaxes.onmousemove = function (e, obj)
+            {
+                e.target.style.cursor = 'pointer';
+            }
+        })
+    </script>
+
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.pie.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+
+    <title>A Pie chart with gradients</title>
+    
+    <meta name="description" content="A Pie chart with gradients" />
+     
+</head>
+<body>
+
+    <h1>A Pie chart with gradients</h1>
+    This Pie chart shows you how you can use gradients, shadows and segment separation in-conjunction with each other to good effect.
+    
+    <p />
+
+    <canvas id="cvs" width="800" height="600">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var pie = new RGraph.Pie('cvs', [17,15,16,15,13,13,15,15,11,15,12,15,15])
+                .set('labels', ['Alvin','Pete','Hoolio','Jack','Kevin','Luis','Louise','Jesse','Rachel','Christian','Lola','Kevin','Barry','Peter','Luis'])
+                .set('radius', 175)
+                .set('linewidth', 3)
+                .set('text.size', 18)
+                .set('strokestyle', 'white')
+                .set('shadow', true)
+                .set('shadow.color', '#ddd')
+                .set('shadow.offsetx', 15)
+                .set('shadow.offsety', 15)
+                .set('shadow.blur', 25)
+                .set('labels.sticks', true)
+                .set('labels.sticks.length', 35)
+                .set('exploded', [25,25,55,25,75,25,55,25,25,55,25,75,25])
+                .set('colors', [
+                                'Gradient(white:#ff0:#aa0:#660)',
+                                'Gradient(white:#f00:#a00:#600)',
+                                'Gradient(white:#0ff:#0aa:#066)',
+                                'Gradient(white:#0f0:#0a0:#060)',
+                                'Gradient(white:#fff:#aaa:#666)',
+                                'Gradient(white:#f0f:#a0a:#606)',
+                                'Gradient(white:#ff0:#aa0:#660)',
+                                'Gradient(white:#f00:#a00:#600)',
+                                'Gradient(white:#0ff:#0aa:#066)',
+                                'Gradient(white:#0f0:#0a0:#060)',
+                                'Gradient(white:#fff:#aaa:#666)',
+                                'Gradient(white:#f0f:#a0a:#606)',
+                                'Gradient(white:#fff:#aaa:#666)'
+                               ])
+                .draw()
+        })
+    </script>
+
+    <p>        
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

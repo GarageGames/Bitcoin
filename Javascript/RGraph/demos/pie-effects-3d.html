@@ -1,0 +1,64 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.pie.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>Pie chart with border</title>
+    
+    <meta name="description" content="A Pie chart that has been made to look 3D-esque by transforming the canvas before drawing" />
+     
+</head>
+<body>
+
+    <h1>3D Pie chart</h1>
+    
+    <p>
+        This is an example of a 3D Pie chart effect then can be accomplished with a few extra lines of code.
+    </p>
+
+    <canvas id="cvs" width="450" height="300">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var pie = new RGraph.Pie('cvs', [4,5,5,7,5,8,4,9])
+                .set('strokestyle', '#e8e8e8')
+                .set('linewidth', 2)
+                .set('shadow', true)
+                .set('shadow.offsety', 15)
+                .set('shadow.offsetx', 0)
+                .set('shadow.color', '#aaa')
+                .set('exploded', 10)
+                .set('radius', 80)
+                .set('tooltips', ['Mavis','Kevin','Luis','June','Olga','Luis','Pete','Bridget'])
+                .set('tooltips.coords.page', true)
+                .set('labels', ['Mavis','Kevin','Luis','June','Olga','Luis','Pete','Bridget'])
+                .set('labels.sticks', true)
+                .set('labels.sticks.length', 15)
+            
+            // This is the factor that the canvas is scaled by
+            var factor = 1.5;
+        
+            // Set the transformation of the canvas - a scale up by the factor (which is 1.5 and a simultaneous translate
+            // so that the Pie appears in the center of the canvas
+            pie.context.setTransform(factor,0,0,1,((pie.canvas.width * factor) - pie.canvas.width) * -0.5,0);
+        
+            //pie.Draw();
+            pie.roundRobin({frames: 30})
+        })
+    </script>
+
+    <p>        
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

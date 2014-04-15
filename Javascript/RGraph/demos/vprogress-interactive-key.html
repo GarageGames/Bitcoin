@@ -1,0 +1,48 @@
+
+<!DOCTYPE html >
+<html>
+<head>
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.key.js" ></script>
+    <script src="../libraries/RGraph.drawing.rect.js" ></script>
+    <script src="../libraries/RGraph.vprogress.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>An example of a VProgress chart with an interactive key</title>
+    
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    
+    <meta name="description" content="An example of a VProgress chart with an interactive key" />
+     
+</head>
+<body>
+
+    <h1>An example of a VProgress chart with an interactive key</h1>
+    
+    <p>
+        The interactive key has been re-implemented as of June 2013 and added to more chart types.
+    </p>
+
+    <canvas id="cvs" width="250" height="500">[No canvas support]</canvas>
+    <script>
+        $(document).ready(function ()
+        {
+            var vprogress = new RGraph.VProgress('cvs', 0,100,[10,12,13,16,18])
+                .set('key', ['Jim','Jack','Joseph','Jane', 'Jimmy'])
+                .set('key.interactive', true)
+                .set('key.position.x', 140)
+                .set('key.position.y', 20)
+                .set('gutter.right', 150)
+                .draw();
+        })
+    </script>
+    
+    <br />
+    
+    <a href="./">&lt;Back</a><br />
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.common.key.js" ></script>
+    <script src="../libraries/RGraph.pie.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+
+    <title>A Donut chart showing browser market share</title>
+    
+    <meta name="description" content="A Donut chart showing browser market share" />
+     
+</head>
+<body>
+
+    <h1>A Donut chart showing browser market share</h1>
+
+    <canvas id="cvs" width="475" height="350">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var donut = new RGraph.Pie('cvs', [41,37,16,3,3])
+                .set('variant', 'donut')
+                .set('linewidth', 5)
+                .set('strokestyle', 'white')
+                .set('title', "Browser share")
+                .set('tooltips', ['MSIE 7 (41%)', 'MSIE 6 (37%)', 'Firefox (16%)', 'Safari (3%)', 'Other (3%)'])
+                .set('key', ['MSIE 7 (41%)', 'MSIE 6 (37%)', 'Firefox (16%)', 'Safari (3%)', 'Other (3%)'])
+                .set('key.shadow', true)
+                .set('key.shadow.offsetx', 0)
+                .set('key.shadow.offsety', 0)
+                .set('key.shadow.blur', 15)
+                .set('key.shadow.color', '#ccc')
+                .set('key.align', 'right')
+                .set('align', 'left')
+                .set('shadow', true)
+                .set('shadow.offsetx', 0)
+                .set('shadow.offsety', 0)
+                .set('shadow.blur', 25)
+                .set('centerx', 185)
+                .draw();
+        })
+    </script>
+
+    <p>        
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

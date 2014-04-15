@@ -1,0 +1,71 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.key.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.drawing.xaxis.js" ></script>
+    <script src="../libraries/RGraph.hbar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Horizontal Bar chart example showing the XAxis drawing API object</title>
+    
+    <meta name="description" content="A Horizontal Bar chart where the X axis is drawn using the drawing API" />
+     
+</head>
+<body>
+
+    <h1>A Horizontal Bar chart example showing the XAxis drawing API object</h1>
+
+
+   <canvas id="cvs" width="600" height="400">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+
+            var hbar = new RGraph.HBar('cvs', [[80,64],[1,2],[11,12],[3,12],[5,7]])
+                .set('gutter.left', 135)
+                .set('gutter.top', 35)
+                .set('labels', ['Improved','Worsened', 'No change - \r\n peoples perceptions\r\nare generally positive','No change - \r\n peoples perceptions\r\nare generally negative',"Don't know"])
+                .set('colors', ['#F68B23','#164366'])
+                .set('xmax', 100)
+                .set('background.grid', false)
+                .set('noxaxis', true)
+                .set('noyaxis', true)
+                .set('xlabels', false)
+                .set('key', ['Non-disabled','Disabled'])
+                .set('key.position', 'gutter')
+                .set('key.position.gutter.boxed', false)
+                .set('key.position.y', 0)
+                .set('tooltips', ['A','B','C','D','E','F','G','H','I','J'])
+                .on('beforedraw', function (obj)
+                {
+                    obj.context.fillStyle = '#eee';
+                    obj.context.fillRect(obj.gutterLeft, obj.gutterTop, obj.canvas.width - obj.gutterLeft - obj.gutterRight, obj.canvas.height - obj.gutterTop - obj.gutterBottom);
+                })
+                .on('draw', function (obj)
+                {
+                    obj.context.strokeRect(obj.gutterLeft, obj.gutterTop, obj.canvas.width - obj.gutterLeft - obj.gutterRight, obj.canvas.height - obj.gutterTop - obj.gutterBottom);
+                })
+                .grow()
+
+           var xaxis = new RGraph.Drawing.XAxis('cvs', 35)
+               .set('gutter.left', hbar.Get('gutter.left'))
+               .set('max', 100)
+               .set('align', 'top')
+               .draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

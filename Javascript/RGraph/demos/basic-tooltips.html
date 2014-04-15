@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>A basic example of a chart with tooltips that contain Pie charts</title>
+
+    <meta name="description" content=" A basic example of a chart with tooltips that contain Pie charts. It shows a simple example and there is little happening on the page so the source is easy to navigate." />
+    <meta name="googlebot" content="NOODP">
+
+    <!-- Include the RGraph libraries -->
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.common.key.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.bar.js" ></script>
+    <script src="../libraries/RGraph.pie.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+
+</head>
+
+<body>
+
+    <h1>A basic example of Pie charts in tooltips</h1>
+
+    <canvas id="myBar" width="1000" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            /**
+            * This creates the Bar chart
+            */
+            var bar = new RGraph.Bar('myBar', [12,13,16,15])
+                .set('gutter.left', 35)
+                .set('colors', ['red'])
+                .set('title', 'A basic graph with charts in tooltips')
+                .Set('labels', ['Kev', 'Brian', 'Fred', 'John'])
+
+            // A function which returns the string which is used as every tooltip
+            if (!RGraph.ISOLD) {
+                window.__mybar__ = bar;
+                bar.set('tooltips', function (idx) {return '<div style="text-align: center"><h3 style="margin: 0">' + window.__mybar__.Get('labels')[idx] + '\'s statistics:</h3><canvas id="__tooltip__canvas__" width="100" height="100">[No canvas support]</canvas></div>';});
+            } else {
+                alert("[RGRAPH] Sorry, your browser doesn't support tooltips");
+            }
+
+            bar.draw();
+
+
+            /**
+            * This is the function which ceates the Pie chart (using the custom ontooltip RGraph event
+            */
+            function myCreatePieChart(obj)
+            {
+                var canvas  = obj.canvas;
+                var context = obj.context;
+                var id      = obj.id;
+                
+                // This gets the tooltip index from the tooltip (which is stored in the RGraph registry) itself
+                var idx = RGraph.Registry.Get('chart.tooltip').__index__;
+                
+                /**
+                * The Pie chart data. Realistically this would come from a dynamic source,
+                * eg AJAX
+                */
+                var pieData = [
+                               [4,5,3,6],
+                               [8,4,5,2],
+                               [4,3,5,1],
+                               [4,2,1,3]
+                              ];
+                
+                var pie = new RGraph.Pie('__tooltip__canvas__', pieData[idx])
+                    .Set('align', 'left')
+                    .Set('gutter.top', 10)
+                    .Set('gutter.bottom', 10)
+                    .Set('gutter.left', 10)
+                    .Set('gutter.right', 10)
+                    .Set('exploded', [3,3,3,3])
+                    .Set('strokestyle', 'rgba(0,0,0,0)')
+                    .Draw();
+            }
+
+            RGraph.AddCustomEventListener(bar, 'ontooltip', myCreatePieChart);
+        })
+    </script>
+    
+    <p>
+        This is a basic example that shows charts (Pie charts) in tooltips. The canvas element is part of the tooltip
+        HTML code (specified like regular tooltips), and then it uses the <i>ontooltip</i> event to run some code whhich
+        then creates the Pie chart in the tooltip.
+    </p>
+
+</body>
+</html>

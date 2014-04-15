@@ -1,0 +1,62 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.drawing.rect.js" ></script>
+    <script src="../libraries/RGraph.hprogress.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A HProgress based bullet chart</title>
+    
+    <meta name="description" content="A Horizontal Progress Bar being used to show a bullet chart" />
+     
+</head>
+<body>
+
+    <h1>A HProgress based bullet chart</h1>
+
+    <canvas id="cvs" width="600" height="100">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var hprogress = new RGraph.HProgress('cvs', 0,100,85)
+                .set('margin', 12)
+                .draw();
+            
+            var coords = hprogress.coords[0];
+            var x = hprogress.getXCoord(55);
+
+            // Create the rect object that covers the lower part
+            var rect = new RGraph.Drawing.Rect('cvs', hprogress.gutterLeft,
+                                                      hprogress.gutterTop + 5,
+                                                      x - hprogress.gutterLeft,
+                                                      hprogress.canvas.height - hprogress.gutterTop - hprogress.gutterBottom - 10)
+                .set('fillstyle', 'rgba(255,0,0,0.5)')
+                .draw();
+            
+            x = hprogress.getXCoord(95);
+
+            // Create the rect object that indicates the target
+            var rect = new RGraph.Drawing.Rect('cvs', x - 3,
+                                                      hprogress.gutterTop + 5,
+                                                      6,
+                                                      hprogress.canvas.height - hprogress.gutterTop - hprogress.gutterBottom - 10)
+                .set('fillstyle', 'black')
+                .set('highlight.stroke', 'rgba(0,0,0,0)')
+                .set('tooltips', ['The target was 95% of eveything, everywhere'])
+                .draw();
+        })
+    </script>
+
+    <p>        
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

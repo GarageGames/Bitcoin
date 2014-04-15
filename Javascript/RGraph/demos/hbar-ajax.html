@@ -1,0 +1,47 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.hbar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A horizontal bar chart fetching data via AJAX</title>
+
+
+    <meta name="description" content="A horizontal bar chart fetching data via AJAX" />
+     
+</head>
+<body>
+    <div style="background-color: #ffc; border: 2px solid #cc0; border-radius: 5px; padding: 5px;">
+        <b>Note:</b>
+        For browser security reasons the AJAX demos don't work offline. You can view the demos on the RGraph website here:
+        <a href="http://www.rgraph.net/demos/" target="_blank" rel="nofollow">http://www.rgraph.net/demos</a>
+    </div>
+
+    <h1>A horizontal bar chart fetching data via AJAX</h1>
+
+   <canvas id="cvs" width="600" height="600">[No canvas support]</canvas>
+
+   <script>
+       function drawHBar (data)
+       {
+           var hbar = new RGraph.HBar('cvs', data)
+               .set('grouping', 'grouped')
+               .set('vmargin', 5)
+               .set('labels', ['Charlie','Jake','Luis','Jack','Bernie','Luis','Bob','Joe','Jack','Cynthia'])
+               .set('colors', ['Gradient(white:#3366CC:#3366CC)'])
+               .draw();
+       }
+       
+       RGraph.AJAX.getCSV('/getdata.html', drawHBar);
+   </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

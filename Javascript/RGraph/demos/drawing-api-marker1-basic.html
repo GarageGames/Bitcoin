@@ -1,0 +1,48 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="../libraries/RGraph.drawing.marker1.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A basic example of the drawing API marker1 object</title>
+
+    <meta name="description" content="A basic example of the drawing API narker1 object" />
+    
+</head>
+<body>
+        
+    <h1>A basic example of the drawing API marker1 object</h1>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var line = new RGraph.Line('cvs', [5,8,6,4,3,5,2])
+                .set('hmargin', 5)
+                .set('labels', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])
+                .draw();
+            
+            var coords = line.coords[2];
+            
+            var marker1 = new RGraph.Drawing.Marker1('cvs', ((550 / 6) * 4) + 25,225, 35, 'Woohoo!')
+                .set('tooltips', ['Lou'])
+                .set('align', 'left')
+                .draw();
+        })
+    </script>
+
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

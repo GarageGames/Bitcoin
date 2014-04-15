@@ -1,0 +1,45 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.rose.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Rose chart with offset start</title>
+
+    <meta name="description" content="A Rose chart where the start point is offset slightly" />
+     
+</head>
+<body>
+
+    <h1>A Rose chart with offset start</h1>
+    
+    <p>
+        By using chart.angles.start you can specify the start angle of the Rose chart. The first segment here is coloured pink so
+        you can see the offset.
+    </p>
+
+    <canvas id="cvs" width="400" height="400">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var rose = new RGraph.Rose('cvs', [4,8,6,3,2,5,6])
+                .set('margin', 2.5)
+                .set('angles.start', -(RGraph.HALFPI/2))
+                .set('colors', ['pink','blue','lime','green','black','red','green'])
+                .set('colors.sequential', true)
+                .roundRobin();
+        })
+    </script>
+
+    <p>        
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

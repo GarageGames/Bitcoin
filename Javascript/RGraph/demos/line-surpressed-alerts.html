@@ -1,0 +1,56 @@
+<html>
+<head>
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Line chart with warnings prevented</title>
+    
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <meta name="description" content="A Line chart where the alert function has been updated so that error messages are sent to the console" />
+     
+</head>
+<body>
+
+    <h1>A line chart with alert() warnings prevented</h1>
+    
+    <p>
+        This is a standard line chart and the page also redefines the alert() function so that there are no warnings displayed. You
+        simply need to redefine the alert function <b>before</b> you create the chart.
+    </p>
+    
+    <pre class="code">
+alert = function (str)
+{
+    console.log(str);
+}
+</pre>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+    <script>
+        $(document).ready(function ()
+        {
+            /**
+            * Redefine the alert() function so that no warnings are displayed
+            */
+            if (!RGraph.ISOLD) {
+                alert = function (str)
+                {
+                    console.log(str);
+                }
+            }
+    
+            var line = new RGraph.Line('cvs', [4,6,8,5,-5,-4,-7])
+                .set('labels', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])
+                .draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

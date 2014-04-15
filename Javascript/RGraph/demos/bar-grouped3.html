@@ -1,0 +1,53 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="../libraries/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A grouped bar chart (from the example page as of 5th March 2014)</title>
+    
+    <meta name="description" content="This demonstration shows a grouped Bar chart (the one from the example page as of 5th March 2014)" />
+    
+</head>
+<body>
+        
+    <h1>A grouped bar chart (from the example page as of 5th March 2014)</h1>
+    
+    <p>
+        This is the grouped Bar chart that was shown on the example page as of 5th March 2014.
+    </p>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var bar = new RGraph.Bar('cvs', [[3,4,6],[2,5,3],[1,5,2],[1,4,6],[1,6,8]])
+                .Set('background.grid.autofit.numvlines', 5)
+                .Set('labels', ['Mal', 'Barry', 'Gary', 'Neil', 'Kim'])
+                .Set('colors', ['Gradient(#99f:#27afe9:#058DC7:#058DC7)', 'Gradient(#94f776:#50B332:#B1E59F)', 'Gradient(#fe783e:#EC561B:#F59F7D)'])
+                .Set('hmargin', 15)
+                .Set('strokestyle', 'white')
+                .Set('linewidth', 1)
+                .Set('shadow', true)
+                .Set('shadow.color', '#ccc')
+                .Set('shadow.offsetx', 0)
+                .Set('shadow.offsety', 0)
+                .Set('shadow.blur', 10)
+                .Draw();
+        })
+    </script>
+    
+    <br />
+
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

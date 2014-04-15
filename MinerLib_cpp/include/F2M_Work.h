@@ -1,6 +1,15 @@
 #ifndef _F2M_WORK_H_
 #define _F2M_WORK_H_
 
+#ifdef _DEBUG   
+#include <memory.h>
+#include <crtdbg.h>
+    #ifndef DBG_NEW      
+        #define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )      
+        #define new DBG_NEW   
+    #endif
+#endif  // _DEBUG
+
 struct F2M_Work
 {
     unsigned int    hashStart;

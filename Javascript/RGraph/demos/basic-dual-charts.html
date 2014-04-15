@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>A basic example of a page with two charts on it</title>
+
+    <meta name="description" content=" A basic example of a page that has two seperate charts on it." />
+    <meta name="googlebot" content="NOODP">
+
+    <!-- Include the RGraph libraries -->
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.bar.js" ></script>
+    <script src="../libraries/RGraph.pie.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+
+</head>
+
+<body>
+
+    <h1>A basic example of a page with two charts on it</h1>
+    
+    <p>
+        This is a basic example that shows two charts on the same page. Both charts are created on seperate canvas tags
+        and in the window.onload event.
+    </p>
+
+    <canvas id="cvs1" width="600" height="250">[No canvas support]</canvas>
+    <canvas id="cvs2" width="300" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var bar = new RGraph.Bar('cvs1', [12,13,16,15])
+                .set('gutter.left', 35)
+                .set('colors', ['red'])
+                .set('labels', ['Kev', 'Brian', 'Fred', 'John'])
+                .set('tooltips', ['Kev', 'Brian', 'Fred', 'John'])
+                .draw();
+            
+            var pie = new RGraph.Pie('cvs2', [8,4,9,5,6,8])
+                .set('labels', ['Rachel','Luis','June','Kevin','Pete','Lou'])
+                .set('text.color', '#999')
+                .draw();
+        })
+    </script>
+
+</body>
+</html>

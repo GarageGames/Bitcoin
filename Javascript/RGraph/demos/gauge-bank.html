@@ -1,0 +1,76 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.gauge.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <title>A bank of adjustable Gauge charts</title>
+
+    <meta name="description" content="A bank of adjustable Gauge charts" />
+     
+</head>
+<body>
+
+    <h1>A bank of adjustable Gauge charts</h1>
+    
+    <p>
+        These Gauge charts are adjustable and are brought to the "front" of the stacking order when mouseover'ed
+    </p>
+    
+    <button onclick="gauge2.value = 100; gauge2.grow()">Click me to animate centerGauge</button><br /><br />
+
+    <canvas id="cvs" width="500" height="250" style="border: 1px solid gray">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            // These are intentionally globals
+            gauge1 = new RGraph.Gauge('cvs', 0, 10, 18)
+                .set('title', 'Pressure')
+                .set('title.bottom', 'Pa')
+                .set('title.bottom.color', '#aaa')
+                .set('centerx', 125)
+                .set('radius', 100)
+                .set('adjustable', true)
+                .draw();
+
+            gauge2 = new RGraph.Gauge('cvs', 0, 100, 78)
+                .set('centerx', 250)
+                .set('radius', 100)
+                .set('adjustable', true)
+                .set('title', 'Volume')
+                .set('title.bottom', 'm³')
+                .set('title.bottom.color', '#aaa')
+                .draw();
+
+            gauge3 = new RGraph.Gauge('cvs', 0, 100, 78)
+                .set('centerx', 375)
+                .set('radius', 100)
+                .set('adjustable', true)
+                .set('title', 'Flow rate')
+                .set('title.bottom', 'm³/s')
+                .set('title.bottom.color', '#aaa')
+                .draw();
+            
+            gauge3.canvas.onmousemove = function (e)
+            {
+                var mouseXY = RGraph.getMouseXY(e);
+                var obj     = RGraph.ObjectRegistry.getObjectByXY(e);
+                
+                if (obj) {
+                    RGraph.ObjectRegistry.bringToFront (obj);
+                }
+            }
+        })
+    </script>
+    
+    
+
+</body>
+</html>

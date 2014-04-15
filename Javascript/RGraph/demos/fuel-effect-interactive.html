@@ -1,0 +1,50 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.fuel.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A clickable interactive Fuel chart</title>
+    
+    <meta name="description" content="A clickable interactive Fuel chart" />
+     
+</head>
+<body>
+
+    <h1>A clickable interactive Fuel chart</h1>
+
+    <canvas id="cvs" width="250" height="250">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var fuel = new RGraph.Fuel('cvs', 0, 100, 96)
+                .set('scale.visible', true)
+                .set('colors', ['Gradient(white:blue)'])
+                .set('needle.color', 'blue')
+                .set('units.post', '%')
+                .draw();
+            
+            fuel.canvas.onclick = function (e)
+            {
+                var obj   = e.target.__object__;
+                var value = obj.getValue(e);
+                
+                obj.value = value;
+                obj.grow();
+            }
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

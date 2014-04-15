@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>A basic example of the new simple gradient syntax</title>
+
+    <meta name="description" content=" A basic example of a chart where the colors use the new simple gradient syntax" />
+    <meta name="googlebot" content="NOODP">
+
+    <!-- Include the RGraph libraries -->
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.rose.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+
+</head>
+
+<body>
+
+    <h1>A basic example of the new simple gradient syntax</h1>
+    
+    <p>
+        Here is a simple Rose chart that uses the new easy gradient syntax for colors: <i>Gradient(white:red)</i>
+    </p>
+
+    <canvas id="cvs" width="500" height="500">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var rose = new RGraph.Rose('cvs', [8,8,9,6,8,7,7])
+                .set('colors', ['Gradient(white:red)',
+                                'Gradient(white:green)',
+                                'Gradient(white:blue)',
+                                'Gradient(white:pink)',
+                                'Gradient(white:#ddd)',
+                                'Gradient(white:cyan)',
+                                'Gradient(white:orange)'])
+                .set('colors.sequential', true)
+                .set('labels.axes', 'n')
+                .set('margin', 3)
+                .draw();
+        })
+    </script>
+
+</body>
+</html>

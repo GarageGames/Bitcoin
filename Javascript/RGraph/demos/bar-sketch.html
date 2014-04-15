@@ -1,0 +1,52 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="../libraries/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <meta name="description" content="A Bar chart that is using the sketch variant" />
+     
+</head>
+<body>
+
+    <div style="text-align: center; font-family: Comic sans MS; width: 800px">
+        <h1>Fruit consumed at the luncheon</h1>
+    
+        <canvas id="cvs" width="800" height="250">[No canvas support]</canvas>
+    
+        <script>
+            $(document).ready(function ()
+            {
+                var bar7 = new RGraph.Bar('cvs', [248,243,180,160,120,43])
+                    .set('colors', ['black'])
+                    .set('labels.above', true)
+                    .set('labels.above.specific', ['Apples', 'Oranges', 'Kiwi', 'Grapes', 'Mango', 'Kum-quat'])
+                    .set('labels.above.size', 8)
+                    .set('ylabels.specific', [
+                                                    'Lots',
+                                                    '','','','','','','','','','','','','','','','','','','','',
+                                                    '','','','','','','','','','','','','','','','','','','','',
+                                                    'Not so much'])
+                    .set('gutter.top', 50)
+                    .set('gutter.left', 100)
+                    .set('gutter.bottom', 25)
+                    .set('variant', 'sketch')
+                    .set('variant.sketch.verticals', true)
+                    .set('text.font', 'Comic sans MS')
+                    .set('text.size', 8)
+                    .set('background.grid', false)
+                    .draw();
+            })
+        </script>
+    </div>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

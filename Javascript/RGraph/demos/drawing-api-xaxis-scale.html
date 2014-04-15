@@ -1,0 +1,50 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.drawing.xaxis.js" ></script>
+    <script src="../libraries/RGraph.scatter.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>An example of the drawing API X axis</title>
+    
+
+    <meta name="description" content="An example of the drawing API X axis object" />
+     
+</head>
+<body>
+        
+    <h1>An example of the drawing API X axis (with a scale)</h1>
+
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var scatter = new RGraph.Scatter('cvs', [[50,432],[423,485],[375,500],[123,369],[411,149]])
+                .set('ymax', 500)
+                .set('xmax', 500)
+                .set('xaxis', false)
+                .set('noyaxis', true)
+                .draw();
+            
+            var xaxis = new RGraph.Drawing.XAxis('cvs', scatter.canvas.height - 25)
+                .set('max', 500)
+                .set('xaxispos', 'center')
+                .draw();
+        })
+    </script>
+
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

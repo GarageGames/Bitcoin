@@ -1,0 +1,68 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.scatter.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Scatter chart which shows financial information</title>
+
+    <meta name="description" content="A Scatter chart which is showing financial information" />
+     
+
+    <script>
+        $(document).ready(function ()
+        {
+            /**
+            * Generate the financial data
+            */
+            var value = 5;
+            var data = [];
+
+            for (var i=0; i<365; i+=1) {
+                data.push([i,value]);
+                value += RGraph.random(-1, 1);
+                value = Math.max(0, value)
+                value = Math.min(10, value)
+            }
+            
+            var scatter = new RGraph.Scatter('cvs', data)
+                .set('ymax', 10)
+                .set('xmin', 0)
+                .set('xmax', data.length)
+                .set('labels', ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])
+                .set('tickmarks', null)
+                .set('line', true)
+                .set('line.colors', ['red'])
+                .set('units.pre', '$')
+                .set('gutter.left', 40)
+                .set('title', 'Sample financial data')
+                .set('background.grid.autofit.numvlines', 64)
+                .set('background.grid.autofit.numhlines', 20)
+                .set('background.grid.color', '#eee')
+                .draw();
+        })
+    </script>
+</head>
+<body>
+
+    <h1>A Scatter chart which shows financial information</h1>
+    
+    <p>
+        This Scatter chart shows sample fiancial data. It looks like it does because there is many data points.
+    </p>
+
+    <canvas id="cvs" width="600" height="200">[No canvas support]</canvas>
+    
+
+
+
+    <p>        
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

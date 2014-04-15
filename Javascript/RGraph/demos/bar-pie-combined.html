@@ -1,0 +1,94 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="../libraries/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.bar.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.pie.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    <link rel="stylesheet" href="../css/animate.css" type="text/css" media="screen" />
+    
+    <title>A combined Bar and Pie chart</title>
+    <meta name="description" content="A combined Bar and Pie chart that uses gradients. " />
+    
+</head>
+<body>
+
+    <h1>A combined Bar and Pie chart</h1>
+    
+    <p>
+        This is the chart that was used on the front page (as of 13th December 2013)    
+    </p>
+
+
+    <canvas id="cvs" width="450" height="200">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var bar = new RGraph.Bar('cvs', [[50,60,52],[65,30,50],[40,80,70],[115,100,92]])
+                .set('gutter.top', 15)
+                .set('gutter.left', 35)
+                .set('gutter.right', 15)
+                .set('background.grid.vlines', false)
+                .set('background.grid.border', false)
+                .set('colors', ['Gradient(white:#f11:#f11)', 'Gradient(white:#1cc:#1cc)', 'Gradient(white:#00f:#00f)'])
+                .set('tooltips.event', 'mousemove')
+                .set('tooltips', [
+                                  'Bob on Monday: 50 sales', 'Bob on Tuesday: 60 sales', 'Bob on Wednesday: 112 sales',
+                                  'Jamie on Monday: 65 sales', 'Jamie on Tuesday: 30 sales', 'Jamie on Wednesday: 50 sales',
+                                  'Cynthia on Monday: 40 sales', 'Cynthia on Tuesday: 80 sales', 'Cynthia on Wednesday: 70 sales',
+                                  'Peter on Monday: 115 sales', 'Peter on Tuesday: 100 sales', 'Peter on Wednesday: 92 sales'
+                                 ])
+                .set('labels', ['Bob', 'Jamie', 'Cynthia', 'Peter'])
+                .set('highlight.stroke', 'rgba(0,0,0,0.1)')
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .set('shadow', true)
+                .set('shadow.offsetx', -2)
+                .set('shadow.offsety', -2)
+                .set('shadow.blur', 15)
+                .set('ymax', 150)
+                .set('noyaxis', true)
+                .set('ylabels', false)
+                .set('labels.above', true)
+                .set('linewidth', 2)
+                .set('hmargin', 15)
+                .draw();
+
+
+
+            var pie = new RGraph.Pie('cvs', [270,270,164])
+                .set('exploded', [7,2,2])
+                .set('labels.sticks', [true])
+                .set('labels.sticks.color', 'black')
+                .set('labels', ['Mondays sales'])
+                .set('centerx', 60)
+                .set('centery', 45)
+                .set('radius', 30)
+                .set('shadow', true)
+                .set('shadow.blur', 5)
+                .set('shadow.offsetx', 2)
+                .set('shadow.offsetY', 2)
+                .set('shadow.color', '#aaa')
+                .set('colors', ['Gradient(white:#c11:#c11:#c11)', 'Gradient(white:#1cc:#1cc:#1cc)', 'Gradient(white:#11c:#11c:#11c)'])
+                .set('tooltips', ['Total Monday sales: 270', 'Total Tuesday sales: 270', 'Total Wednesday sales: 264'])
+                .set('tooltips.event', 'onmousemove')
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .draw();
+
+
+
+            !RGraph.ISOLD ? $('#cvs').addClass('animated expand') : null;;
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

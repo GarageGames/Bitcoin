@@ -405,7 +405,7 @@ void ScryptHashSSE(F2M_ScryptDataSSE* data)
 
 F2M_ScryptDataSSE* F2M_ScryptInitSSE(F2M_Work* work)
 {
-    F2M_ScryptDataSSE* data = (F2M_ScryptDataSSE*)_aligned_malloc(sizeof(F2M_ScryptDataSSE), 32);
+    F2M_ScryptDataSSE* data = (F2M_ScryptDataSSE*)_aligned_malloc(sizeof(F2M_ScryptDataSSE), 128);
     memset(data, 0, sizeof(F2M_ScryptDataSSE));
 
     unsigned int dataBuffer[16] = {0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x80000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x000004A0};	

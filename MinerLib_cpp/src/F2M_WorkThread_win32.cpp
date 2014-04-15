@@ -94,7 +94,7 @@ DWORD WINAPI HashWorkThread(void* param)
 
 void F2M_WorkThread::InternalInit()
 {
-    mKill = CreateEvent(NULL, FALSE, FALSE, NULL);
+    mKill = CreateEvent(NULL, TRUE, FALSE, NULL);
     mDead = CreateEvent(NULL, FALSE, FALSE, NULL);
     mWorkToDo = CreateEvent(NULL, FALSE, FALSE, NULL);
     mWorkDone = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -103,6 +103,13 @@ void F2M_WorkThread::InternalInit()
 
 void F2M_WorkThread::InternalDestroy()
 {
+    // Stop the thread
+    SetEvent(mKill);
+    WaitForSingleObject(mDead, INFINITE);
+    CloseHandle(mKill);
+    CloseHandle(mDead);
+    CloseHandle(mWorkToDo);
+    CloseHandle(mWorkDone);
 }
 
 void F2M_WorkThread::InternalStartWork()

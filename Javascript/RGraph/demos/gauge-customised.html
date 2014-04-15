@@ -1,0 +1,59 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.gauge.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A customised Gauge chart</title>
+    
+    <meta name="description" content="A customised Gauge chart" />
+     
+</head>
+<body>
+
+    <h1>A customised Gauge chart</h1>
+
+    <canvas id="cvs" width="250" height="250">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var gauge = new RGraph.Gauge('cvs', 0, 200, [184,12])
+                .set('title.top', 'Air Speed')
+                .set('title.top.size', 'Italic 22')
+                .set('title.top.font', 'Impact')
+                .set('title.top.color', 'white')
+                .set('title.top', 'Air Speed')
+                .set('title.bottom.size', 'Italic 14')
+                .set('title.bottom.font', 'Impact')
+                .set('title.bottom.color', '#ccc')
+                .set('title.bottom', 'Knots')
+                .set('title.bottom.pos', 0.4)
+                .set('background.color', 'black')
+                .set('background.gradient', true)
+                .set('centerpin.color', '#666');
+            
+            gauge.set('needle.colors', [RGraph.radialGradient(gauge, 125, 125, 0, 125, 125, 25, 'transparent', 'white'),
+                                        RGraph.radialGradient(gauge, 125, 125, 0, 125, 125, 25, 'transparent', '#d66')])
+                .set('needle.size', [null, 50])
+                .set('text.color', 'white')
+                .set('tickmarks.big.color', 'white')
+                .set('tickmarks.medium.color', 'white')
+                .set('tickmarks.small.color', 'white')
+                .set('border.outer', '#666')
+                .set('border.inner', '#333')
+                .set('colors.ranges', [])
+                .draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

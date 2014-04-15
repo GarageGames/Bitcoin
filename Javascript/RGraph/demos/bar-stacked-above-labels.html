@@ -1,0 +1,36 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <meta name="description" content="A stacked bar chart that is showing the chart.labels.above option" />
+     
+</head>
+<body>
+
+    <h1>A stacked Bar chart with chart.labels.above</h1>
+    
+    <canvas id="cvs" width="600" height="250"></canvas>
+        <script>
+            $(document).ready(function ()
+            {
+                var bar = new RGraph.Bar('cvs', [[10,12,13],[45,43,26],[42,21,52],[4,3,5]])
+                    .set('labels', ['January','February','March','April'])
+                    .set('hmargin', 20)
+                    .set('hmargin.grouped', 2)
+                    .set('highlight.fill', 'red')
+                    .set('labels.above', true)
+                    .set('grouping', 'stacked')
+                    .draw();
+            })
+        </script>
+        
+        <br />
+        
+</body>
+</html>

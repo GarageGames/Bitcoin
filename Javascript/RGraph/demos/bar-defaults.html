@@ -1,0 +1,38 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="../libraries/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Bar chart showing the new default colors</title>
+    
+    <meta name="description" content="A Bar chart showing the new default colors" />
+
+</head>
+<body>
+
+    <h1>A Bar chart showing the new default colors</h1>
+
+    <canvas id="cvs" width="900" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var bar = new RGraph.Bar('cvs', [[4,8,6,5,3,8],[1,2,3,4,5,6],[8,4,6,3,5,4],[8,4,3,2,5,8],[4,8,6,5,3,5]])
+                .set('labels', ['Monday','Tuesday','Wednesday','Thursday','Friday'])
+                .set('hmargin', 25)
+                .set('background.grid.autofit.numvlines', 5)
+                .draw()
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

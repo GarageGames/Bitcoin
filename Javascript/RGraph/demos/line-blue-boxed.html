@@ -1,0 +1,64 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Line chart in blue</title>
+    
+    <meta name="description" content="A Line chart in blue surrounded by a black box" />
+     
+</head>
+<body>
+
+    <h1>A Line chart in blue</h1>
+    
+    <p>
+        A Line chart in blue surrounded by a black box. The box is added after the main drawing by using the ondraw
+        custom RGraph event.
+    </p>
+    
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var line = new RGraph.Line('cvs', [28,21,26,32,35,36,39,45,47,51,55,74,85])
+                .set('labels', ['1950','1955','1960','1965','1970','1975','1980','1985','1990','1995','2000','2005','2010'])
+                .set('colors', ['blue'])
+                .set('noaxes', true)
+                .set('ymax', 100)
+                .set('units.post', '%')
+                .set('gutter.left', 45)
+                .set('gutter.bottom', 45)
+                .set('gutter.top', 5)
+                .set('gutter.right', 5)
+                .set('text.angle', 45)
+                .set('linewidth', 3)
+                .set('background.grid.autofit.numvlines', 12)
+                .set('hmargin', 7)
+            
+            line.ondraw = function (obj)
+            {
+                var co = obj.context;
+                
+                co.lineWidth = 3;
+                co.lineJoin = 'miter';
+                co.strokeRect(45,5,550.01,200); // The .01 is to get around a Chrome oddity
+            }
+
+            line.draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

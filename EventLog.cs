@@ -72,6 +72,12 @@ namespace CentralMine.NET
             mUpdateThread.Start();
         }
 
+        public void Close()
+        {
+            // Kill the update thread
+            mUpdateThread.Abort();
+        }
+
         public void RecordEvent(EventType type, string evt)
         {
             EventInfo info = new EventInfo();
@@ -91,10 +97,15 @@ namespace CentralMine.NET
         public void RecordClientWork(Client c)
         {
             ClientWork w = new ClientWork();
-            w.mTime = DateTime.Now;
+            w.mTime = DateTime.UtcNow;
             w.mMemberName = c.mAgent;
             w.mProductName = c.mLocation;
             w.mHashes = c.mHashesDone;
+
+            if (w.mMemberName == null || w.mMemberName.Length <= 0)
+                w.mMemberName = "unknown";
+            if (w.mProductName == null || w.mProductName.Length <= 0)
+                w.mProductName = "unknown";
 
             mClientWorkQueueLock.WaitOne();
             mClientWorkQueue.Add(w);
@@ -141,40 +152,64 @@ namespace CentralMine.NET
 
         uint GetMemberId(string memberName)
         {
+            if (memberName.Length > 64)
+                memberName = memberName.Substring(0, 64);
+
             if (!mMemberIDs.ContainsKey(memberName))
             {
-                // This member isnt in the database, add it now I guess
-                MySqlCommand cmd = new MySqlCommand("INSERT INTO members (member_name) VALUES ('" + memberName + "')", mSql);
-                cmd.ExecuteNonQuery();
+                string sql = "INSERT INTO members (member_name) VALUES ('" + memberName + "')";
+                try
+                {
 
-                // Now querry the database for the index
-                cmd = new MySqlCommand("SELECT * FROM members WHERE member_name='" + memberName + "'", mSql);
-                MySqlDataReader r = cmd.ExecuteReader();
-                r.Read();
-                uint ID = (uint)r[0];
-                r.Close();
+                    MySqlCommand cmd = new MySqlCommand(sql, mSql);
+                    cmd.ExecuteNonQuery();
 
-                mMemberIDs[memberName] = ID;
+                    // Now querry the database for the index
+                    sql = "SELECT * FROM members WHERE member_name='" + memberName + "'";
+                    cmd = new MySqlCommand(sql, mSql);
+                    MySqlDataReader r = cmd.ExecuteReader();
+                    r.Read();
+                    uint ID = (uint)r[0];
+                    r.Close();
+
+                    mMemberIDs[memberName] = ID;
+                }
+                catch (Exception ex)
+                {
+                    Email.SendErrorEmail(sql + "\n\n" + ex.ToString());
+                }
             }
 
             return mMemberIDs[memberName];
         }
 
-        uint GetProductId(string product)
+        uint GetProductId(string product, uint memberId)
         {
+            if (product.Length > 128)
+                product = product.Substring(0, 128);
+
             if (!mProductIDs.ContainsKey(product))
             {
-                MySqlCommand cmd = new MySqlCommand("INSERT INTO products (product_name) VALUES ('" + product + "')", mSql);
-                cmd.ExecuteNonQuery();
+                string sql = "INSERT INTO products (product_name, member) VALUES ('" + product + "', '" + memberId + "')";
+                try
+                {
+                    MySqlCommand cmd = new MySqlCommand(sql, mSql);
+                    cmd.ExecuteNonQuery();
 
-                // Now querry the database for the index
-                cmd = new MySqlCommand("SELECT * FROM products WHERE product_name='" + product + "'", mSql);
-                MySqlDataReader r = cmd.ExecuteReader();
-                r.Read();
-                uint ID = (uint)r[0];
-                r.Close();
-
-                mProductIDs[product] = ID;
+                    // Now querry the database for the index
+                    sql = "SELECT * FROM products WHERE product_name='" + product + "'";
+                    cmd = new MySqlCommand(sql, mSql);
+                    MySqlDataReader r = cmd.ExecuteReader();
+                    r.Read();
+                    uint ID = (uint)r[0];
+                    r.Close();
+                    mProductIDs[product] = ID;
+                }
+                catch (Exception ex)
+                {
+                    Email.SendErrorEmail(sql + "\n\n" + ex.ToString());
+                }
+                
             }
 
             return mProductIDs[product];
@@ -193,11 +228,19 @@ namespace CentralMine.NET
                 mEventQueueLock.ReleaseMutex();
 
                 // Send data to database
-                foreach (EventInfo e in events)
+                string sql = "";
+                try
                 {
-                    string sql = string.Format("INSERT INTO events (timestamp, type, event) VALUES ('{0}', '{1}', '{2}')", e.mTime.ToString("yyyy-MM-dd HH:mm:ss"), (int)e.mType, e.mEventData);
-                    MySqlCommand cmd = new MySqlCommand(sql, mSql);
-                    cmd.ExecuteNonQuery();
+                    foreach (EventInfo e in events)
+                    {
+                        sql = string.Format("INSERT INTO events (timestamp, type, event) VALUES ('{0}', '{1}', '{2}')", e.mTime.ToString("yyyy-MM-dd HH:mm:ss"), (int)e.mType, e.mEventData);
+                        MySqlCommand cmd = new MySqlCommand(sql, mSql);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Email.SendErrorEmail(sql + "\n\n" + ex.ToString());
                 }
 
                 // Copy the client work list
@@ -208,33 +251,40 @@ namespace CentralMine.NET
                 mIntervalStart = DateTime.Now;
                 mClientWorkQueueLock.ReleaseMutex();
 
-                // Collect information into products
-                Dictionary<string, Product> products = new Dictionary<string, Product>();
-                foreach (ClientWork w in cw)
+                try
                 {
-                    if (!products.ContainsKey(w.mProductName))
+                    // Collect information into products
+                    Dictionary<string, Product> products = new Dictionary<string, Product>();
+                    foreach (ClientWork w in cw)
                     {
-                        // Add this product
-                        Product p = new Product();
-                        p.mMember = GetMemberId(w.mMemberName);
-                        p.mProduct = GetProductId(w.mProductName);
-                        p.mHashes = 0;
-                        products[w.mProductName] = p;
+                        if (!products.ContainsKey(w.mProductName))
+                        {
+                            // Add this product
+                            Product p = new Product();
+                            p.mMember = GetMemberId(w.mMemberName);
+                            p.mProduct = GetProductId(w.mProductName, p.mMember);
+                            p.mHashes = 0;
+                            products[w.mProductName] = p;
+                        }
+
+                        Product prod = products[w.mProductName];
+                        prod.mHashes += w.mHashes;
+                        products[w.mProductName] = prod;
                     }
 
-                    Product prod = products[w.mProductName];
-                    prod.mHashes += w.mHashes;
-                    products[w.mProductName] = prod;
+                    // Write entries into the database for each prodcut
+                    string timeString = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+                    foreach (KeyValuePair<string, Product> kv in products)
+                    {
+                        ulong hashrate = (ulong)(kv.Value.mHashes / interval.TotalSeconds);
+                        sql = string.Format("INSERT INTO workdata (member_id, product_id, hashrate, timestamp) VALUES ('{0}', '{1}', '{2}', '{3}')", kv.Value.mMember, kv.Value.mProduct, hashrate, timeString);
+                        MySqlCommand cmd = new MySqlCommand(sql, mSql);
+                        cmd.ExecuteNonQuery();
+                    }
                 }
-
-                // Write entries into the database for each prodcut
-                string timeString = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                foreach (KeyValuePair<string, Product> kv in products)
+                catch (Exception ex)
                 {
-                    ulong hashrate = (ulong)(kv.Value.mHashes / interval.TotalSeconds);
-                    string sql = string.Format("INSERT INTO workdata (member_id, product_id, hashrate, timestamp) VALUES ('{0}', '{1}', '{2}', '{3}')", kv.Value.mMember, kv.Value.mProduct, hashrate, timeString);
-                    MySqlCommand cmd = new MySqlCommand(sql, mSql);
-                    cmd.ExecuteNonQuery();
+                    Email.SendErrorEmail(sql + "\n\n" + ex.ToString());
                 }
 
                 TimeSpan duration = DateTime.Now - start;

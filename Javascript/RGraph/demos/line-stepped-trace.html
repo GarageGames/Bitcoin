@@ -1,0 +1,51 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.common.key.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A stepped Line chart with Trace2 effect</title>
+    
+    <meta name="description" content="A stepped Line chart that uses the Trace effect" />
+     
+</head>
+<body>
+
+    <h1>A stepped Line chart using Trace2 effect</h1>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var line = new RGraph.Line('cvs', [70,60,80,50,50,60,70,60,50,40,50,50], [20,30,50,40,30,50,40,30,60,50,10,20])
+                .set('gutter.left', 45)
+                .set('gutter.right', 100)
+                .set('background.grid', false)
+                .set('noxaxis', true)
+                .set('stepped', true)
+                .set('units.pre', '$')
+                .set('units.post', 'K')
+                .set('ylabels.count', 8)
+                .set('labels', ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])
+                .set('key', ['Credit limit','MTM + AR'])
+                .set('key.position', 'gutter')
+                .set('key.color.shape', 'circle')
+                .set('linewidth', 3)
+                .set('shadow', false)
+                .trace2()
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

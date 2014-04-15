@@ -1,0 +1,80 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.pie.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+
+    <title>The (old) front page Pie chart</title>
+    
+    <meta name="description" content="The (old) front page Pie chart" />
+     
+</head>
+<body>
+
+    <h1>The (old) front page Pie chart</h1>
+    
+    <p>
+        This is the Pie chart from the front page. It starts with the RoundRobin effect and allows you to click to explode
+        the Pie chart segments.
+    </p>
+
+    <canvas id="cvs" width="350" height="250">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var pie = new RGraph.Pie('cvs', [9,5,12,8,4,9])
+                .set('strokestyle', '#e8e8e8')
+                .set('linewidth', 2)
+                .set('shadow', true)
+                .set('shadow.blur', 5)
+                .set('shadow.offsety', 5)
+                .set('shadow.offsetx', 5)
+                .set('shadow.color', '#aaa')
+                .set('exploded', 10)
+                .set('radius', 80)
+                //.set('tooltips', ['Mavis','Kevin','Luis','June','Olga','Luis','Pete','Bridget'])
+                .set('tooltips.event', 'onmousemove')
+                .set('labels', ['Mavis','Kevin','Luis','June','Olga','Luis','Pete','Bridget'])
+                .set('labels.sticks', true)
+                .set('labels.sticks.length', 15);
+            
+            !RGraph.ISIE || RGraph.ISIE9UP ? pie.roundRobin({frames:30}) : pie.draw();
+            
+            pie.onclick = function (e, shape)
+            {
+                var index = shape.index;
+                var obj = shape.object;
+                
+                // Reset all the segments to 10
+                obj.set('exploded', 10);
+                
+                obj.explodeSegment(index, 15);
+                
+                e.stopPropagation();
+            }
+            
+            pie.onmousemove = function (e, shape)
+            {
+                e.target.style.cursor = 'pointer';
+            }
+            
+            window.addEventListener('mousedown', function (e)
+            {
+                pie.set('exploded', 10);
+            }, true);
+        })
+    </script>
+
+    <p>        
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.radar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+
+    <title>An animated Radar chart</title>
+
+    <meta name="description" content="An animated Radar chart that uses the Grow effect" />
+     
+</head>
+<body>
+
+    <h1>An animated Radar chart</h1>
+
+    <canvas id="cvs" width="450" height="400">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var radar2 = new RGraph.Radar('cvs', [4,8,5,2,3],[9,5,6,3,5])
+                .set('labels', ['Mal', 'Barry', 'Gary','Dave','Paul'])
+                .set('tooltips', ['Mal', 'Barry', 'Gary','Dave','Paul', 'Mal', 'Barry', 'Gary','Dave','Paul'])
+                .set('background.circles.poly', true)
+                .set('background.circles.spacing', 30)
+                .set('colors', ['rgba(255,0,0,0.25)','rgba(255,255,0,0.25)'])
+                .set('axes.color', 'transparent')
+                .set('highlights', true)
+                .set('strokestyle', ['red','black'])
+                .grow()
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

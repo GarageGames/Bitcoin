@@ -1,0 +1,48 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.key.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Line chart with an HTML key</title>
+    
+    <meta name="description" content="this page demonstrates the new HTML based key that you can use with RGraph" />
+     
+</head>
+<body>
+
+    <h1>A line chart with an HTML key</h1>
+
+    <div style="position: relative">
+        <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+        <div style="position: absolute; left: 600px; top: 25px" id="myKey"></div>
+    </div>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var line = new RGraph.Line('cvs', [5,4,1,6,8,5,3], [23,26,27,21,24,25,26], [3,1,5,6,2,4,5], [15,16,13,18,16,13])
+                .set('labels', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])
+                .draw();
+            
+            document.getElementById('myKey').style.top = line.Get('gutter.top') + 'px';
+            
+            RGraph.HTML.Key('myKey', {
+                                      'colors': line.Get('colors'),
+                                      'labels': ['John','Fred','Joe','Luis'],
+                                      'labelCss_0': {'color':'red'}
+                                     });
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

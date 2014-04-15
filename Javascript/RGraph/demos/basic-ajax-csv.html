@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>A basic example of a CSV/AJAX</title>
+    <meta name="googlebot" content="NOODP">
+
+    <!-- Include the RGraph libraries -->
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+    <h1>A basic example of AJAX and CSV data</h1>
+    
+    <p>
+        This is a basic example of using CSV and AJAX. AJAX is used to request the data and it is returned in CSV format. The JSON
+        data is then evaluated and a chart created using it.
+    </p>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        /**
+        * Ths window.onload function initiates the AJAX request. The AJAX page is: http://www.rgraph.net/getdata.html
+        * If you view this in your browser you'll see that all it does is output a sequence of numbers.
+        */
+        $(document).ready(function ()
+        {
+            RGraph.AJAX.getCSV('/getdata.html', drawGraph);
+        })
+
+
+
+        /**
+        * This is the AJAX callback function. The AJAX getCSV() converts the strings to numbers for you.
+        */
+        function drawGraph (csv)
+        {
+            // Now draw the chart
+            var line = new RGraph.Line('cvs', csv)
+                .set('hmargin',0)
+                .set('linewidth', 2)
+                .set('ymax', 100)
+                .set('numxticks', 9)
+                .set('labels', ['Gary','Rachel','Neil','Martha','Kevin','Craig','John','Peter','Luis','Bert'])
+                .draw();
+        }
+    </script>
+    
+    <p>
+        <b>Note:</b>
+        In October 2013 a new CSV reader was added to RGraph. It makes reading CSV files much easier. You can read about
+        <a href="http://www.rgraph.net/docs/csv-file-reader.html">the new CSV reader</a> here.
+    </p>
+
+</body>
+</html>

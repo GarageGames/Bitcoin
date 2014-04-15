@@ -1,0 +1,84 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.pie.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>An animated customised Pie chart</title>
+
+    <meta name="description" content="A Pie chart that is exploded and uses custom code to handle exploding the chart onclick" />
+     
+</head>
+<body>
+
+    <h1>Explode when clicked</h1>
+
+    <p>
+        This demo shows a pie chart that has two expanding segments when clicked.
+    </p>
+
+    <canvas id="cvs" width="480" height="250" !style="border:1px solid #ccc">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            /**
+            * Create the Pie chart as normal
+            */
+            var pie = new RGraph.Pie('cvs', [8,6,5,3,5])
+                .set('linewidth', 1)
+                .set('shadow', true)
+                .set('labels', ['Bob',,,'Jerry'])
+                .set('labels.sticks', [true,,,true])
+                .set('labels.sticks.length', 25)
+                .draw();
+            
+            /**
+            * Add the event listener fnctions using the new dollar syntax. This handles the click
+            * for the first and fourh segments
+            */
+            pie.$3.onclick =
+            pie.$0.onclick = function (e, shape)
+            {
+                var obj = shape['object'];
+                obj.set('exploded', []);
+                obj.explodeSegment(shape['index'], 15);
+            }
+
+            /**
+            * Add the event listener fnctions using the new dollar syntax. This handles the mousemove
+            * for the first and fourh segments
+            */
+            pie.$3.onmousemove =
+            pie.$0.onmousemove = function (e, shape)
+            {
+                e.target.style.cursor = 'pointer';
+            }
+
+
+            /**
+            * This function "resets" the pie before the above two functions fire. Note that the event is registered to
+            * use the capture phase of click event so that it will fire before the above two $ events.
+            */
+            function myFunc (e)
+            {
+                pie.set('exploded', []);
+                RGraph.redraw();
+            }
+            window.addEventListener('click', myFunc, true);
+        })
+    </script>
+
+    <p>        
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

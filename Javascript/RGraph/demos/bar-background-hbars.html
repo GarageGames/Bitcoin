@@ -1,0 +1,54 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="../libraries/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Bar chart with background horizontal bars</title>
+    
+    <meta name="description" content="A Bar chart with background horizontal bars" />
+    
+</head>
+<body>
+
+    <h1>Bar charts with background horizontal bars</h1>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas><br />
+    <canvas id="cvs2" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var bar = new RGraph.Bar('cvs', [[21,31],[13, -5],[-12, -58],[5, 29],[59, 28],[40, 10]])
+                .set('colors', ['blue', 'red'])
+                .set('xaxispos', 'center')
+                .set('labels', ['2007', '2008', '2009', '2010', '2011', '2012'])
+                .set('background.hbars', [
+                                          [-55,-5,'rgba(255,0,0,0.2)'],
+                                          [-45,-10,'rgba(255,255,0,0.2)'],
+                                          [-45,90,'rgba(0,255,0,0.2)'],
+                                          [45,10,'rgba(255,255,0,0.2)'],
+                                          [55,null,'rgba(255,0,0,0.2)']
+                                         ])
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .draw();
+
+            var bar2 = new RGraph.Bar('cvs2', [[21,31],[13, 5],[12, 19],[5, 29],[59, 28],[40, 10]])
+                .set('colors', ['blue', 'red'])
+                .set('labels', ['2007', '2008', '2009', '2010', '2011', '2012'])
+                .set('background.hbars', [[0,45,'rgba(0,255,0,0.2)'],[45,10,'rgba(255,255,0,0.2)'],[55,null,'rgba(255,0,0,0.2)']])
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

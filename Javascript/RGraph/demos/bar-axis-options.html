@@ -1,0 +1,57 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Bar chart with the X axis in the middle</title>
+    
+    <meta name="description" content="A bar chart that is showing the various axis options that are available to you" />
+    
+</head>
+<body>
+
+    <h1>A Bar chart demonstrating  the axis options</h1>
+
+    <button onclick="obj = getObject(); obj.Set('xaxispos', obj.Get('xaxispos') == 'bottom' ? 'center' : 'bottom'); RGraph.Redraw();">Toggle the X axis position</button>
+    <button onclick="obj = getObject(); obj.Set('yaxispos', obj.Get('yaxispos') == 'left' ? 'right' : 'left'); RGraph.Redraw();">Toggle the Y axis position</button>
+    <button onclick="obj = getObject(); obj.Set('ylabels', obj.Get('ylabels') ? false : true); RGraph.Redraw();">Toggle the Y axis labels</button>
+    <button onclick="obj = getObject(); obj.Set('ylabels.specific', obj.Get('ylabels.specific') ? false : ['High','Medium','Low']); RGraph.Redraw();">Toggle specific Y axis labels</button>
+    <button onclick="obj = getObject(); obj.Set('ymin', obj.Get('ymin') ? 0 : 50); RGraph.Redraw();">Toggle ymin (50) setting</button>
+    <button onclick="obj = getObject(); obj.Set('labels', obj.Get('labels') ? null : ['Q1','Q2','Q3','Q4']); RGraph.Redraw();">Toggle labels</button>
+    <button onclick="obj = getObject(); obj.Set('noxaxis', obj.Get('noxaxis') ? false : true); RGraph.Redraw();">Toggle X axis</button>
+    
+    <br />
+
+    <canvas id="cvs" width="600" height="400">[No canvas support]</canvas>
+    
+    <script>
+        function getObject ()
+        {
+            return RGraph.ObjectRegistry.getFirstObjectByType('bar');
+        }
+
+        $(document).ready(function ()
+        {
+            var bar = new RGraph.Bar('cvs', [64,65,70,74])
+                .set('ymax', 120)
+                .set('xmax', 365)
+                .set('labels', ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])
+                .set('xaxispos', 'center')
+                .set('gutter.bottom', 45)
+                .set('gutter.left', 35)
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .draw();
+        })
+    </script>
+
+    <p>        
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

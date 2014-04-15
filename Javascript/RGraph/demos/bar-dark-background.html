@@ -1,0 +1,45 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="../libraries/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Bar chart that's color inverted</title>
+    
+    <meta name="description" content="A Bar chart that's color inverted - ie with a dark background" />
+    
+</head>
+<body>
+
+    <h1>A Bar chart that's color inverted</h1>
+
+    <canvas id="cvs" width="500" height="250" style="background-color: #333; border-radius: 5px; box-shadow: 2px 2px 2px #999">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var data = [[45,56],[75,32],[39,47],[34,48],[46,47],[48,52]];
+
+            var bar = new RGraph.Bar('cvs', data)
+                .set('shadow', false)
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .set('grouping', 'grouped')
+                .set('colors', ['Gradient(white:#ccf:#ccf:#ccf:#ccf)','Gradient(white:#faa:#faa:#faa:#faa)'])
+                .set('background.grid.vlines', false)
+                .set('background.grid.border', false)
+                .set('text.color', 'white')
+                .set('labels', ['2007','2008','2009','2011','2012','2013'])
+                .draw();
+        });
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

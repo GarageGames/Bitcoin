@@ -1,0 +1,71 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.pie.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>Pie chart RoundRobin then Explode</title>
+
+    <meta name="description" content="A Pie chart using the RoundRobin effect and then exploding" />
+     
+</head>
+<body>
+
+    <h1>Pie chart effect then explode</h1>
+
+    <canvas id="cvs" width="450" height="300">[No canvas support]</canvas>
+    
+    <script>
+        var pie1 = new RGraph.Pie('cvs', [21,12,25,17,7])
+            .set('radius', 100)
+            .set('tooltips', ['John (2%)', 'Richard (29%)', 'Fred (45%)', 'Brian (17%)', 'Peter (7%)'])
+            .set('labels', ['John (2%)', 'Richard (29%)', 'Fred (45%)', 'Brian (17%)', 'Peter (7%)'])
+            .set('strokestyle', 'white')
+            .set('linewidth', 2)
+            .set('shadow', true)
+            .set('shadow.blur', 10)
+            .set('shadow.offsetx', 0)
+            .set('shadow.offsety', 0)
+            .set('shadow.color', '#000')
+            .set('text.color', '#999')
+        
+        var explode = 20;
+
+        function myExplode (obj)
+        {
+            window.__pie__ = pie1;
+
+            for (var i=0; i<obj.data.length; ++i) {
+                setTimeout('window.__pie__.explodeSegment('+i+',10)', i * 50);
+            }
+        }
+
+        if (RGraph.ISOLD) {
+            pie1.draw();
+        
+        } else if (navigator.userAgent.toLowerCase().indexOf('firefox') >= 0) {
+            pie1.roundRobin();
+        
+        } else {
+            /**
+            * The RoundRobin callback initiates the exploding
+            */
+
+            pie1.roundRobin(null, myExplode);
+            //pie1.implode()
+        }
+    </script>
+
+    <p>        
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

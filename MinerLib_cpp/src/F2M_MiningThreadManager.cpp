@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-static F2M_Timer timer;
+//static F2M_Timer timer;
 
 F2M_MiningThreadManager::F2M_MiningThreadManager(int threadCount, bool useSSE, float gpuPercentage)
 {
@@ -26,6 +26,13 @@ F2M_MiningThreadManager::F2M_MiningThreadManager(int threadCount, bool useSSE, f
 
 F2M_MiningThreadManager::~F2M_MiningThreadManager()
 {
+    for( int i = 0; i < mThreadCount; i++ )
+    {
+        delete mThreads[i];
+        mThreads[i] = 0;
+    }
+    delete[] mThreads;
+
     if( mGPUThread )
         delete mGPUThread;
 
@@ -82,15 +89,15 @@ void F2M_MiningThreadManager::Update(F2M_MinerConnection* connection)
             connection->SendWorkComplete(solutionFound, ntohl(solution), hashes);            
             delete mCurrentWork;
             mCurrentWork = 0;
-            timer.Stop();
-            printf("gpu: %d  hps: %d\n", mGPUThread ? mGPUThread->GetHashrate() : 0, (unsigned int)(hashes / timer.GetDuration()));
+            //timer.Stop();
+            //printf("gpu: %d  hps: %d\n", mGPUThread ? mGPUThread->GetHashrate() : 0, (unsigned int)(hashes / timer.GetDuration()));
         }
     }
 }
 
 void F2M_MiningThreadManager::StartWork(F2M_Work* work)
 {
-    timer.Start();
+    //timer.Start();
     if( mCurrentWork )
         delete mCurrentWork;
 

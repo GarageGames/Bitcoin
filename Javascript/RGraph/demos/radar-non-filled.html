@@ -1,0 +1,53 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.radar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+
+    <title>An non-filled Radar chart</title>
+
+    <meta name="description" content="A non-filled Radar chart with two data series" />
+     
+</head>
+<body>
+
+    <h1>A non-filled Radar chart</h1>
+
+    <canvas id="cvs" width="500" height="400">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var radar3 = new RGraph.Radar('cvs', [8,7,6,7,8,6], [8,9,4,6,6,8])
+                .set('labels', ['', 'Barry', 'Gary','Dave','Paul','Rich'])
+                .set('tooltips', [
+                                  'Mal', 'Barry', 'Gary','Dave','Paul', 'Rich',
+                                  'Mal', 'Barry', 'Gary','Dave','Paul', 'Rich'
+                                 ])
+                .set('background.circles.poly', true)
+                .set('background.circles.spacing', 30)
+                .set('colors', ['transparent'])
+                .set('axes.color', 'transparent')
+                .set('highlights', true)
+                .set('strokestyle', ['red', 'black'])
+                .set('linewidth', 2)
+                .set('linewidth', 2)
+                .set('labels.axes', 'n')
+                .set('text.size', 16)
+                .grow()
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

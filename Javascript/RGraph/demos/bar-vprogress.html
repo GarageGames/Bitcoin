@@ -1,0 +1,47 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="../libraries/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Bar chart customised to look like a VProgress bar</title>
+    
+    <meta name="description" content="A Bar chart customised to look like a VProgress bar" />
+    
+</head>
+<body>
+
+    <h1>A Bar chart customised to look like a VProgress bar</h1>
+
+    <canvas id="cvs" width="150" height="250">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var data = [68];
+
+            var bar = new RGraph.Bar('cvs', data)
+                .set('ymax', 100)
+                .set('noxaxis', true)
+                .set('labels', ['Engine output'])
+                .set('labels.above', true)
+                .set('units.post', '%')
+                .set('colors', ['gradient(red:white)'])
+                .set('background.grid', false)
+                .set('gutter.left', 55)
+                .set('gutter.right', 5)
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

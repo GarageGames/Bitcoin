@@ -1,0 +1,48 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.key.js" ></script>
+    <script src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A bar chart with an odd number of Y labels</title>
+
+    <meta name="description" content="A demonstration of a Bar chart that has seven Y labels" />
+    <meta name="robots" content="noindex,nofollow" />
+</head>
+<body>
+        
+    <h1>A bar chart with an odd number of Y labels</h1>
+    
+    <p>
+        A demonstration of a Bar chart with an odd number of Y labels - showiing that any number of Y labels is possible.
+    </p>
+
+    <canvas id="cvs" width="700" height="350">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var bar = new RGraph.Bar('cvs', [153,164,144,125,188,198,200])
+                .set('labels', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])
+                .set('ylabels.count', 7)
+                .set('background.grid.autofit.numhlines', 7)
+                .set('background.grid.autofit.numvlines', 7)
+                .set('numyticks', 14)
+                .set('ymax', 700)
+                .set('gutter.left', 30)
+                .draw();
+        })
+    </script>
+
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

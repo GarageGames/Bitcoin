@@ -2,6 +2,7 @@
 //
 
 #include <tchar.h>
+#include <crtdbg.h>
 
 #include <F2M_MinerConnection.h>
 #include <F2M_MiningThreadManager.h>
@@ -16,7 +17,9 @@ static const char* HostAddress = "ronsTestMachine.cloudapp.net";
 //static const char* HostAddress = "127.0.0.1";
 
 int _tmain(int argc, _TCHAR* argv[])
-{    
+{   
+    //_CrtSetBreakAlloc(144);
+
     char agentName[128];
     strcpy_s(agentName, sizeof(agentName), "C++ Test Miner");
     
@@ -50,8 +53,19 @@ int _tmain(int argc, _TCHAR* argv[])
     F2M_MinerConnection* conn = new F2M_MinerConnection(hashBlockCount, agentName, "Windows", myIPAddress );
     conn->ConnectTo(HostAddress, HostPort);
 
+    _CrtMemState checkpoint;
+    _CrtMemCheckpoint(&checkpoint);
     while( 1 )
     {
+        if( GetAsyncKeyState(VK_ESCAPE) != 0 )
+            break;
+        if( GetAsyncKeyState(VK_SPACE) != 0 )
+        {
+            _CrtMemDumpAllObjectsSince(&checkpoint);
+            _CrtMemCheckpoint(&checkpoint);
+        }
+        
+
         // Update connection to server
         conn->Update();
         threadManager->Update(conn);
@@ -73,6 +87,10 @@ int _tmain(int argc, _TCHAR* argv[])
         // Sleep
         Sleep(10);
     }
+    delete threadManager;
+    delete conn;
+
+    _CrtDumpMemoryLeaks();
 
 	return 0;
 }

@@ -1,0 +1,112 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A dynamically updating Line chart</title>
+    
+    <meta name="description" content="A dynamically updating Line chart. The data here is simply generated randomly but could just as easily be retrieved from a server via AJAX (for example)." />
+     
+</head>
+<body>
+
+    <h1>A dynamically updating Line chart</h1>
+    
+    <p>
+        This chart updates itself 20 times a second.New values are appended to the data that's displayed and old values are removed
+        from the data. Careful use is made of local variables - so that the updates are done smoothly.
+    </p>
+
+    
+    <div style="text-align:center; font-weight: bold; font-size: 14pt; width: 600px">
+        Bandwidth used  (Mb/s)<br />
+        <canvas id="cvs" width="600" height="250">[No canvas support]</canvas><br />
+        <span style="font-size: 12pt; font-weight: normal">
+            Last 60 seconds
+        </span>
+    </div>
+    
+    <script>
+
+        $(document).ready(function ()
+        {
+            var RG        = RGraph;
+            var canvas    = document.getElementById("cvs");
+            var obj       = null;
+            var data      = [];
+            var l         = 0; // The letter 'L' - NOT a one
+            var numvalues = 1200;
+            var updates = 0;
+
+            // Pre-pad the arrays with null values
+            for (var i=0; i<numvalues; ++i) {
+                data.push(null);
+            }
+        
+            function drawGraph ()
+            {
+                RG.Clear(canvas);
+                
+
+                if (!obj) {
+                    obj = new RG.Line('cvs', [])
+                        .set('title.vpos', 0.5)
+                        .set('title.yaxis.pos', 0.5)
+                        .set('colors', ['black'])
+                        .set('linewidth',0.75)
+                        .set('yaxispos', 'right')
+                        .set('ymax', 50)
+                        .set('xticks', 25)
+                        .set('numyticks', 0)
+                        .set('numxticks', 0)
+                        .set('background.grid', false)
+                        .set('tickmarks', false)
+                        .set('shadow', false)
+                        .set('gutter.top', 5)
+                        .set('gutter.bottom', 5)
+                }
+
+                // Add some data to the data arrays
+                var len          = data.length;
+                var lastvalue    = RG.is_null(data[len - 1]) ? 26 : data[len - 1];
+                var random_value = RG.random(lastvalue  - 2,lastvalue  + 2);
+               
+               random_value = Math.max(random_value, 0);
+               random_value = Math.min(random_value, 50);
+
+                data.push(random_value);
+                
+                if (data.length > numvalues) {
+                    data = RG.array_shift(data);
+                }
+    
+                if (RGraph.ISIE8) {
+                    alert('[MSIE] Sorry, Internet Explorer 8 is not fast enough to support dynamic charts');
+                } else {
+                    obj.original_data[0] = data;
+                    obj.Draw();
+                    setTimeout(drawGraph, 16.666);
+                }
+
+                updates++;
+                if (updates % 100 === 0) {
+                    console.log(updates);
+                }
+            }
+        
+            drawGraph();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

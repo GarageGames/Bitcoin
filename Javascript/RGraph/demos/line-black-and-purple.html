@@ -1,0 +1,76 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.bar.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A combined Bar and Line chart</title>
+    
+    <meta name="description" content="A combined Bar and Line chart" />
+     
+</head>
+<body>
+
+    <h1>A combined Bar and Line chart</h1>
+
+    <canvas id="cvs" width="600" height="250" style="background-color: #555; border: 5px solid #000; border-radius: 7px; box-shadow: 2px 2px 3px gray">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var bar = new RGraph.Bar("cvs", [81,90,75,85,90,78])
+              .set('ymax', 100)
+              .set('background.grid.vlines', false)
+              .set('background.grid.autofit.numhlines', 6)
+              .set('background.grid.border', false)
+              .set('background.grid.color', '#999')
+              .set('numyticks', 12)
+              .set('labels', ['1','2','3','4','5','6'])
+              .set('hmargin', 30)
+              .set('ylabels.count', 6)
+              .set('gutter.left', 30)
+              .set('colors', ['#A18AC5'])
+              .set('text.color', '#ccc')
+              .set('axis.color', '#999')
+              .set('numyticks', 0)
+              .set('numxticks', 0)
+              .set('shadow', true)
+              .set('shadow.color', 'black')
+              .set('shadow.offsetx', 0)
+              .set('shadow.offsety', 0)
+              .set('shadow.blur', 15)
+              .set('gutter.right', 30)
+              .set('scale.zerostart', true)
+              .set('strokestyle', 'rgba(0,0,0,0)')
+              .draw();
+
+            var line = new RGraph.Line('cvs', [150,73,160,350,490,250])
+              .set('ymax', 600)
+              .set('noxaxis', true)
+              .set('background.grid', false)
+              .set('shadow', true)
+              .set('linewidth', 7)
+              .set('colors', ['#d00'])
+              .set('hmargin', 45.42)
+              .set('yaxispos', 'right')
+              .set('axis.color', '#999')
+              .set('text.color', '#ccc')
+              .set('gutter.right', 30)
+              .set('ylabels.count', 6)
+              .set('numyticks', 0)
+              .set('tickmarks', null)
+              .draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

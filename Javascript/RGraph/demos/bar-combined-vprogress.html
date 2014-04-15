@@ -1,0 +1,134 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.common.key.js" ></script>
+    <script src="../libraries/RGraph.bar.js" ></script>
+    <script src="../libraries/RGraph.vprogress.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <meta name="description" content="A Bar chart that has been combined with the VProgress chart" />
+    
+    
+    <style>
+        .RGraph_tooltip img {
+            display: none;
+        }
+
+        .RGraph_tooltip {
+            box-shadow: none ! important;
+            border: 2px solid blue ! important;
+            background-color: white ! important;
+            padding: 3px ! important;
+            text-align: center;
+            font-weight: bold;
+            font-family: Verdana;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Combined grouped Bar and VProgress chart</h1>
+    
+    <p>
+        A demo of the VProgress bar combined with a grouped Bar chart. It could be used to show different peoples stats over two years
+        for example. Red is one year, yellow is the previous. The tooltip styling has been overridden using stylesheets
+        and the positioning has been overridden by redefining the .positionTooltip() function on each vertical
+        progress bar object (as well as defining a mousemove event on the canvas to update the tooltips position).
+    </p>
+    
+    <canvas id="cvs" width="600" height="250"></canvas>
+        <script>
+            $(document).ready(function ()
+            {
+                var people = ['Rob','Luis','Kinga'];
+                var bar = new RGraph.Bar('cvs', [[18,15,45],[21,23,41],[28,21,12],[21,15,38]])
+                    .set('labels', ['January','February','March','April'])
+                    .set('hmargin', 20)
+                    .set('hmargin.grouped', 2)
+                    .set('highlight.fill', 'red')
+                    .set('key', ['This year','Last year'])
+                    .set('key.colors', ['red','yellow'])
+                    .set('key.position', 'gutter')
+                    .set('key.position.gutter.boxed', false)
+                    .set('colors', ['rgba(0,0,0,0)'])
+                    .draw();
+    
+                function DrawBottomAxis (obj)
+                {
+                    var context = bar.context;
+                    var x = bar.gutterLeft;
+                    var y = bar.canvas.height - bar.gutterBottom;
+                    var w = bar.canvas.width - bar.gutterLeft - bar.gutterRight
+                    var h = 0;
+                    context.strokeStyle = 'black';
+                    context.strokeRect(x, y, w, h);
+                }     
+    
+                /**
+                * Now create the VProgress bars
+                */
+                for (var i=0,j=0; i<bar.coords.length; ++i,++j) {
+                    
+                    if (i % 3 == 0) {
+                        j = 0;
+                    }
+                    
+                    var coords = bar.coords[i];
+                    
+                    var vp = new RGraph.VProgress('cvs',0,100, [25,75])
+                        .set('gutter.left', coords[0])
+                        .set('gutter.top', coords[1])
+                        .set('gutter.right', bar.canvas.width - (coords[0] + coords[2]) )
+                        .set('gutter.bottom', 25)
+                        .set('labels.count', 0)
+                        .set('tickmarks', false)
+                        .set('colors', ['yellow', 'rgba(255,0,0,0.5)'])
+                        .set('tooltips', [people[j],people[j]])
+                        .set('tooltips.event', 'mousemove')
+                        .set('tooltips.effect', 'none')
+                    vp.set('strokestyle', 'rgba(0,0,0,0)')
+                    vp.ondraw = DrawBottomAxis
+                    vp.draw();
+    
+    
+    
+    
+                    /**
+                    * Override the function that positions the tooltip and place to the right of
+                    * the mouse pointer.
+                    */
+                    vp.positionTooltip = function (obj, x, y, tooltip, idx)
+                    {
+                        tooltip.style.top = (y  - tooltip.offsetHeight - 3) + 'px';
+                        tooltip.style.left = (x - 3) + 'px';
+                    }
+                    
+                    vp.canvas.onmousemove = function (e)
+                    {
+                        var tooltip = RGraph.Registry.Get('chart.tooltip');
+    
+                        if (tooltip) {
+                            tooltip.style.top = (e.pageY  - tooltip.offsetHeight - 3) + 'px';
+                            tooltip.style.left = (e.pageX + 3) + 'px';
+                        }
+                    }
+                    
+                    vp.canvas.onmouseout = function (e)
+                    {
+                        RGraph.hideTooltip();
+                        RGraph.redraw();
+                    }
+                }
+            })
+        </script>
+        
+        <br />
+        
+</body>
+</html>

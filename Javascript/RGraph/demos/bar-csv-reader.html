@@ -1,0 +1,59 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="../libraries/RGraph.common.core.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.common.csv.js" ></script>
+    <script type="text/javascript" src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Bar chart using the CSV reader</title>
+
+    <meta name="description" content="A Bar chart using the CSV reader" />
+    
+</head>
+<body>
+
+    <h1>A Bar chart using the CSV reader</h1>
+
+    <div style="background-color: #ffc; border: 2px solid #cc0; border-radius: 5px; padding: 5px;">
+        <b>Note:</b>
+        For browser security reasons the AJAX demos don't work offline. You can view the demos on the RGraph website here:
+        <a href="http://www.rgraph.net/demos/" target="_blank" rel="nofollow">http://www.rgraph.net/demos</a>
+    </div>
+    <canvas id="cvs" width="500" height="250">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            RGraph.CSV('/sample.csv', function (csv)
+            {
+                // Just fetch the first row of the CSV file, starting at the second column
+                var data = csv.getRow(0, 1);
+                
+                var bar = new RGraph.Bar('cvs', data)
+                    .set('labels.above.specific', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])
+                    .set('labels.above.size', 8)
+                    .set('noxaxis', true)
+                    .set('shadow', true)
+                    .set('shadow.offsetx', 2)
+                    .set('shadow.offsety', 2)
+                    .set('shadow.blur', 5)
+                    .set('hmargin', 15)
+                    .set('background.grid.autofit.numvlines', 7)
+                    .set('colors', ['Gradient(#DDF:#01B4FF)'])
+                    .set('linewidth', 2)
+                    .set('strokestyle', 'white')
+                    .draw();
+            })
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="../libraries/RGraph.drawing.text.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A basic example of the drawing API text object being used as a link</title>
+
+    <meta name="description" content="A basic example of the drawing API text object being used as a link" />
+     
+</head>
+<body>
+        
+    <h1>A basic example of the drawing API text object being used as a link</h1>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var line = new RGraph.Line('cvs', [4,8,6,3,5,2,6])
+                .set('labels', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])
+                .draw();
+            
+            var text = new RGraph.Drawing.Text('cvs', 575,225,'Read more...')
+                .set('font', 'Arial bold italic')
+                .set('size', 10)
+                .set('halign', 'right')
+                .set('valign', 'bottom')
+                .set('colors', ['blue'])
+                .set('link', 'http://www.google.com')
+                .set('link.target', '_blank') // Default is _self
+                 //.Set('link.options', 'width=400,height=400,top=200,left=200')
+                .draw();
+        })
+    </script>
+
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

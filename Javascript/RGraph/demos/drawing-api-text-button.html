@@ -1,0 +1,137 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.bar.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="../libraries/RGraph.drawing.text.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A basic example of the drawing API text object being used as a button to switch between charts</title>
+
+    <meta name="description" content="A basic example of the drawing API text object being used as a button to switch between charts" />
+     
+</head>
+<body>
+        
+    <h1>A basic example of the drawing API text object being used as a button to switch between charts</h1>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var canvas = document.getElementById('cvs');
+            
+            /**
+            * Draw the Line chart when the page loads
+            */
+            drawLine();
+
+
+            /**
+            * Draw the line chart
+            */
+            function drawLine ()
+            {
+                RGraph.Reset(canvas);
+    
+                var line = new RGraph.Line('cvs', [4,8,6,3,5,2,6])
+                    .set('labels', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])
+                    .set('hmargin', 5)
+                    .set('linewidth', 5)
+                    .set('shadow', true)
+                    .draw();
+                
+                
+                drawButtons();
+            }
+
+
+
+
+            
+            
+            /**
+            * Draw the Bar chart
+            */
+            function drawBar ()
+            {
+                RGraph.Reset(canvas);
+    
+                var bar = new RGraph.Bar('cvs', [4,8,6,3,5,2,6])
+                    .set('labels', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])
+                    .set('colors', ['Gradient(white:blue)'])
+                    .draw();
+                    
+                    drawButtons();
+            }
+
+
+
+
+            /**
+            * Draw the buttons (using the drawing API text object).
+            */
+            function drawButtons ()
+            {
+                var text1 = new RGraph.Drawing.Text('cvs', 600 - 25 - 5,25 + 5,'Line chart')
+                    .set('font', 'Arial')
+                    .set('size', 14)
+                    .set('bounding.fill', 'white')
+                    .set('bounding', true)
+                    .set('bounding.shadow', true)
+                    .set('bounding.shadow.color', '#666')
+                    .set('bounding.shadow.offsetx', 1)
+                    .set('bounding.shadow.offsety', 1)
+                    .set('halign', 'right')
+                    .set('valign', 'top')
+                    .set('colors', ['blue'])
+                    .draw();
+                    
+                // onmousemove defined below
+                
+                text1.onclick = function (e, shape)
+                {
+                    drawLine();
+                }
+
+                var text2 = new RGraph.Drawing.Text('cvs', 600 - 25 - 5 - 5 - text1.coords[0][2], 25 + 5,'Bar chart')
+                    .set('font', 'Arial')
+                    .set('size', 14)
+                    .set('bounding', true)
+                    .set('bounding.fill', 'white')
+                    .set('bounding.shadow', true)
+                    .set('bounding.shadow.color', '#666')
+                    .set('bounding.shadow.offsetx', 1)
+                    .set('bounding.shadow.offsety', 1)
+                    .set('halign', 'right')
+                    .set('valign', 'top')
+                    .set('colors', ['blue'])
+                    .draw();
+                
+                text1.onmousemove =
+                text2.onmousemove = function (e, shape)
+                {
+                    e.target.style.cursor = 'pointer';
+                }
+                
+                text2.onclick = function (e, shape)
+                {
+                    drawBar();
+                }
+            }
+        });
+    </script>
+
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<html>
+<head>
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.common.tooltips.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.bar.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A combined Bar and Spline chart</title>
+    
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <meta name="description" content="A combined Bar and Line chart where the line is a spline" />
+    
+</head>
+<body>
+    
+    <h1>A combined Bar and Spline chart</h1>
+    
+    <p>
+        Here the two charts are animated using the RGraph effects library. The Line chart uses the Trace effect and the Bar
+        chart uses the Grow effect.
+    </p>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+    <script>
+        bar = new RGraph.Bar('cvs', [4,5,3,8,4,9,6,5,3,7])
+            .set('labels', ['Mal', 'Barry', 'Gary', 'Neil', 'Kim', 'Pete', 'Lou', 'Fred', 'Jobe', 'Larry'])
+            .set('colors', ['#ddf'])
+            .set('ylabels', false)
+            .set('background.grid.vlines', false)
+            .set('strokestyle', 'rgba(0,0,0,0)')
+            .grow();
+        
+        line = new RGraph.Line('cvs', [41,43,45,54,42,41,21,18,12,11])
+            .set('spline', true)
+            .set('shadow', true)
+            .set('tickmarks', 'endsquare')
+            .set('background.grid.vlines', false)
+            .set('tooltips', ['Mal', 'Barry', 'Gary', 'Neil', 'Kim', 'Pete', 'Lou', 'Fred', 'Jobe', 'Larry'])
+        line.set('hmargin', (line.canvas.width - line.Get('gutter.left') - line.Get('gutter.right')) / (bar.data.length * 2))
+            .trace();
+    </script>
+
+</body>
+</html>

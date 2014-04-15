@@ -1,0 +1,55 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.effects.js" ></script>
+    <script src="../libraries/RGraph.pie.js" ></script>
+    <script src="../libraries/RGraph.bar.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>A Bar chart with animated Pie chart</title>
+    
+    <meta name="description" content="A Bar chart with an animated Pie chart" />
+    
+</head>
+<body>
+
+    <h1>A Bar chart with animated Pie chart</h1>
+    
+    <p>
+        This demo shows a simple effect using the Pie chart RoundRobin effect.
+    </p>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+    
+    <script>
+        $(document).ready(function ()
+        {
+            var bar = new RGraph.Bar('cvs', [5,4,5,6,8,5,3])
+                .set('gutter.bottom', 40)
+                .set('labels', ['Monday','\r\nTuesday','Wednesday','\r\nThursday','Friday','\r\nSaturday','Sunday'])
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .draw();
+            
+            var pie = new RGraph.Pie('cvs', [4,8,6])
+                .set('centerx', 60)
+                .set('centery', 60)
+                .set('radius', 25)
+                .set('exploded', [5])
+                .set('strokestyle', 'rgba(0,0,0,0)')
+                .set('shadow', true)
+                .set('strokestyle', '#fff')
+                .set('linewidth', 1)
+                .roundRobin({frames: 30, radius: false});
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<html>
+<head>
+    <script src="../libraries/RGraph.common.core.js" ></script>
+    <script src="../libraries/RGraph.common.dynamic.js" ></script>
+    <script src="../libraries/RGraph.line.js" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--[if lt IE 9]><script src="../excanvas/excanvas.js"></script><![endif]-->
+    
+    <title>An adjustablerange Line chart</title>
+    
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+
+    <meta name="description" content="A range Line chart which is adjustable - so you can drag the data points up and down" />
+     
+</head>
+<body>
+
+    <h1>An adjustable range Line chart</h1>
+    
+    <p>
+        An adjustable range chart.
+    </p>
+
+    <canvas id="cvs" width="600" height="250">[No canvas support]</canvas>
+
+    <script>
+        $(document).ready(function ()
+        {
+            var l1 = new RGraph.Line('cvs', [51,52,56,54,53,54,21,65,32,48,51,52,56,54,53,54,21,65,32,48,51,52,56,54,53,54,21,65,32,48],[4,5,3,2,5,6,8,9,5,6,4,5,3,2,5,6,8,9,5,6,4,5,3,2,5,6,8,9,5,6])
+                .set('labels', ['13th','14th','15th','16th','15th','16th','17th','18th','19th'])
+                .set('title', 'Range of fuel consumption')
+                .set('background.grid.autofit.align', true)
+                .set('filled', true)
+                .set('filled.range', true)
+                .set('fillstyle', 'rgba(128,255,128,0.5)')
+                .set('linewidth', 2)
+                .set('colors', ['green'])
+                .set('numxticks', 8)
+                .set('adjustable', 8)
+                .set('tickmarks', null)
+                .set('ymax', 65)
+                .draw();
+        })
+    </script>
+
+    <p>
+        <a href="./">&laquo; Back</a>
+    </p>
+
+</body>
+</html>
+
