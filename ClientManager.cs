@@ -198,7 +198,7 @@ namespace CentralMine.NET
                     body += "Hashrate: " + hashrate + "\n";
                     body += "Clients: " + mClients.Count + "\n";
                     body += "\n\n";
-                    mMailer.SendEmail(body);
+                    //mMailer.SendEmail(body);
 
                     mEventLog.RecordEvent(EventLog.EventType.Upstream, string.Format("Work accepted! solution: {0}, dataString: {1}", solution, data));
 

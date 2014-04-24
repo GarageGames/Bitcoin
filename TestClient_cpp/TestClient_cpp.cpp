@@ -36,7 +36,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
     int threadCount = sysinfo.dwNumberOfProcessors - 1;
     //threadCount = 1;
-    F2M_MiningThreadManager* threadManager = new F2M_MiningThreadManager(threadCount, sse, 50);
+    F2M_MiningThreadManager* threadManager = new F2M_MiningThreadManager(threadCount, sse, 0);
 
     
     // Call F2M_NetInit here to initialize winsock so gethostname/gethostbyname work
@@ -50,7 +50,7 @@ int _tmain(int argc, _TCHAR* argv[])
         strcpy_s(myIPAddress, sizeof(myIPAddress), inet_ntoa(*(in_addr*)he->h_addr_list[0]));
     
     unsigned int hashBlockCount = threadCount * 5000;
-    F2M_MinerConnection* conn = new F2M_MinerConnection(hashBlockCount, agentName, "Windows", myIPAddress );
+    F2M_MinerConnection* conn = new F2M_MinerConnection(hashBlockCount, "MiningTest", "Windows", "WinC++" );
     conn->ConnectTo(HostAddress, HostPort);
 
     _CrtMemState checkpoint;

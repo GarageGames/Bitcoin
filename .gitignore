@@ -3,6 +3,7 @@
 *.opensdf
 bin/
 obj/
+Android/
 MinerLib_cpp/Debug/
 MinerLib_cpp/Release/
 MinerLib_cpp/ipch/

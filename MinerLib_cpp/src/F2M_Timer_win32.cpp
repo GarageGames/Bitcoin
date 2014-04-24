@@ -1,4 +1,4 @@
-#include <Windows.h>
+#include "F2M_Platform.h"
 #include "F2M_Timer.h"
 
 struct TimerDataWin32

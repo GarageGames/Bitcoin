@@ -1,6 +1,7 @@
 #ifndef _F2M_WORK_H_
 #define _F2M_WORK_H_
 
+#ifdef WIN32
 #ifdef _DEBUG   
 #include <memory.h>
 #include <crtdbg.h>
@@ -9,6 +10,7 @@
         #define new DBG_NEW   
     #endif
 #endif  // _DEBUG
+#endif // WIN32
 
 struct F2M_Work
 {

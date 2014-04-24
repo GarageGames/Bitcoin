@@ -28,7 +28,7 @@ F2M_MinerConnection::F2M_MinerConnection(unsigned int hashChunkSize, const char*
 F2M_MinerConnection::~F2M_MinerConnection(void)
 {
     Disconnect();
-    closesocket(mSocket);
+    SOCKET_CLOSE(mSocket);
 
     if( mWorkBlock )
         delete mWorkBlock;
@@ -39,11 +39,10 @@ void F2M_MinerConnection::SetupSocket()
     mSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
     // Make the socket non blocking
-    u_long arg = 1;
-    ioctlsocket(mSocket, FIONBIO, &arg);
+    F2M_Socket_SetNonBlocking(mSocket);
 
     // Disable nagle algorithm
-    BOOL nagle = FALSE;
+    int nagle = 0;
     setsockopt(mSocket, IPPROTO_TCP, TCP_NODELAY, (const char*)&nagle, sizeof(nagle));
 }
 
@@ -59,12 +58,12 @@ void F2M_MinerConnection::Update()
     FD_SET(mSocket, &exceptSet);
 
     timeval waitTime;
-    waitTime.tv_sec = 0;
-    waitTime.tv_usec = 100;
+    waitTime.tv_sec = 2;
+    waitTime.tv_usec = 0;
 
-    int result = select(0, &readSet, &writeSet, &exceptSet, &waitTime);
+    int result = select(FD_SETSIZE, &readSet, &writeSet, &exceptSet, &waitTime);
     if( result > 0 )
-    {
+    {        
         mCanRead = (FD_ISSET(mSocket, &readSet) != 0);
         mCanWrite = (FD_ISSET(mSocket, &writeSet) != 0);
 
@@ -72,7 +71,7 @@ void F2M_MinerConnection::Update()
         {
             if( FD_ISSET(mSocket, &writeSet) )
             {
-                // Connection succeeded
+                // Connection succeeded                
                 mConnectionState = F2M_MinerConnection::Connected;
                 SendIdentityPacket();
             }
@@ -120,15 +119,14 @@ void F2M_MinerConnection::Update()
         }
         else
         {
-            int err = WSAGetLastError();
+            SocketError err = F2M_Socket_GetLastError();
             switch( err )
             {
-                case WSAECONNABORTED:
-                case WSAECONNRESET:
+                case SE_ConnectionAborted:
+                case SE_ConnectionReset:
                     Disconnect();
                     break;
                 default:
-                    //printf("recv failed: (%d)0x%8.8x\n", err, err);
                     break;
             }
         }
@@ -137,7 +135,7 @@ void F2M_MinerConnection::Update()
     if( mConnectionState == F2M_MinerConnection::Connected )
     {
         time_t now = time(0);
-        __int64 timeSinceSeen = now - mAliveTime;
+        unsigned int timeSinceSeen = now - mAliveTime;
         if( timeSinceSeen > 5 )
         {
             SendPing();
@@ -150,28 +148,38 @@ void F2M_MinerConnection::ConnectTo(const char* hostName, unsigned short port)
 {
     // Disconnect from any existing connection
     Disconnect();
-
+    
     // Get the IP address from the host name string
     unsigned long hostAddr = inet_addr(hostName);
     if( hostAddr == INADDR_NONE )
     {
         // Not an ip address, do a DNS lookup on the host name
         hostent* host = gethostbyname(hostName);
-        hostAddr = *reinterpret_cast<unsigned long *>( host->h_addr_list[0]);
+        if( host )
+        	hostAddr = *reinterpret_cast<unsigned long *>( host->h_addr_list[0]);
     }
 
     // Start the connect to the remote host
     if( hostAddr != INADDR_NONE )
     {
-        SOCKADDR_IN addr;
-        addr.sin_family = AF_INET;
-        addr.sin_addr.S_un.S_addr = hostAddr;
-        addr.sin_port = htons(port);
-        memset(addr.sin_zero, 0, sizeof(addr.sin_zero));
-
-        int result = connect(mSocket, (SOCKADDR*)&addr, sizeof(addr));
-        mConnectionState = F2M_MinerConnection::Connecting;
+        sockaddr_in addr;
+        F2M_Socket_SetupSockAddr(addr, hostAddr, port);
+        
+        int result = connect(mSocket, (sockaddr*)&addr, sizeof(addr));
+        if( result < 0 )
+        {
+            SocketError err = F2M_Socket_GetLastError();
+            if( err == SE_InProgress || err == SE_WouldBlock )
+            {
+                // Connect started
+                result = 0;
+            }
+        }
+        if( result == 0 )
+        	mConnectionState = F2M_MinerConnection::Connecting;
+            
     }
+
 }
 
 void F2M_MinerConnection::Disconnect()
@@ -179,7 +187,7 @@ void F2M_MinerConnection::Disconnect()
     if( mConnectionState != F2M_MinerConnection::Disconnected )
     {
         // close the connection
-        closesocket(mSocket);
+        SOCKET_CLOSE(mSocket);
         
         // Reset socket to be used again
         SetupSocket();
@@ -196,7 +204,6 @@ void F2M_MinerConnection::SendPacket(unsigned char* packetData, int packetLen)
         int sentBytes = send(mSocket, (const char*)packetData, packetLen, 0);
         if( sentBytes < 0 )
         {
-            int err = WSAGetLastError();
         }
     }
 }

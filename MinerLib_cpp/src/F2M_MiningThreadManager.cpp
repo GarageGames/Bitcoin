@@ -7,14 +7,14 @@
 
 #include <stdio.h>
 
-//static F2M_Timer timer;
-
 F2M_MiningThreadManager::F2M_MiningThreadManager(int threadCount, bool useSSE, float gpuPercentage)
 {
     mThreadCount = threadCount;
     mThreads = new F2M_WorkThread*[threadCount];
+    if( useSSE )
+        F2M_WorkThread::sScryptImplementation = F2M_WorkThread::eSI_SSE;
     for( int i = 0; i < threadCount; i++ )
-        mThreads[i] = new F2M_WorkThread(useSSE);
+        mThreads[i] = new F2M_WorkThread();
 
     if( gpuPercentage > 0 )
         mGPUThread = new F2M_GPUThread(gpuPercentage);
@@ -84,20 +84,16 @@ void F2M_MiningThreadManager::Update(F2M_MinerConnection* connection)
                     solution = mThreads[i]->mSolution;
                 }
             }
-
-
+            
             connection->SendWorkComplete(solutionFound, ntohl(solution), hashes);            
             delete mCurrentWork;
             mCurrentWork = 0;
-            //timer.Stop();
-            //printf("gpu: %d  hps: %d\n", mGPUThread ? mGPUThread->GetHashrate() : 0, (unsigned int)(hashes / timer.GetDuration()));
         }
     }
 }
 
 void F2M_MiningThreadManager::StartWork(F2M_Work* work)
 {
-    //timer.Start();
     if( mCurrentWork )
         delete mCurrentWork;
 
