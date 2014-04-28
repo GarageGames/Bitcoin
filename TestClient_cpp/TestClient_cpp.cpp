@@ -7,6 +7,8 @@
 #include <F2M_MinerConnection.h>
 #include <F2M_MiningThreadManager.h>
 #include <F2M_Net.h>
+#include <F2M_UnitTest.h>
+
 #include <intrin.h> // __cpuid
 #include <stdio.h>
 
@@ -19,6 +21,8 @@ static const char* HostAddress = "ronsTestMachine.cloudapp.net";
 int _tmain(int argc, _TCHAR* argv[])
 {   
     //_CrtSetBreakAlloc(144);
+
+    bool testSuccess = F2M_TestAll();
 
     char agentName[128];
     strcpy_s(agentName, sizeof(agentName), "C++ Test Miner");

@@ -19,7 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\F2M_GPUThread_none.cpp" />
+    <ClCompile Include="src\F2M_GPUThread_none.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\F2M_GPUThread_OpenCL.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Android'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Android'">true</ExcludedFromBuild>
@@ -50,6 +53,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Android'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Android'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\F2M_UnitTest.cpp" />
     <ClCompile Include="src\F2M_Utils.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Android'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Android'">true</ExcludedFromBuild>
@@ -102,8 +106,10 @@
     <ClInclude Include="include\F2M_MinerConnection.h" />
     <ClInclude Include="include\F2M_MiningThreadManager.h" />
     <ClInclude Include="include\F2M_Net.h" />
+    <ClInclude Include="include\F2M_Platform.h" />
     <ClInclude Include="include\F2M_Sockets.h" />
     <ClInclude Include="include\F2M_Timer.h" />
+    <ClInclude Include="include\F2M_UnitTest.h" />
     <ClInclude Include="include\F2M_Utils.h" />
     <ClInclude Include="include\F2M_Work.h" />
     <ClInclude Include="include\F2M_WorkThread.h" />

@@ -8,8 +8,10 @@
     #include <stdlib.h>
     #include <Mswsock.h>
 
-#define PRE_ALIGN(x)    __declspec(align((x))
-#define POST_ALIGN(x)   
+    #define F2M_Sleep   Sleep
+
+    #define PRE_ALIGN(x)    __declspec(align(x))
+    #define POST_ALIGN(x)   
 
     #define SOCKET_CLOSE    closesocket
 
@@ -22,6 +24,12 @@
     #include <sys/ioctl.h>
     #include <arpa/inet.h>
     #include <netdb.h>
+
+    #define F2M_Sleep(x)    usleep(x * 1000)
+    
+    #define PRE_ALIGN(x)
+    #define POST_ALIGN(x)   __attribute__((aligned(x)))
+
     #define SOCKET_CLOSE    close
     #define SOCKET          int
     
@@ -37,8 +45,10 @@
     #include <string.h>
     #include <stdlib.h>
 
-#define PRE_ALIGN(x)
-#define POST_ALIGN(x)   __attribute__((aligned(x)))
+    #define F2M_Sleep(x)    usleep(x * 1000)
+
+    #define PRE_ALIGN(x)
+    #define POST_ALIGN(x)   __attribute__((aligned(x)))
 
     #define SOCKET_CLOSE    close
     #define SOCKET          int

@@ -33,11 +33,6 @@ inline __m128i vrsh(__m128i a, int b)
     return _mm_srli_epi32(a, b);
 }
 
-inline __m128i vadd(__m128i a, __m128i b)
-{
-    return _mm_add_epi32(a, b);
-}
-
 inline __m128i vmul(__m128i a, __m128i b)
 {
     __m128i tmp1 = _mm_mul_epu32(a,b);
@@ -45,20 +40,27 @@ inline __m128i vmul(__m128i a, __m128i b)
     return _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE (0,0,2,0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE (0,0,2,0)));
 }
 
-inline __m128i vor(__m128i a, __m128i b)
+#ifndef __APPLE__
+inline __m128i operator +(__m128i a, __m128i b)
+{
+    return _mm_add_epi32(a, b);
+}
+
+inline __m128i operator |(__m128i a, __m128i b)
 {
     return _mm_or_si128(a, b);
 }
 
-inline __m128i vxor(__m128i a, __m128i b)
+inline __m128i operator ^(__m128i a, __m128i b)
 {
     return _mm_xor_si128(a, b);
 }
 
-inline __m128i vand(__m128i a, __m128i b)
+inline __m128i operator &(__m128i a, __m128i b)
 {
     return _mm_and_si128(a, b);
 }
+#endif // __APPLE__
 
 /*
 inline __m128i ByteReverseSSE(__m128i value)

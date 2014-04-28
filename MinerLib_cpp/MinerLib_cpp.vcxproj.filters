@@ -55,6 +55,9 @@
     <ClCompile Include="src\F2M_GPUThread_OpenCL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\F2M_UnitTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\F2M_GPUThread_none.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -91,6 +94,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\F2M_HashSSE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\F2M_UnitTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\F2M_Platform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

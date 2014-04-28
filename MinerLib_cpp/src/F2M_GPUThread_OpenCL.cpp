@@ -181,17 +181,11 @@ bool F2M_GPUThread::IsWorkDone()
         // Check for the end
         mHashesDone += mGPUThreadCount;
         mHashStart += mGPUThreadCount;
-        if( mHashStart >= mHashEnd )
-        {
-            F2M_ScryptCleanup(mScryptData);
-            mScryptData = 0;
-            mWorkDoneEvent = 0;   
-            return true;
-        }
-
+        
         // Start more work
-        DoWork();
-
+        if( mHashStart < mHashEnd )
+            DoWork();
+        
         // Check all positives
         for( unsigned int i = 0; i < positive; i++ )
         {
@@ -201,10 +195,19 @@ bool F2M_GPUThread::IsWorkDone()
                 mSolution = mPositivesArea[i];
                 mWorkDoneEvent = 0;
                 F2M_ScryptCleanup(mScryptData);
+                mScryptData = 0;
 
                 clFinish(mQ);
                 return true;
             }
+        }
+
+        if( mHashStart >= mHashEnd )
+        {
+            F2M_ScryptCleanup(mScryptData);
+            mScryptData = 0;
+            mWorkDoneEvent = 0;   
+            return true;
         }
     }
 

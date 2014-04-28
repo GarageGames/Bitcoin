@@ -201,9 +201,9 @@ F2M_ScryptData* F2M_ScryptInit(F2M_Work* work)
     memcpy(data->dataBuffer2, dataBuffer2, sizeof(dataBuffer2));
     memcpy(data->tempHash, tempHash, sizeof(tempHash));
 
-    data->dataBuffer[0] = work->data64[0];
-    data->dataBuffer[1] = work->data64[1];
-    data->dataBuffer[2] = work->data64[2];
+    data->dataBuffer[0] = work->dataFull[16];
+    data->dataBuffer[1] = work->dataFull[17];
+    data->dataBuffer[2] = work->dataFull[18];
 
     unsigned int difficulty = work->dataFull[18];
     unsigned diffZeros = 32 - (difficulty & 0xFF);
@@ -236,8 +236,8 @@ void F2M_ScryptCleanup(F2M_ScryptData* scryptData)
 
 bool F2M_ScryptHash(unsigned int nonce, F2M_Work* work, F2M_ScryptData* scrypt)
 {
-    scrypt->dataBuffer[3] = work->data64[3] = nonce;
-    ScryptHashOpt(work->dataFull, work->data64, scrypt);
+    scrypt->dataBuffer[3] = work->dataFull[19] = nonce;
+    ScryptHashOpt(work->dataFull, &work->dataFull[16], scrypt);
 
     if( (scrypt->output[7] & scrypt->outputMask) == 0 )
     {

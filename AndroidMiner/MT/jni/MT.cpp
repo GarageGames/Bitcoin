@@ -7,6 +7,7 @@
 #include <F2M_Net.h>
 #include <F2M_MinerConnection.h>
 #include <F2M_MiningThreadManager.h>
+#include <F2M_UnitTest.h>
 
 static const int HostPort = 80;
 static const char* HostAddress = "ronsTestMachine.cloudapp.net";
@@ -17,6 +18,9 @@ volatile bool gMiningThreadKill = true;
 
 void* MiningThread(void* arg)
 {
+    bool testSuccess = F2M_TestStandard();
+    __android_log_print(ANDROID_LOG_DEBUG, "TAG", "testingSuccess: %d\n", testSuccess);
+
     F2M_MiningThreadManager* threadManager = new F2M_MiningThreadManager(1, false, 0);
 
     F2M_NetInit();

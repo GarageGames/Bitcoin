@@ -38,7 +38,7 @@ void F2M_Timer::Stop()
 double F2M_Timer::GetDuration()
 {
     TimerDataWin32* data = (TimerDataWin32*)mTimerData;
-    double clocks = data->stop.QuadPart - data->start.QuadPart;
+    double clocks = (double)(data->stop.QuadPart - data->start.QuadPart);
     double seconds = clocks * data->clocksPerSecond;
     return seconds;
 }
