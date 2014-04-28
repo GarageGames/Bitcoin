@@ -8,6 +8,9 @@
     #include <stdlib.h>
     #include <Mswsock.h>
 
+#define PRE_ALIGN(x)    __declspec(align((x))
+#define POST_ALIGN(x)   
+
     #define SOCKET_CLOSE    closesocket
 
     #define SSE_MINING
@@ -23,6 +26,29 @@
     #define SOCKET          int
     
     typedef long long __int64;
+#elif defined(__APPLE__)
+    #include <unistd.h>
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <netinet/tcp.h>
+    #include <sys/ioctl.h>
+    #include <arpa/inet.h>
+    #include <netdb.h>
+    #include <string.h>
+    #include <stdlib.h>
+
+#define PRE_ALIGN(x)
+#define POST_ALIGN(x)   __attribute__((aligned(x)))
+
+    #define SOCKET_CLOSE    close
+    #define SOCKET          int
+
+    typedef long long __int64;
+
+    #define SSE_MINING
+
+    #define _aligned_malloc(size, align) malloc(size)
+    #define _aligned_free free
 #endif
 
 

@@ -4,7 +4,6 @@
 
 #include <pthread.h>
 #include <unistd.h>
-#include <android/log.h>
 
 struct PosixThreadData
 {
@@ -58,6 +57,7 @@ void F2M_WorkThread::InternalInit()
     td->mWorkToDo = false;
     td->mWorkDone = true;
     pthread_attr_init(&td->mThreadAttr);
+    pthread_attr_setstacksize(&td->mThreadAttr, 1024 * 1024 * 2);
     pthread_attr_setdetachstate(&td->mThreadAttr, PTHREAD_CREATE_JOINABLE);
     pthread_create(&td->mThread, &td->mThreadAttr, HashWorkThread, this);
     mThreadData = td;
@@ -97,4 +97,25 @@ bool F2M_WorkThread::WantsThreadExit()
 
 void F2M_WorkThread::ScryptHashes_SSE()
 {
+#ifdef SSE_MINING
+    __int64 end = mHashStart + mHashCount;
+    F2M_ScryptDataSSE* scryptData = F2M_ScryptInitSSE(mWork);
+    for( __int64 i = mHashStart; i < end; i += 4 )
+    {
+        if( WantsThreadExit() )
+            break;
+        
+        unsigned int inonce = (unsigned int)i;
+        __m128i nonce = _mm_set_epi32(inonce, inonce + 1, inonce + 2, inonce + 3);
+        int success = F2M_ScryptHashSSE(nonce, mWork, scryptData);
+        mHashesDone += 4;
+        if( success >= 0 )
+        {
+            mSolution = inonce + success;
+            mSolutionFound = true;
+            break;
+        }
+    }
+    F2M_ScryptCleanupSSE(scryptData);
+#endif
 }

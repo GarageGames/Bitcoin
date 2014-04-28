@@ -22,6 +22,9 @@ F2M_MiningThreadManager::F2M_MiningThreadManager(int threadCount, bool useSSE, f
         mGPUThread = 0;
 
     mCurrentWork = 0;
+    mHashRate = 0;
+    
+    mTimer = new F2M_Timer();
 }
 
 F2M_MiningThreadManager::~F2M_MiningThreadManager()
@@ -38,6 +41,8 @@ F2M_MiningThreadManager::~F2M_MiningThreadManager()
 
     if( mCurrentWork )
         delete mCurrentWork;
+    
+    delete mTimer;
 }
 
 void F2M_MiningThreadManager::Update(F2M_MinerConnection* connection)
@@ -88,12 +93,17 @@ void F2M_MiningThreadManager::Update(F2M_MinerConnection* connection)
             connection->SendWorkComplete(solutionFound, ntohl(solution), hashes);            
             delete mCurrentWork;
             mCurrentWork = 0;
+            
+            mTimer->Stop();
+            mHashRate = (unsigned int)((double)hashes / mTimer->GetDuration());
         }
     }
 }
 
 void F2M_MiningThreadManager::StartWork(F2M_Work* work)
 {
+    mTimer->Start();
+    
     if( mCurrentWork )
         delete mCurrentWork;
 

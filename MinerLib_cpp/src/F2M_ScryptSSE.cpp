@@ -4,7 +4,7 @@
 #include <smmintrin.h>
 #include <string.h>
 
-__declspec(align(32)) unsigned int staticHashw[] = 
+PRE_ALIGN(32) unsigned int staticHashw[] POST_ALIGN(32) =
 {
     0x6a09e667, 0x6a09e667,0x6a09e667,0x6a09e667,
     0xbb67ae85, 0xbb67ae85,0xbb67ae85,0xbb67ae85,
@@ -23,42 +23,43 @@ inline unsigned int ByteReverse(unsigned int value)
     return (value<<16) | (value>>16);
 }
 
-inline __m128i operator <<(__m128i a, int b)
+inline __m128i vlsh(__m128i a, int b)
 {
     return _mm_slli_epi32(a, b);
 }
 
-inline __m128i operator >>(__m128i a, int b)
+inline __m128i vrsh(__m128i a, int b)
 {
     return _mm_srli_epi32(a, b);
 }
 
-inline __m128i operator +(__m128i a, __m128i b)
+inline __m128i vadd(__m128i a, __m128i b)
 {
     return _mm_add_epi32(a, b);
 }
 
-inline __m128i operator *(__m128i a, __m128i b)
+inline __m128i vmul(__m128i a, __m128i b)
 {
-    __m128i tmp1 = _mm_mul_epu32(a,b); /* mul 2,0*/
-    __m128i tmp2 = _mm_mul_epu32( _mm_srli_si128(a,4), _mm_srli_si128(b,4)); /* mul 3,1 */
-    return _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE (0,0,2,0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE (0,0,2,0))); /* shuffle results to [63..0] and pack */
+    __m128i tmp1 = _mm_mul_epu32(a,b);
+    __m128i tmp2 = _mm_mul_epu32( _mm_srli_si128(a,4), _mm_srli_si128(b,4));
+    return _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE (0,0,2,0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE (0,0,2,0)));
 }
 
-inline __m128i operator |(__m128i a, __m128i b)
+inline __m128i vor(__m128i a, __m128i b)
 {
     return _mm_or_si128(a, b);
 }
 
-inline __m128i operator ^(__m128i a, __m128i b)
+inline __m128i vxor(__m128i a, __m128i b)
 {
     return _mm_xor_si128(a, b);
 }
 
-inline __m128i operator &(__m128i a, __m128i b)
+inline __m128i vand(__m128i a, __m128i b)
 {
     return _mm_and_si128(a, b);
 }
+
 /*
 inline __m128i ByteReverseSSE(__m128i value)
 {
@@ -79,12 +80,12 @@ inline __m128i ByteReverseSSE(__m128i value)
     return result;
 }
 
-#define ROTATESSE(a,n)     (((a)<<(n))|((a)>>(32-(n))))
+#define ROTATESSE(a,n)     ((vrsh((a),n))|(vlsh((a), 32-(n))))
 
 #define Sigma0SSE(x)   (ROTATESSE((x),30) ^ ROTATESSE((x),19) ^ ROTATESSE((x),10))
 #define Sigma1SSE(x)   (ROTATESSE((x),26) ^ ROTATESSE((x),21) ^ ROTATESSE((x),7))
-#define sigma0SSE(x)   (ROTATESSE((x),25) ^ ROTATESSE((x),14) ^ ((x)>>3))
-#define sigma1SSE(x)   (ROTATESSE((x),15) ^ ROTATESSE((x),13) ^ ((x)>>10))
+#define sigma0SSE(x)   (ROTATESSE((x),25) ^ ROTATESSE((x),14) ^ (vlsh((x),3)))
+#define sigma1SSE(x)   (ROTATESSE((x),15) ^ ROTATESSE((x),13) ^ (vlsh((x),10)))
 #define ChSSE(x,y,z)   (_mm_xor_si128(_mm_and_si128(x, y), _mm_andnot_si128(x, z)))
 #define MajSSE(x,y,z)  (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
 
@@ -321,7 +322,7 @@ static inline void xor_salsa8SSE(__m128i B[16], const __m128i Bx[16])
 	B[15] = B[15] + x15;
 }
 
-
+#include <stdio.h>
 
 void ScryptHashSSE(F2M_ScryptDataSSE* data)
 {
@@ -329,7 +330,7 @@ void ScryptHashSSE(F2M_ScryptDataSSE* data)
     __m128i outer[8];
     sha256_blockSSEu(inner, staticHashSSE, data->input);
     sha256_blockSSEu(inner, inner, data->inputB);
-    	
+
     __m128i const36 = _mm_set1_epi8(0x36);
     __m128i const5c = _mm_set1_epi8(0x5c);
     for( int i = 0; i < 8; i++ )
@@ -374,7 +375,7 @@ void ScryptHashSSE(F2M_ScryptDataSSE* data)
 	for (int i = 0; i < 1024; i++) 
     {
         __m128i lessThan1024 = (X[16] & const1023);
-		__m128i j = const32 * lessThan1024;
+		__m128i j = vmul(const32, lessThan1024);
 		for (unsigned int k = 0; k < 32; k++)
         {
             __m128i vk = _mm_set1_epi32(k);
@@ -382,10 +383,11 @@ void ScryptHashSSE(F2M_ScryptDataSSE* data)
 
             __m128 abcd;
             _mm_store_si128((__m128i*)&abcd, idx);
-            __m128i Va = V[abcd.m128_u32[3]] & quadMask1;
-            __m128i Vb = V[abcd.m128_u32[2]] & quadMask2;
-            __m128i Vc = V[abcd.m128_u32[1]] & quadMask3;
-            __m128i Vd = V[abcd.m128_u32[0]] & quadMask4;            
+            unsigned int* pieces = (unsigned int*)&abcd;
+            __m128i Va = V[pieces[3]] & quadMask1;
+            __m128i Vb = V[pieces[2]] & quadMask2;
+            __m128i Vc = V[pieces[1]] & quadMask3;
+            __m128i Vd = V[pieces[0]] & quadMask4;            
             __m128i vtotal = Va | Vb | Vc | Vd;
             X[k] = X[k] ^ vtotal;
         }
@@ -476,7 +478,8 @@ int F2M_ScryptHashSSE(__m128i nonce,  F2M_Work* work, F2M_ScryptDataSSE* data)
 
     __m128 testVal;
     _mm_store_si128((__m128i*)&testVal, masked);
-    if( testVal.m128_u32[3] == 0 )
+    unsigned int* testPtr = (unsigned int*)&testVal;
+    if( testPtr[3] == 0 )
     {
         // Full test, one of these 4 looks good
         __m128* memHash = (__m128*)data->output;
@@ -484,7 +487,8 @@ int F2M_ScryptHashSSE(__m128i nonce,  F2M_Work* work, F2M_ScryptDataSSE* data)
         {
             for( int k = 7; k > 0; k-- )
             {
-                unsigned int hashval = ByteReverse(memHash[k].m128_u32[j]);
+                testPtr = (unsigned int*)&memHash[k];
+                unsigned int hashval = ByteReverse(testPtr[j]);
                 if( hashval > work->target[k] )
                     break;
                 if( hashval < work->target[k] )

@@ -210,10 +210,10 @@ void F2M_MinerConnection::SendPacket(unsigned char* packetData, int packetLen)
 
 void F2M_MinerConnection::SendIdentityPacket()
 {
-    int agentSize = strlen(mAgent) + 1;
-    int platformSize = strlen(mPlatform) + 1;
-    int locationSize = strlen(mLocation) + 1;
-    int packetLen = 7 + agentSize + platformSize + locationSize;
+    size_t agentSize = strlen(mAgent) + 1;
+    size_t platformSize = strlen(mPlatform) + 1;
+    size_t locationSize = strlen(mLocation) + 1;
+    size_t packetLen = 7 + agentSize + platformSize + locationSize;
     unsigned char* packet = (unsigned char*)malloc(packetLen);
 
     packet[0] = 1;                  // Identity Packet

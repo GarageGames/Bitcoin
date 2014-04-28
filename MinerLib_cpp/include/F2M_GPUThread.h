@@ -1,7 +1,12 @@
 #ifndef _F2M_GPUTHREAD_H_
 #define _F2M_GPUTHREAD_H_
 
-#include "CL/cl.h"
+#ifdef __APPLE__
+#include <OpenCL/cl.h>
+#else
+#include <CL/cl.h>
+#endif
+
 #include "F2M_Hash.h"
 
 struct F2M_Work;
