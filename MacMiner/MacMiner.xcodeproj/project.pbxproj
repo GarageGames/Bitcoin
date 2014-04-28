@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6F880A4D190EFFC5008AF623 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F880A4C190EFFC5008AF623 /* OpenCL.framework */; };
 		6FAA9D201909E421001DA6EF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6FAA9D1F1909E421001DA6EF /* main.cpp */; };
 		6FAA9D221909E421001DA6EF /* MacMiner.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FAA9D211909E421001DA6EF /* MacMiner.1 */; };
 		6FAA9E2D190AFE9D001DA6EF /* libMinerLib_cpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FAA9E2C190AFE9D001DA6EF /* libMinerLib_cpp.a */; };
@@ -26,6 +27,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6F880A4C190EFFC5008AF623 /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/OpenCL.framework; sourceTree = DEVELOPER_DIR; };
 		6FAA9D1C1909E421001DA6EF /* MacMiner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MacMiner; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FAA9D1F1909E421001DA6EF /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		6FAA9D211909E421001DA6EF /* MacMiner.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = MacMiner.1; sourceTree = "<group>"; };
@@ -37,6 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F880A4D190EFFC5008AF623 /* OpenCL.framework in Frameworks */,
 				6FAA9E2D190AFE9D001DA6EF /* libMinerLib_cpp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -47,6 +50,7 @@
 		6FAA9D131909E421001DA6EF = {
 			isa = PBXGroup;
 			children = (
+				6F880A4C190EFFC5008AF623 /* OpenCL.framework */,
 				6FAA9E2C190AFE9D001DA6EF /* libMinerLib_cpp.a */,
 				6FAA9D1E1909E421001DA6EF /* MacMiner */,
 				6FAA9D1D1909E421001DA6EF /* Products */,
@@ -196,13 +200,14 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
-				GCC_UNROLL_LOOPS = YES;
+				GCC_UNROLL_LOOPS = NO;
 				HEADER_SEARCH_PATHS = ../MinerLib_cpp/include/;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../MinerLib_cpp/include/CL\"",
 				);
 				LLVM_LTO = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx10.7;
@@ -218,14 +223,14 @@
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_UNROLL_LOOPS = YES;
+				GCC_UNROLL_LOOPS = NO;
 				HEADER_SEARCH_PATHS = ../MinerLib_cpp/include/;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../MinerLib_cpp/include/CL\"",
 				);
 				LLVM_LTO = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx10.7;

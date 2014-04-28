@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		6F880A15190EEFD7008AF623 /* F2M_Timer_osx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F880A14190EEFD7008AF623 /* F2M_Timer_osx.cpp */; };
+		6F880A49190EFDDD008AF623 /* F2M_GPUThread_OpenCL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6FAA9DF6190AFE45001DA6EF /* F2M_GPUThread_OpenCL.cpp */; };
+		6F880A4F190F00E9008AF623 /* F2M_Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F880A4E190F00E9008AF623 /* F2M_Utils.cpp */; };
 		6FAA9E05190AFE45001DA6EF /* cl.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FAA9DDD190AFE45001DA6EF /* cl.h */; };
 		6FAA9E06190AFE45001DA6EF /* cl.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6FAA9DDE190AFE45001DA6EF /* cl.hpp */; };
 		6FAA9E07190AFE45001DA6EF /* cl_d3d10.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FAA9DDF190AFE45001DA6EF /* cl_d3d10.h */; };
@@ -38,11 +40,12 @@
 		6FAA9E24190AFE45001DA6EF /* F2M_Sockets_posix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6FAA9DFD190AFE45001DA6EF /* F2M_Sockets_posix.cpp */; };
 		6FAA9E29190AFE45001DA6EF /* F2M_WorkThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6FAA9E02190AFE45001DA6EF /* F2M_WorkThread.cpp */; };
 		6FAA9E2A190AFE45001DA6EF /* F2M_WorkThread_posix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6FAA9E03190AFE45001DA6EF /* F2M_WorkThread_posix.cpp */; };
-		6FAA9E2E190AFFC8001DA6EF /* F2M_GPUThread_none.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6FAA9DF5190AFE45001DA6EF /* F2M_GPUThread_none.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		6F880A14190EEFD7008AF623 /* F2M_Timer_osx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = F2M_Timer_osx.cpp; sourceTree = "<group>"; };
+		6F880A4A190EFFA6008AF623 /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/OpenCL.framework; sourceTree = DEVELOPER_DIR; };
+		6F880A4E190F00E9008AF623 /* F2M_Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = F2M_Utils.cpp; sourceTree = "<group>"; };
 		6FAA9DD4190AFE26001DA6EF /* libMinerLib_cpp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMinerLib_cpp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FAA9DDD190AFE45001DA6EF /* cl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cl.h; sourceTree = "<group>"; };
 		6FAA9DDE190AFE45001DA6EF /* cl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cl.hpp; sourceTree = "<group>"; };
@@ -93,6 +96,7 @@
 		6FAA9DCB190AFE26001DA6EF = {
 			isa = PBXGroup;
 			children = (
+				6F880A4A190EFFA6008AF623 /* OpenCL.framework */,
 				6FAA9DDB190AFE45001DA6EF /* include */,
 				6FAA9DF4190AFE45001DA6EF /* src */,
 				6FAA9DD5190AFE26001DA6EF /* Products */,
@@ -149,6 +153,7 @@
 		6FAA9DF4190AFE45001DA6EF /* src */ = {
 			isa = PBXGroup;
 			children = (
+				6F880A4E190F00E9008AF623 /* F2M_Utils.cpp */,
 				6F880A14190EEFD7008AF623 /* F2M_Timer_osx.cpp */,
 				6FAA9DF5190AFE45001DA6EF /* F2M_GPUThread_none.cpp */,
 				6FAA9DF6190AFE45001DA6EF /* F2M_GPUThread_OpenCL.cpp */,
@@ -248,8 +253,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F880A49190EFDDD008AF623 /* F2M_GPUThread_OpenCL.cpp in Sources */,
 				6FAA9E1E190AFE45001DA6EF /* F2M_MinerConnection.cpp in Sources */,
-				6FAA9E2E190AFFC8001DA6EF /* F2M_GPUThread_none.cpp in Sources */,
 				6FAA9E1F190AFE45001DA6EF /* F2M_MiningThreadManager.cpp in Sources */,
 				6FAA9E20190AFE45001DA6EF /* F2M_Net_posix.cpp in Sources */,
 				6FAA9E22190AFE45001DA6EF /* F2M_Scrypt.cpp in Sources */,
@@ -258,6 +263,7 @@
 				6FAA9E29190AFE45001DA6EF /* F2M_WorkThread.cpp in Sources */,
 				6FAA9E2A190AFE45001DA6EF /* F2M_WorkThread_posix.cpp in Sources */,
 				6F880A15190EEFD7008AF623 /* F2M_Timer_osx.cpp in Sources */,
+				6F880A4F190F00E9008AF623 /* F2M_Utils.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,14 +342,14 @@
 				GCC_ENABLE_SSE41_EXTENSIONS = YES;
 				GCC_ENABLE_SSE42_EXTENSIONS = YES;
 				GCC_ENABLE_SUPPLEMENTAL_SSE3_INSTRUCTIONS = YES;
-				GCC_UNROLL_LOOPS = YES;
+				GCC_UNROLL_LOOPS = NO;
 				GCC_VERSION = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../include/CL\"",
 				);
 				LLVM_LTO = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx10.7;
@@ -366,14 +372,14 @@
 				GCC_ENABLE_SSE42_EXTENSIONS = YES;
 				GCC_ENABLE_SUPPLEMENTAL_SSE3_INSTRUCTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_UNROLL_LOOPS = YES;
+				GCC_UNROLL_LOOPS = NO;
 				GCC_VERSION = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../include/CL\"",
 				);
 				LLVM_LTO = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx10.7;
