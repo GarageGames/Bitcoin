@@ -206,7 +206,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../MinerLib_cpp/include/CL\"",
 				);
-				LLVM_LTO = YES;
+				LLVM_LTO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = NO;
@@ -229,7 +229,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../MinerLib_cpp/include/CL\"",
 				);
-				LLVM_LTO = YES;
+				LLVM_LTO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = NO;

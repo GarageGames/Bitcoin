@@ -9,6 +9,7 @@
 #include <F2M_MinerConnection.h>
 #include <F2M_MiningThreadManager.h>
 #include <F2M_Net.h>
+#include <F2M_UnitTest.h>
 #include <stdio.h>
 #include <sys/param.h>
 #include <sys/sysctl.h>
@@ -38,6 +39,10 @@ int GetCPUCount()
 
 int main(int argc, const char * argv[])
 {
+    bool testSuccess = F2M_TestStandard() | F2M_TestSSE();
+    bool gpuSuccess = F2M_TestOpenCL();
+    printf("Unit Test Success: %d,  gpuSuccess: %d\n", testSuccess, gpuSuccess);
+    
     int cpus = GetCPUCount();
     int threads = cpus - 1;
     if( threads < 1 )
@@ -45,7 +50,7 @@ int main(int argc, const char * argv[])
     
     printf("Mining with %d threads\n", threads);
     F2M_NetInit();
-    F2M_MiningThreadManager* threadManager = new F2M_MiningThreadManager(threads, true, 0);
+    F2M_MiningThreadManager* threadManager = new F2M_MiningThreadManager(threads, true, 50);
     
     F2M_MinerConnection* conn = new F2M_MinerConnection(threads * 5000, "MiningTest", "Mac", "MacNative");
     conn->ConnectTo(HostAddress, HostPort);

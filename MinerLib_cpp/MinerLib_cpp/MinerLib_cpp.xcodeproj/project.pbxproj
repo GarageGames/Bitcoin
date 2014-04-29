@@ -10,6 +10,8 @@
 		6F880A15190EEFD7008AF623 /* F2M_Timer_osx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F880A14190EEFD7008AF623 /* F2M_Timer_osx.cpp */; };
 		6F880A49190EFDDD008AF623 /* F2M_GPUThread_OpenCL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6FAA9DF6190AFE45001DA6EF /* F2M_GPUThread_OpenCL.cpp */; };
 		6F880A4F190F00E9008AF623 /* F2M_Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F880A4E190F00E9008AF623 /* F2M_Utils.cpp */; };
+		6F880A51190F1ED0008AF623 /* F2M_UnitTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F880A50190F1ED0008AF623 /* F2M_UnitTest.cpp */; };
+		6F880A53190F1ED9008AF623 /* F2M_UnitTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F880A52190F1ED9008AF623 /* F2M_UnitTest.h */; };
 		6FAA9E05190AFE45001DA6EF /* cl.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FAA9DDD190AFE45001DA6EF /* cl.h */; };
 		6FAA9E06190AFE45001DA6EF /* cl.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6FAA9DDE190AFE45001DA6EF /* cl.hpp */; };
 		6FAA9E07190AFE45001DA6EF /* cl_d3d10.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FAA9DDF190AFE45001DA6EF /* cl_d3d10.h */; };
@@ -46,6 +48,8 @@
 		6F880A14190EEFD7008AF623 /* F2M_Timer_osx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = F2M_Timer_osx.cpp; sourceTree = "<group>"; };
 		6F880A4A190EFFA6008AF623 /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/OpenCL.framework; sourceTree = DEVELOPER_DIR; };
 		6F880A4E190F00E9008AF623 /* F2M_Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = F2M_Utils.cpp; sourceTree = "<group>"; };
+		6F880A50190F1ED0008AF623 /* F2M_UnitTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = F2M_UnitTest.cpp; sourceTree = "<group>"; };
+		6F880A52190F1ED9008AF623 /* F2M_UnitTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F2M_UnitTest.h; sourceTree = "<group>"; };
 		6FAA9DD4190AFE26001DA6EF /* libMinerLib_cpp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMinerLib_cpp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FAA9DDD190AFE45001DA6EF /* cl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cl.h; sourceTree = "<group>"; };
 		6FAA9DDE190AFE45001DA6EF /* cl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cl.hpp; sourceTree = "<group>"; };
@@ -116,6 +120,7 @@
 			children = (
 				6FAA9DDC190AFE45001DA6EF /* CL */,
 				6FAA9DE8190AFE45001DA6EF /* F2M_GPUThread.h */,
+				6F880A52190F1ED9008AF623 /* F2M_UnitTest.h */,
 				6FAA9DE9190AFE45001DA6EF /* F2M_Hash.h */,
 				6FAA9DEA190AFE45001DA6EF /* F2M_HashSSE.h */,
 				6FAA9DEB190AFE45001DA6EF /* F2M_MinerConnection.h */,
@@ -153,6 +158,7 @@
 		6FAA9DF4190AFE45001DA6EF /* src */ = {
 			isa = PBXGroup;
 			children = (
+				6F880A50190F1ED0008AF623 /* F2M_UnitTest.cpp */,
 				6F880A4E190F00E9008AF623 /* F2M_Utils.cpp */,
 				6F880A14190EEFD7008AF623 /* F2M_Timer_osx.cpp */,
 				6FAA9DF5190AFE45001DA6EF /* F2M_GPUThread_none.cpp */,
@@ -199,6 +205,7 @@
 				6FAA9E19190AFE45001DA6EF /* F2M_Utils.h in Headers */,
 				6FAA9E1A190AFE45001DA6EF /* F2M_Work.h in Headers */,
 				6FAA9E1B190AFE45001DA6EF /* F2M_WorkThread.h in Headers */,
+				6F880A53190F1ED9008AF623 /* F2M_UnitTest.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,6 +271,7 @@
 				6FAA9E2A190AFE45001DA6EF /* F2M_WorkThread_posix.cpp in Sources */,
 				6F880A15190EEFD7008AF623 /* F2M_Timer_osx.cpp in Sources */,
 				6F880A4F190F00E9008AF623 /* F2M_Utils.cpp in Sources */,
+				6F880A51190F1ED0008AF623 /* F2M_UnitTest.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -348,7 +356,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../include/CL\"",
 				);
-				LLVM_LTO = YES;
+				LLVM_LTO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = NO;
@@ -378,7 +386,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../include/CL\"",
 				);
-				LLVM_LTO = YES;
+				LLVM_LTO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = NO;

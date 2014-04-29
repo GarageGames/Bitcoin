@@ -156,7 +156,8 @@ void F2M_GPUThread::DoWork()
     size_t localItems = mGPUThreadCount < 128 ? mGPUThreadCount : 128;
     cl_int status = clEnqueueNDRangeKernel(mQ, mKernel, 1, &offset, &globalItems, &localItems, 0, 0, 0);
     
-    status = clEnqueueReadBuffer(mQ, mGPUOutput, CL_FALSE, 0, mGPUThreadCount * 4, mOutputArea, 0, 0, &mWorkDoneEvent);
+    status = clEnqueueReadBuffer(mQ, mGPUOutput, CL_TRUE, 0, mGPUThreadCount * 4, mOutputArea, 0, 0, &mWorkDoneEvent);
+    clFlush(mQ);
 }
 
 bool F2M_GPUThread::IsWorkDone()
