@@ -61,8 +61,10 @@ int _tmain(int argc, _TCHAR* argv[])
                 F2M_Connection_Connect(conn, HostAddress, HostPort);
                 break;
         }
+        Sleep(10);
     }
-
+    F2M_Connection_Destroy(conn);
+    F2M_MTM_Destroy(conn);
     F2M_Shutdown();
 #else   // MINER_DLL
     bool testSuccess = F2M_TestAll();
