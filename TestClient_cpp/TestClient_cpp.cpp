@@ -12,6 +12,9 @@
 #include <intrin.h> // __cpuid
 #include <stdio.h>
 
+#ifdef MINER_DLL
+#include <F2M_Dll.h>
+#endif
 
 static const int HostPort = 80;
 static const char* HostAddress = "ronsTestMachine.cloudapp.net";
@@ -20,39 +23,54 @@ static const char* HostAddress = "ronsTestMachine.cloudapp.net";
 
 int _tmain(int argc, _TCHAR* argv[])
 {   
-    //_CrtSetBreakAlloc(144);
-
-    bool testSuccess = F2M_TestAll();
-
-    char agentName[128];
-    strcpy_s(agentName, sizeof(agentName), "C++ Test Miner");
-    
     int CPUInfo[4];
         __cpuid(CPUInfo, 1);
     bool sse = ((CPUInfo[3] & (1 << 26)) != 0);
-    if( sse )
-        strcat_s(agentName, sizeof(agentName) - 15, " - sse");
-    else
-        strcat_s(agentName, sizeof(agentName) - 15, " - x86");
 
     SYSTEM_INFO sysinfo;
     GetSystemInfo( &sysinfo );
-
     int threadCount = sysinfo.dwNumberOfProcessors - 1;
     //threadCount = 1;
-    F2M_MiningThreadManager* threadManager = new F2M_MiningThreadManager(threadCount, sse, 0);
+
+    float gpuPercentage = 50;
+
+#ifdef MINER_DLL
+    F2M_Initialize();
+    void* threadManager = F2M_MTM_Create(threadCount, sse, gpuPercentage);
+    void* conn = F2M_Connection_Create("MiningTest", "C++ Dll", "Windows", threadCount * 5000);
+    F2M_Connection_Connect(conn, HostAddress, HostPort);
+
+    while( 1 )
+    {
+        F2M_Connection_Update(conn);
+        F2M_MTM_Update(threadManager, conn);
+        int state = F2M_Connection_GetState(conn);
+        switch( state )
+        {
+            case 1: // Connected
+                {
+                    void* work = F2M_Connection_GetWork(conn);
+                    if( work )
+                    {
+                        printf("starting work, %d hashes/sec\n", F2M_MTM_GetHashRate(threadManager));
+                        F2M_MTM_StartWork(threadManager, work);
+                    }
+                }
+                break;
+            case 2: // Disconnected
+                F2M_Connection_Connect(conn, HostAddress, HostPort);
+                break;
+        }
+    }
+
+    F2M_Shutdown();
+#else   // MINER_DLL
+    bool testSuccess = F2M_TestAll();
+    
+    F2M_MiningThreadManager* threadManager = new F2M_MiningThreadManager(threadCount, sse, gpuPercentage);
 
     
-    // Call F2M_NetInit here to initialize winsock so gethostname/gethostbyname work
-    F2M_NetInit();
-
-    char myName[128];
-    char myIPAddress[32];
-    gethostname(myName, sizeof(myName));
-    hostent* he = gethostbyname(myName);
-    if( he )
-        strcpy_s(myIPAddress, sizeof(myIPAddress), inet_ntoa(*(in_addr*)he->h_addr_list[0]));
-    
+    F2M_NetInit();        
     unsigned int hashBlockCount = threadCount * 5000;
     F2M_MinerConnection* conn = new F2M_MinerConnection(hashBlockCount, "MiningTest", "Windows", "WinC++" );
     conn->ConnectTo(HostAddress, HostPort);
@@ -95,7 +113,7 @@ int _tmain(int argc, _TCHAR* argv[])
     delete conn;
 
     _CrtDumpMemoryLeaks();
-
+#endif  // MINER_DLL
 	return 0;
 }
 

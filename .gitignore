@@ -5,7 +5,11 @@ bin/
 obj/
 Android/
 MinerLib_cpp/Debug/
+MinerLib_cpp/Debug DLL/
 MinerLib_cpp/Release/
+MinerLib_cpp/Release DLL/
 MinerLib_cpp/ipch/
 TestClient_cpp/Debug/
+TestClient_cpp/Debug DLL/
 TestClient_cpp/Release/
+TestClient_cpp/Release DLL/

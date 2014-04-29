@@ -42,7 +42,7 @@ bool F2M_TestSSE()
 
     F2M_ScryptDataSSE* data = F2M_ScryptInitSSE(&work);
     __m128i nonce = _mm_set_epi32(sNOnce, sNOnce + 1, sNOnce + 2, sNOnce + 3);
-    bool result = F2M_ScryptHashSSE(nonce, &work, data);
+    bool result = F2M_ScryptHashSSE(nonce, &work, data) >= 0;
     F2M_ScryptCleanupSSE(data);
 
     return result;

@@ -61,6 +61,9 @@
     <ClCompile Include="src\F2M_GPUThread_none.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\F2M_Dll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\F2M_MinerConnection.h">
@@ -100,6 +103,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\F2M_Platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\F2M_Dll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
