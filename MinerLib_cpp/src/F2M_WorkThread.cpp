@@ -4,12 +4,12 @@
 
 F2M_WorkThread::eScryptImplementation F2M_WorkThread::sScryptImplementation = F2M_WorkThread::eSI_Normal;
 
-F2M_WorkThread::F2M_WorkThread()
+F2M_WorkThread::F2M_WorkThread(int threadIndex)
 {
     mWork = new F2M_Work;
     mHashCount = 0;
 
-    InternalInit();
+    InternalInit(threadIndex);
 }
 
 F2M_WorkThread::~F2M_WorkThread(void)

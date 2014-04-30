@@ -40,7 +40,7 @@ inline __m128i vmul(__m128i a, __m128i b)
     return _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE (0,0,2,0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE (0,0,2,0)));
 }
 
-#ifndef __APPLE__
+#ifdef WIN32
 inline __m128i operator +(__m128i a, __m128i b)
 {
     return _mm_add_epi32(a, b);
@@ -323,8 +323,6 @@ static inline void xor_salsa8SSE(__m128i B[16], const __m128i Bx[16])
 	B[14] = B[14] + x14;
 	B[15] = B[15] + x15;
 }
-
-#include <stdio.h>
 
 void ScryptHashSSE(F2M_ScryptDataSSE* data)
 {

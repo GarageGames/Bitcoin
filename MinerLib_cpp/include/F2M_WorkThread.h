@@ -14,7 +14,7 @@ public:
         eSI_Neon,
     };
 
-    F2M_WorkThread();
+    F2M_WorkThread(int threadIndex);
     ~F2M_WorkThread();
     
     void StartWork(unsigned int hashStart, unsigned int hashCount, F2M_Work* work);
@@ -25,7 +25,7 @@ public:
 
 
 protected:
-    void InternalInit();
+    void InternalInit(int threadIndex);
     void InternalDestroy();
     void InternalStartWork();
 

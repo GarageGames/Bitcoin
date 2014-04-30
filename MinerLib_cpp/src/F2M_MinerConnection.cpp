@@ -3,6 +3,7 @@
 
 
 #include <stdio.h>
+#include <string.h>
 
 #define NETWORK_VERSION 1
 

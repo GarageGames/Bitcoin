@@ -4,6 +4,7 @@
 bin/
 obj/
 Android/
+LinuxBuild/
 MinerLib_cpp/Debug/
 MinerLib_cpp/Debug DLL/
 MinerLib_cpp/Release/

@@ -24,6 +24,8 @@
     #include <sys/ioctl.h>
     #include <arpa/inet.h>
     #include <netdb.h>
+	#include <string.h>
+	#include <stdlib.h>
 
     #define F2M_Sleep(x)    usleep(x * 1000)
     
@@ -34,6 +36,37 @@
     #define SOCKET          int
     
     typedef long long __int64;
+#elif defined(LINUX)
+	#include <unistd.h>
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <netinet/tcp.h>
+    #include <sys/ioctl.h>
+    #include <arpa/inet.h>
+    #include <netdb.h>
+	#include <string.h>
+	#include <stdlib.h>
+	#include <malloc.h>
+
+    #define F2M_Sleep(x)    usleep(x * 1000)
+
+    #define PRE_ALIGN(x)
+    #define POST_ALIGN(x)   __attribute__((aligned(x)))
+
+    #define SOCKET_CLOSE    close
+    #define SOCKET          int
+
+    typedef long long __int64;
+
+	#define SSE_MINING
+
+	#ifndef aligned_alloc
+    extern void* _aligned_alloc_impl(size_t align, size_t size);
+	#define aligned_alloc _aligned_alloc_impl
+	#endif
+
+	#define _aligned_malloc(size, align)	aligned_alloc(align, size)
+	#define _aligned_free					free
 #elif defined(__APPLE__)
     #include <unistd.h>
     #include <sys/socket.h>

@@ -33,6 +33,7 @@ bool F2M_TestStandard()
     return result;
 }
 
+#include <stdio.h>
 bool F2M_TestSSE()
 {
 #ifdef SSE_MINING

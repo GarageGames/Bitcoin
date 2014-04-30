@@ -44,13 +44,13 @@ void* HashWorkThread(void* param)
             td->mWorkDone = true;
         }
 
-        sleep(1);
+        pthread_yield();
     }
     
     return 0;
 }
 
-void F2M_WorkThread::InternalInit()
+void F2M_WorkThread::InternalInit(int threadIndex)
 {
     PosixThreadData* td = new PosixThreadData;
     td->mKill = false;
@@ -60,6 +60,12 @@ void F2M_WorkThread::InternalInit()
     pthread_attr_setstacksize(&td->mThreadAttr, 1024 * 1024 * 2);
     pthread_attr_setdetachstate(&td->mThreadAttr, PTHREAD_CREATE_JOINABLE);
     pthread_create(&td->mThread, &td->mThreadAttr, HashWorkThread, this);
+
+    cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
+    CPU_SET(threadIndex * 2, &cpuset);
+
+    //pthread_setaffinity_np(td->mThread, sizeof(cpu_set_t), &cpuset);
     mThreadData = td;
 }
 

@@ -11,7 +11,6 @@ struct TimerDataPosix
 F2M_Timer::F2M_Timer()
 {
     mTimerData = malloc(sizeof(TimerDataPosix));
-    TimerDataPosix* data = (TimerDataPosix*)mTimerData;
 }
 
 F2M_Timer::~F2M_Timer()
