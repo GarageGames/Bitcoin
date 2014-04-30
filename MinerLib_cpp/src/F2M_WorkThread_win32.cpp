@@ -50,7 +50,7 @@ DWORD WINAPI HashWorkThread(void* param)
     return 0;
 }
 
-void F2M_WorkThread::InternalInit()
+void F2M_WorkThread::InternalInit(int threadIndex)
 {
     WinThreadData* td = new WinThreadData;
     td->mKill = CreateEvent(NULL, TRUE, FALSE, NULL);
