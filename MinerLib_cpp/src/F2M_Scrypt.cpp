@@ -206,7 +206,7 @@ F2M_ScryptData* F2M_ScryptInit(F2M_Work* work)
     data->dataBuffer[2] = work->dataFull[18];
 
     unsigned int difficulty = work->dataFull[18];
-    unsigned diffZeros = 32 - (difficulty & 0xFF);
+    unsigned int diffZeros = 32 - (difficulty & 0xFF);
     switch( diffZeros )
     {
         case 0:
