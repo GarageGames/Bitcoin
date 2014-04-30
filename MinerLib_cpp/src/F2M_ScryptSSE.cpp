@@ -40,7 +40,7 @@ inline __m128i vmul(__m128i a, __m128i b)
     return _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE (0,0,2,0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE (0,0,2,0)));
 }
 
-#ifdef WIN32
+#ifndef __APPLE__
 inline __m128i operator +(__m128i a, __m128i b)
 {
     return _mm_add_epi32(a, b);
@@ -82,12 +82,12 @@ inline __m128i ByteReverseSSE(__m128i value)
     return result;
 }
 
-#define ROTATESSE(a,n)     ((vrsh((a),n))|(vlsh((a), 32-(n))))
+#define ROTATESSE(a,n)     ((vlsh((a),n))|(vrsh((a), 32-(n))))
 
 #define Sigma0SSE(x)   (ROTATESSE((x),30) ^ ROTATESSE((x),19) ^ ROTATESSE((x),10))
 #define Sigma1SSE(x)   (ROTATESSE((x),26) ^ ROTATESSE((x),21) ^ ROTATESSE((x),7))
-#define sigma0SSE(x)   (ROTATESSE((x),25) ^ ROTATESSE((x),14) ^ (vlsh((x),3)))
-#define sigma1SSE(x)   (ROTATESSE((x),15) ^ ROTATESSE((x),13) ^ (vlsh((x),10)))
+#define sigma0SSE(x)   (ROTATESSE((x),25) ^ ROTATESSE((x),14) ^ (vrsh((x),3)))
+#define sigma1SSE(x)   (ROTATESSE((x),15) ^ ROTATESSE((x),13) ^ (vrsh((x),10)))
 #define ChSSE(x,y,z)   (_mm_xor_si128(_mm_and_si128(x, y), _mm_andnot_si128(x, z)))
 #define MajSSE(x,y,z)  (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
 
@@ -324,13 +324,15 @@ static inline void xor_salsa8SSE(__m128i B[16], const __m128i Bx[16])
 	B[15] = B[15] + x15;
 }
 
+
+
 void ScryptHashSSE(F2M_ScryptDataSSE* data)
 {
     __m128i inner[8];
     __m128i outer[8];
     sha256_blockSSEu(inner, staticHashSSE, data->input);
     sha256_blockSSEu(inner, inner, data->inputB);
-
+    	
     __m128i const36 = _mm_set1_epi8(0x36);
     __m128i const5c = _mm_set1_epi8(0x5c);
     for( int i = 0; i < 8; i++ )
