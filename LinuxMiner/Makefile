@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-c -Wall -I ../MinerLib_cpp/include -D LINUX -D_REENTRANT -msse4.1 -g
-LFLAGS=-Wall -L ../MinerLib_cpp/LinuxBuild/ -static -g
+CFLAGS=-c -Wall -I ../MinerLib_cpp/include -D LINUX -D_REENTRANT -msse4.1 -Ofast
+LFLAGS=-Wall -L ../MinerLib_cpp/LinuxBuild/ -static
 LIBS=-lMiner -lstdc++ -lrt -lpthread
 OBJECTS=LinuxMiner.o
 OUTDIR=LinuxBuild
