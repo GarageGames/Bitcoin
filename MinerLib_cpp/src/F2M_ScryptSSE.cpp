@@ -4,6 +4,14 @@
 #include <smmintrin.h>
 #include <string.h>
 
+struct SSEVector
+{
+	SSEVector() {}
+	SSEVector(__m128i iv) { v = iv; }
+	operator __m128i() { return v; }
+	__m128i v;
+};
+
 PRE_ALIGN(32) unsigned int staticHashw[] POST_ALIGN(32) =
 {
     0x6a09e667, 0x6a09e667,0x6a09e667,0x6a09e667,
@@ -15,7 +23,7 @@ PRE_ALIGN(32) unsigned int staticHashw[] POST_ALIGN(32) =
     0x1f83d9ab, 0x1f83d9ab,0x1f83d9ab,0x1f83d9ab,
     0x5be0cd19, 0x5be0cd19,0x5be0cd19,0x5be0cd19
 };
-static const __m128i* staticHashSSE = (__m128i*)staticHashw;
+static const SSEVector* staticHashSSE = (SSEVector*)staticHashw;
 
 inline unsigned int ByteReverse(unsigned int value)
 {
@@ -23,59 +31,57 @@ inline unsigned int ByteReverse(unsigned int value)
     return (value<<16) | (value>>16);
 }
 
-inline __m128i vlsh(__m128i a, int b)
+inline SSEVector vlsh(SSEVector a, int b)
 {
     return _mm_slli_epi32(a, b);
 }
 
-inline __m128i vrsh(__m128i a, int b)
+inline SSEVector vrsh(SSEVector a, int b)
 {
     return _mm_srli_epi32(a, b);
 }
 
-inline __m128i vmul(__m128i a, __m128i b)
+inline SSEVector vmul(SSEVector a, SSEVector b)
 {
-    __m128i tmp1 = _mm_mul_epu32(a,b);
-    __m128i tmp2 = _mm_mul_epu32( _mm_srli_si128(a,4), _mm_srli_si128(b,4));
+    SSEVector tmp1 = _mm_mul_epu32(a,b);
+    SSEVector tmp2 = _mm_mul_epu32( _mm_srli_si128(a,4), _mm_srli_si128(b,4));
     return _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE (0,0,2,0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE (0,0,2,0)));
 }
 
-#ifndef __APPLE__
-inline __m128i operator +(__m128i a, __m128i b)
+inline SSEVector operator +(SSEVector a, SSEVector b)
 {
     return _mm_add_epi32(a, b);
 }
 
-inline __m128i operator |(__m128i a, __m128i b)
+inline SSEVector operator |(SSEVector a, SSEVector b)
 {
     return _mm_or_si128(a, b);
 }
 
-inline __m128i operator ^(__m128i a, __m128i b)
+inline SSEVector operator ^(SSEVector a, SSEVector b)
 {
     return _mm_xor_si128(a, b);
 }
 
-inline __m128i operator &(__m128i a, __m128i b)
+inline SSEVector operator &(SSEVector a, SSEVector b)
 {
     return _mm_and_si128(a, b);
 }
-#endif // __APPLE__
 
 /*
-inline __m128i ByteReverseSSE(__m128i value)
+inline SSEVector ByteReverseSSE(SSEVector value)
 {
-    __m128i swapMask = _mm_set_epi8(12, 13, 14, 15, 8, 9, 10, 11, 4, 5, 6, 7, 0, 1, 2, 3);    
+    SSEVector swapMask = _mm_set_epi8(12, 13, 14, 15, 8, 9, 10, 11, 4, 5, 6, 7, 0, 1, 2, 3);
     return _mm_shuffle_epi8(value, swapMask);
 }
 */
-inline __m128i ByteReverseSSE(__m128i value)
+inline SSEVector ByteReverseSSE(SSEVector value)
 {
-    __m128i maskA = _mm_set1_epi32(0x00FF00FF);
-    __m128i maskB = _mm_set1_epi32(0xFF00FF00);
-    __m128i shiftedA = _mm_slli_epi32(_mm_and_si128(value, maskA), 8);
-    __m128i shiftedB = _mm_srli_epi32(_mm_and_si128(value, maskB), 8);
-    __m128i result = _mm_or_si128(shiftedA, shiftedB);
+    SSEVector maskA = _mm_set1_epi32(0x00FF00FF);
+    SSEVector maskB = _mm_set1_epi32(0xFF00FF00);
+    SSEVector shiftedA = _mm_slli_epi32(_mm_and_si128(value, maskA), 8);
+    SSEVector shiftedB = _mm_srli_epi32(_mm_and_si128(value, maskB), 8);
+    SSEVector result = _mm_or_si128(shiftedA, shiftedB);
     shiftedA = _mm_slli_epi32(result, 16);
     shiftedB = _mm_srli_epi32(result, 16);
     result = _mm_or_si128(shiftedA, shiftedB);
@@ -91,10 +97,10 @@ inline __m128i ByteReverseSSE(__m128i value)
 #define ChSSE(x,y,z)   (_mm_xor_si128(_mm_and_si128(x, y), _mm_andnot_si128(x, z)))
 #define MajSSE(x,y,z)  (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
 
-static void sha256_blockSSEu(__m128i* output, const __m128i* state, const __m128i* input)
+static void sha256_blockSSEu(SSEVector* output, const SSEVector* state, const SSEVector* input)
 {
-	__m128i a, b, c, d, e, f, g, h, t1, t2;
-	__m128i W[64];
+	SSEVector a, b, c, d, e, f, g, h, t1, t2;
+	SSEVector W[64];
 	int i;
 
 	/* load the input */
@@ -258,9 +264,9 @@ static void sha256_blockSSEu(__m128i* output, const __m128i* state, const __m128
     output[7] = state[7] + h;
 }
 
-static inline void xor_salsa8SSE(__m128i B[16], const __m128i Bx[16])
+static inline void xor_salsa8SSE(SSEVector B[16], const SSEVector Bx[16])
 {
-	__m128i x00,x01,x02,x03,x04,x05,x06,x07,x08,x09,x10,x11,x12,x13,x14,x15;
+	SSEVector x00,x01,x02,x03,x04,x05,x06,x07,x08,x09,x10,x11,x12,x13,x14,x15;
 	int i;
 
 	x00 = B[ 0] = (B[ 0] ^ Bx[ 0]);
@@ -328,35 +334,35 @@ static inline void xor_salsa8SSE(__m128i B[16], const __m128i Bx[16])
 
 void ScryptHashSSE(F2M_ScryptDataSSE* data)
 {
-    __m128i inner[8];
-    __m128i outer[8];
-    sha256_blockSSEu(inner, staticHashSSE, data->input);
-    sha256_blockSSEu(inner, inner, data->inputB);
+    SSEVector inner[8];
+    SSEVector outer[8];
+    sha256_blockSSEu(inner, staticHashSSE, (const SSEVector*)data->input);
+    sha256_blockSSEu(inner, inner, (const SSEVector*)data->inputB);
     	
-    __m128i const36 = _mm_set1_epi8(0x36);
-    __m128i const5c = _mm_set1_epi8(0x5c);
+    SSEVector const36 = _mm_set1_epi8(0x36);
+    SSEVector const5c = _mm_set1_epi8(0x5c);
     for( int i = 0; i < 8; i++ )
     {
         data->pad36[i] = inner[i] ^ const36;
         data->pad5c[i] = inner[i] ^ const5c;
     }
-    sha256_blockSSEu(inner, staticHashSSE, data->pad36);
-    sha256_blockSSEu(outer, staticHashSSE, data->pad5c);
+    sha256_blockSSEu(inner, staticHashSSE, (const SSEVector*)data->pad36);
+    sha256_blockSSEu(outer, staticHashSSE, (const SSEVector*)data->pad5c);
 
-    __m128i salted[8];
-    sha256_blockSSEu(salted, inner, data->input);
+    SSEVector salted[8];
+    sha256_blockSSEu(salted, inner, (const SSEVector*)data->input);
 
-    __m128i bp[32];
+    SSEVector bp[32];
     for( int i = 0; i < 4; i++ )
     {
         data->inputB2[4] = _mm_set1_epi32(i + 1);
 
-        sha256_blockSSEu(data->tempHash, salted, data->inputB2);
-        sha256_blockSSEu(&bp[i * 8], outer, data->tempHash);
+        sha256_blockSSEu((SSEVector*)data->tempHash, salted, (const SSEVector*)data->inputB2);
+        sha256_blockSSEu(&bp[i * 8], outer, (const SSEVector*)data->tempHash);
     }
 	
-    __m128i X[32];
-    __m128i V[1024 * 32];
+    SSEVector X[32];
+    SSEVector V[1024 * 32];
 	for (int i = 0; i < 32; i++)
         X[i] = ByteReverseSSE(bp[i]);
 
@@ -368,29 +374,29 @@ void ScryptHashSSE(F2M_ScryptDataSSE* data)
 		xor_salsa8SSE(&X[16], &X[0]);
 	}
 
-    __m128i const1023 = _mm_set1_epi32(0x3FF);
-    __m128i const32 = _mm_set1_epi32(32);
-    __m128i quadMask1 = _mm_set_epi32(0xFFFFFFFF, 0, 0, 0);
-    __m128i quadMask2 = _mm_set_epi32(0, 0xFFFFFFFF, 0, 0);
-    __m128i quadMask3 = _mm_set_epi32(0, 0, 0xFFFFFFFF, 0);
-    __m128i quadMask4 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
+    SSEVector const1023 = _mm_set1_epi32(0x3FF);
+    SSEVector const32 = _mm_set1_epi32(32);
+    SSEVector quadMask1 = _mm_set_epi32(0xFFFFFFFF, 0, 0, 0);
+    SSEVector quadMask2 = _mm_set_epi32(0, 0xFFFFFFFF, 0, 0);
+    SSEVector quadMask3 = _mm_set_epi32(0, 0, 0xFFFFFFFF, 0);
+    SSEVector quadMask4 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
 	for (int i = 0; i < 1024; i++) 
     {
-        __m128i lessThan1024 = (X[16] & const1023);
-		__m128i j = vmul(const32, lessThan1024);
+        SSEVector lessThan1024 = (X[16] & const1023);
+		SSEVector j = vmul(const32, lessThan1024);
 		for (unsigned int k = 0; k < 32; k++)
         {
-            __m128i vk = _mm_set1_epi32(k);
-            __m128i idx = j + vk;
+            SSEVector vk = _mm_set1_epi32(k);
+            SSEVector idx = j + vk;
 
             __m128 abcd;
             _mm_store_si128((__m128i*)&abcd, idx);
             unsigned int* pieces = (unsigned int*)&abcd;
-            __m128i Va = V[pieces[3]] & quadMask1;
-            __m128i Vb = V[pieces[2]] & quadMask2;
-            __m128i Vc = V[pieces[1]] & quadMask3;
-            __m128i Vd = V[pieces[0]] & quadMask4;            
-            __m128i vtotal = Va | Vb | Vc | Vd;
+            SSEVector Va = V[pieces[3]] & quadMask1;
+            SSEVector Vb = V[pieces[2]] & quadMask2;
+            SSEVector Vc = V[pieces[1]] & quadMask3;
+            SSEVector Vd = V[pieces[0]] & quadMask4;
+            SSEVector vtotal = Va | Vb | Vc | Vd;
             X[k] = X[k] ^ vtotal;
         }
 		xor_salsa8SSE(&X[0], &X[16]);
@@ -403,8 +409,8 @@ void ScryptHashSSE(F2M_ScryptDataSSE* data)
     sha256_blockSSEu(salted, inner, bp);
     sha256_blockSSEu(salted, salted, bp + 16);
 
-    sha256_blockSSEu(data->tempHash, salted, data->dataBuffer2);
-    sha256_blockSSEu(data->output, outer, data->tempHash);
+    sha256_blockSSEu((SSEVector*)data->tempHash, salted, (const SSEVector*)data->dataBuffer2);
+    sha256_blockSSEu((SSEVector*)data->output, outer, (const SSEVector*)data->tempHash);
 }
 
 F2M_ScryptDataSSE* F2M_ScryptInitSSE(F2M_Work* work)
@@ -472,11 +478,11 @@ int F2M_ScryptHashSSE(__m128i nonce,  F2M_Work* work, F2M_ScryptDataSSE* data)
     ScryptHashSSE(data);
 
 
-    __m128i shifted = _mm_shuffle_epi32(data->output[7], 0x93);
-    __m128i aandbcandd = _mm_and_si128(data->output[7], shifted);
+    SSEVector shifted = _mm_shuffle_epi32(data->output[7], 0x93);
+    SSEVector aandbcandd = _mm_and_si128(data->output[7], shifted);
     shifted = _mm_shuffle_epi32(aandbcandd, 0x55);
-    __m128i test = _mm_and_si128(aandbcandd, shifted);
-    __m128i masked = _mm_and_si128(test, data->outputMask);
+    SSEVector test = _mm_and_si128(aandbcandd, shifted);
+    SSEVector masked = _mm_and_si128(test, data->outputMask);
 
     __m128 testVal;
     _mm_store_si128((__m128i*)&testVal, masked);
