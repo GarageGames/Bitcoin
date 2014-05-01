@@ -1,5 +1,6 @@
 #include "F2M_Work.h"
 #include "F2M_Hash.h"
+#include "F2M_WorkThread.h"
 
 #include <smmintrin.h>
 #include <string.h>
@@ -441,4 +442,27 @@ int F2M_ScryptHashSSE(__m128i nonce,  F2M_Work* work, F2M_ScryptDataSSE* data)
         }
     }
     return -1;
+}
+
+void F2M_ScryptHashWork_SIMD(F2M_WorkThread* thread)
+{
+    __int64 end = thread->mHashStart + thread->mHashCount;
+    F2M_ScryptDataSSE* scryptData = F2M_ScryptInitSSE(thread->mWork);
+    for( __int64 i = thread->mHashStart; i < end; i += 4 )
+    {
+        if( thread->WantsThreadExit() )
+            break;
+
+        unsigned int inonce = (unsigned int)i;
+        __m128i nonce = _mm_set_epi32(inonce, inonce + 1, inonce + 2, inonce + 3);
+        int success = F2M_ScryptHashSSE(nonce, thread->mWork, scryptData);
+        thread->mHashesDone += 4;
+        if( success >= 0 )
+        {
+            thread->mSolution = inonce + success;
+            thread->mSolutionFound = true;
+            break;
+        }
+    }
+    F2M_ScryptCleanupSSE(scryptData);
 }

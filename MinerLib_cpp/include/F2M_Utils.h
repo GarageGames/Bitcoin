@@ -12,4 +12,6 @@ void* F2M_FileLoad(const char* fileName, size_t* outFileSize);
 void F2M_FileUnload(void* fileData);
 void F2M_FileSave(const char* fileName, void* data, size_t dataSize);
 
+bool F2M_HardwareSupportsSIMD();
+
 #endif

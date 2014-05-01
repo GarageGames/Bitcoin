@@ -11,8 +11,6 @@ F2M_MiningThreadManager::F2M_MiningThreadManager(int threadCount, bool useSSE, f
 {
     mThreadCount = threadCount;
     mThreads = new F2M_WorkThread*[threadCount];
-    if( useSSE )
-        F2M_WorkThread::sScryptImplementation = F2M_WorkThread::eSI_SSE;
     for( int i = 0; i < threadCount; i++ )
         mThreads[i] = new F2M_WorkThread(i);
 

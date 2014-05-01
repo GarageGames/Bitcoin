@@ -6,14 +6,6 @@ struct F2M_Work;
 class F2M_WorkThread
 {
 public:
-    enum eScryptImplementation
-    {
-        eSI_Normal,
-        eSI_SSE,
-        eSI_AVX,
-        eSI_Neon,
-    };
-
     F2M_WorkThread(int threadIndex);
     ~F2M_WorkThread();
     
@@ -22,7 +14,7 @@ public:
     bool IsWorkDone();
     
     void ScryptHashes();
-
+    bool WantsThreadExit();
 
 protected:
     void InternalInit(int threadIndex);
@@ -30,9 +22,7 @@ protected:
     void InternalStartWork();
 
     void ScryptHashes_Normal();
-    void ScryptHashes_SSE();
 
-    bool WantsThreadExit();
 
 
 public:     // Members public so they can be accessed by threads directly
@@ -44,8 +34,6 @@ public:     // Members public so they can be accessed by threads directly
     bool            mSolutionFound;
     
     void*           mThreadData;
-
-    static eScryptImplementation    sScryptImplementation;
 };
 
 #endif

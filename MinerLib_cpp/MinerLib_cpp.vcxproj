@@ -100,6 +100,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Android'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Android'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\F2M_Utils_x86.cpp" />
     <ClCompile Include="src\F2M_WorkThread.cpp" />
     <ClCompile Include="src\F2M_WorkThread_posix.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

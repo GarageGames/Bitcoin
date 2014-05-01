@@ -95,26 +95,3 @@ bool F2M_WorkThread::WantsThreadExit()
     WinThreadData* td = (WinThreadData*)mThreadData;
     return (WaitForSingleObject(td->mKill, 0) == WAIT_OBJECT_0);
 }
-
-void F2M_WorkThread::ScryptHashes_SSE()
-{
-    __int64 end = mHashStart + mHashCount;
-    F2M_ScryptDataSSE* scryptData = F2M_ScryptInitSSE(mWork);
-    for( __int64 i = mHashStart; i < end; i += 4 )
-    {
-        if( WantsThreadExit() )
-            break;
-
-        unsigned int inonce = (unsigned int)i;
-        __m128i nonce = _mm_set_epi32(inonce, inonce + 1, inonce + 2, inonce + 3);
-        int success = F2M_ScryptHashSSE(nonce, mWork, scryptData);
-        mHashesDone += 4;
-        if( success >= 0 )
-        {
-            mSolution = inonce + success;
-            mSolutionFound = true;
-            break;
-        }
-    }
-    F2M_ScryptCleanupSSE(scryptData);
-}

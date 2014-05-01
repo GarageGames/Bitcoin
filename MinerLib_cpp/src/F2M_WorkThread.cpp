@@ -1,8 +1,7 @@
 #include "F2M_WorkThread.h"
 #include "F2M_Work.h"
 #include "F2M_Hash.h"
-
-F2M_WorkThread::eScryptImplementation F2M_WorkThread::sScryptImplementation = F2M_WorkThread::eSI_Normal;
+#include "F2M_Utils.h"
 
 F2M_WorkThread::F2M_WorkThread(int threadIndex)
 {
@@ -36,19 +35,10 @@ void F2M_WorkThread::ScryptHashes()
     mHashesDone = 0;
     mSolutionFound = false;
 
-    switch( sScryptImplementation )
-    {
-        case eSI_Normal:
-            ScryptHashes_Normal();
-            break;
-        case eSI_SSE:
-            ScryptHashes_SSE();
-            break;
-        case eSI_AVX:
-            break;
-        case eSI_Neon:
-            break;
-    }
+    if( HAS_SIMD_IMPLEMENTATION && F2M_HardwareSupportsSIMD() ) 
+        F2M_ScryptHashWork_SIMD(this);
+    else
+        ScryptHashes_Normal();
 }
 
 void F2M_WorkThread::ScryptHashes_Normal()

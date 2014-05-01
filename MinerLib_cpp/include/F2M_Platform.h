@@ -16,6 +16,7 @@
     #define SOCKET_CLOSE    closesocket
 
     #define SSE_MINING
+    #define HAS_SIMD_IMPLEMENTATION 1
 #elif defined(ANDROID)
     #include <unistd.h>
     #include <sys/socket.h>
@@ -34,6 +35,8 @@
 
     #define SOCKET_CLOSE    close
     #define SOCKET          int
+
+    #define HAS_SIMD_IMPLEMENTATION 0
     
     typedef long long __int64;
 #elif defined(LINUX)
@@ -59,6 +62,7 @@
     typedef long long __int64;
 
 	#define SSE_MINING
+    #define HAS_SIMD_IMPLEMENTATION 1
 
 	#ifndef aligned_alloc
     extern void* _aligned_alloc_impl(size_t align, size_t size);
@@ -89,6 +93,7 @@
     typedef long long __int64;
 
     #define SSE_MINING
+    #define HAS_SIMD_IMPLEMENTATION 1
 
     #define _aligned_malloc(size, align) malloc(size)
     #define _aligned_free free

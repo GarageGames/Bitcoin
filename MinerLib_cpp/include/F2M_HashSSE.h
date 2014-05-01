@@ -7,6 +7,7 @@
 #include <emmintrin.h>
 
 struct F2M_Work;
+class F2M_WorkThread;
 
 struct F2M_ScryptDataSSE
 {
@@ -25,6 +26,8 @@ struct F2M_ScryptDataSSE
 F2M_ScryptDataSSE* F2M_ScryptInitSSE(F2M_Work* work);
 void F2M_ScryptCleanupSSE(F2M_ScryptDataSSE* scryptData);
 int F2M_ScryptHashSSE(__m128i nonce,  F2M_Work* work, F2M_ScryptDataSSE* data);
+
+void F2M_ScryptHashWork_SIMD(F2M_WorkThread* thread);
 #endif  // SSE_MINING
 
 #endif // _F2M_HASH_SSE_H_
