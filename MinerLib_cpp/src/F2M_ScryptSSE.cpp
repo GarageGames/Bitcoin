@@ -12,6 +12,7 @@ struct SSEVector
 	__m128i v;
 };
 
+
 PRE_ALIGN(32) unsigned int staticHashw[] POST_ALIGN(32) =
 {
     0x6a09e667, 0x6a09e667,0x6a09e667,0x6a09e667,
@@ -31,39 +32,44 @@ inline unsigned int ByteReverse(unsigned int value)
     return (value<<16) | (value>>16);
 }
 
-inline SSEVector vlsh(SSEVector a, int b)
+inline SSEVector vlsh(SSEVector& a, int b)
 {
     return _mm_slli_epi32(a, b);
 }
 
-inline SSEVector vrsh(SSEVector a, int b)
+inline SSEVector vrsh(SSEVector& a, int b)
 {
     return _mm_srli_epi32(a, b);
 }
 
-inline SSEVector vmul(SSEVector a, SSEVector b)
+inline SSEVector vmul(SSEVector& a, SSEVector& b)
 {
     SSEVector tmp1 = _mm_mul_epu32(a,b);
     SSEVector tmp2 = _mm_mul_epu32( _mm_srli_si128(a,4), _mm_srli_si128(b,4));
     return _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE (0,0,2,0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE (0,0,2,0)));
 }
 
-inline SSEVector operator +(SSEVector a, SSEVector b)
+inline SSEVector operator +(SSEVector& a, SSEVector& b)
 {
     return _mm_add_epi32(a, b);
 }
 
-inline SSEVector operator |(SSEVector a, SSEVector b)
+inline SSEVector operator +(const SSEVector& a, SSEVector& b)
+{
+    return _mm_add_epi32(a.v, b);
+}
+
+inline SSEVector operator |(SSEVector& a, SSEVector& b)
 {
     return _mm_or_si128(a, b);
 }
 
-inline SSEVector operator ^(SSEVector a, SSEVector b)
+inline SSEVector operator ^(SSEVector& a, SSEVector& b)
 {
     return _mm_xor_si128(a, b);
 }
 
-inline SSEVector operator &(SSEVector a, SSEVector b)
+inline SSEVector operator &(SSEVector& a, SSEVector& b)
 {
     return _mm_and_si128(a, b);
 }
@@ -75,7 +81,7 @@ inline SSEVector ByteReverseSSE(SSEVector value)
     return _mm_shuffle_epi8(value, swapMask);
 }
 */
-inline SSEVector ByteReverseSSE(SSEVector value)
+inline SSEVector ByteReverseSSE(SSEVector& value)
 {
     SSEVector maskA = _mm_set1_epi32(0x00FF00FF);
     SSEVector maskB = _mm_set1_epi32(0xFF00FF00);
@@ -94,7 +100,7 @@ inline SSEVector ByteReverseSSE(SSEVector value)
 #define Sigma1SSE(x)   (ROTATESSE((x),26) ^ ROTATESSE((x),21) ^ ROTATESSE((x),7))
 #define sigma0SSE(x)   (ROTATESSE((x),25) ^ ROTATESSE((x),14) ^ (vrsh((x),3)))
 #define sigma1SSE(x)   (ROTATESSE((x),15) ^ ROTATESSE((x),13) ^ (vrsh((x),10)))
-#define ChSSE(x,y,z)   (_mm_xor_si128(_mm_and_si128(x, y), _mm_andnot_si128(x, z)))
+#define ChSSE(x,y,z)   (SSEVector(_mm_xor_si128(_mm_and_si128(x, y), _mm_andnot_si128(x, z))))
 #define MajSSE(x,y,z)  (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
 
 static void sha256_blockSSEu(SSEVector* output, const SSEVector* state, const SSEVector* input)
@@ -118,141 +124,77 @@ static void sha256_blockSSEu(SSEVector* output, const SSEVector* state, const SS
 	e=state[4];  f=state[5];  g=state[6];  h=state[7];
 
 	/* now iterate */
-	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + _mm_set1_epi32(0x428a2f98) + W[ 0];
-	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
-	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + _mm_set1_epi32(0x71374491) + W[ 1];
-	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
-	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + _mm_set1_epi32(0xb5c0fbcf) + W[ 2];
-	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
-	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + _mm_set1_epi32(0xe9b5dba5) + W[ 3];
-	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
-	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + _mm_set1_epi32(0x3956c25b) + W[ 4];
-	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
-	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + _mm_set1_epi32(0x59f111f1) + W[ 5];
-	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
-	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + _mm_set1_epi32(0x923f82a4) + W[ 6];
-	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
-	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + _mm_set1_epi32(0xab1c5ed5) + W[ 7];
-	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
-
-	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + _mm_set1_epi32(0xd807aa98) + W[ 8];
-	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
-	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + _mm_set1_epi32(0x12835b01) + W[ 9];
-	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
-	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + _mm_set1_epi32(0x243185be) + W[10];
-	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
-	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + _mm_set1_epi32(0x550c7dc3) + W[11];
-	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
-	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + _mm_set1_epi32(0x72be5d74) + W[12];
-	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
-	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + _mm_set1_epi32(0x80deb1fe) + W[13];
-	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
-	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + _mm_set1_epi32(0x9bdc06a7) + W[14];
-	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
-	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + _mm_set1_epi32(0xc19bf174) + W[15];
-	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
-
-	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + _mm_set1_epi32(0xe49b69c1) + W[16];
-	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
-	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + _mm_set1_epi32(0xefbe4786) + W[17];
-	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
-	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + _mm_set1_epi32(0x0fc19dc6) + W[18];
-	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
-	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + _mm_set1_epi32(0x240ca1cc) + W[19];
-	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
-	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + _mm_set1_epi32(0x2de92c6f) + W[20];
-	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
-	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + _mm_set1_epi32(0x4a7484aa) + W[21];
-	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
-	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + _mm_set1_epi32(0x5cb0a9dc) + W[22];
-	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
-	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + _mm_set1_epi32(0x76f988da) + W[23];
-	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
-
-	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + _mm_set1_epi32(0x983e5152) + W[24];
-	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
-	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + _mm_set1_epi32(0xa831c66d) + W[25];
-	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
-	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + _mm_set1_epi32(0xb00327c8) + W[26];
-	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
-	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + _mm_set1_epi32(0xbf597fc7) + W[27];
-	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
-	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + _mm_set1_epi32(0xc6e00bf3) + W[28];
-	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
-	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + _mm_set1_epi32(0xd5a79147) + W[29];
-	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
-	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + _mm_set1_epi32(0x06ca6351) + W[30];
-	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
-	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + _mm_set1_epi32(0x14292967) + W[31];
-	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
-
-	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + _mm_set1_epi32(0x27b70a85) + W[32];
-	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
-	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + _mm_set1_epi32(0x2e1b2138) + W[33];
-	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
-	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + _mm_set1_epi32(0x4d2c6dfc) + W[34];
-	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
-	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + _mm_set1_epi32(0x53380d13) + W[35];
-	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
-	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + _mm_set1_epi32(0x650a7354) + W[36];
-	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
-	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + _mm_set1_epi32(0x766a0abb) + W[37];
-	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
-	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + _mm_set1_epi32(0x81c2c92e) + W[38];
-	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
-	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + _mm_set1_epi32(0x92722c85) + W[39];
-	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
-
-	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + _mm_set1_epi32(0xa2bfe8a1) + W[40];
-	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
-	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + _mm_set1_epi32(0xa81a664b) + W[41];
-	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
-	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + _mm_set1_epi32(0xc24b8b70) + W[42];
-	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
-	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + _mm_set1_epi32(0xc76c51a3) + W[43];
-	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
-	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + _mm_set1_epi32(0xd192e819) + W[44];
-	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
-	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + _mm_set1_epi32(0xd6990624) + W[45];
-	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
-	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + _mm_set1_epi32(0xf40e3585) + W[46];
-	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
-	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + _mm_set1_epi32(0x106aa070) + W[47];
-	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
-
-	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + _mm_set1_epi32(0x19a4c116) + W[48];
-	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
-	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + _mm_set1_epi32(0x1e376c08) + W[49];
-	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
-	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + _mm_set1_epi32(0x2748774c) + W[50];
-	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
-	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + _mm_set1_epi32(0x34b0bcb5) + W[51];
-	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
-	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + _mm_set1_epi32(0x391c0cb3) + W[52];
-	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
-	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + _mm_set1_epi32(0x4ed8aa4a) + W[53];
-	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
-	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + _mm_set1_epi32(0x5b9cca4f) + W[54];
-	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
-	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + _mm_set1_epi32(0x682e6ff3) + W[55];
-	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
-
-	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + _mm_set1_epi32(0x748f82ee) + W[56];
-	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
-	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + _mm_set1_epi32(0x78a5636f) + W[57];
-	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
-	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + _mm_set1_epi32(0x84c87814) + W[58];
-	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
-	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + _mm_set1_epi32(0x8cc70208) + W[59];
-	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
-	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + _mm_set1_epi32(0x90befffa) + W[60];
-	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
-	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + _mm_set1_epi32(0xa4506ceb) + W[61];
-	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
-	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + _mm_set1_epi32(0xbef9a3f7) + W[62];
-	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
-	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + _mm_set1_epi32(0xc67178f2) + W[63];
-	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
+	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + SSEVector(_mm_set1_epi32(0x428a2f98)) + W[ 0];	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
+	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + SSEVector(_mm_set1_epi32(0x71374491)) + W[ 1];	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
+	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + SSEVector(_mm_set1_epi32(0xb5c0fbcf)) + W[ 2];	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
+	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + SSEVector(_mm_set1_epi32(0xe9b5dba5)) + W[ 3];	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
+	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + SSEVector(_mm_set1_epi32(0x3956c25b)) + W[ 4];	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
+	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + SSEVector(_mm_set1_epi32(0x59f111f1)) + W[ 5];	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
+	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + SSEVector(_mm_set1_epi32(0x923f82a4)) + W[ 6];	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
+	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + SSEVector(_mm_set1_epi32(0xab1c5ed5)) + W[ 7];	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
+                                                                               
+	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + SSEVector(_mm_set1_epi32(0xd807aa98)) + W[ 8];	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
+	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + SSEVector(_mm_set1_epi32(0x12835b01)) + W[ 9];	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
+	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + SSEVector(_mm_set1_epi32(0x243185be)) + W[10];	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
+	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + SSEVector(_mm_set1_epi32(0x550c7dc3)) + W[11];	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
+	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + SSEVector(_mm_set1_epi32(0x72be5d74)) + W[12];	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
+	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + SSEVector(_mm_set1_epi32(0x80deb1fe)) + W[13];	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
+	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + SSEVector(_mm_set1_epi32(0x9bdc06a7)) + W[14];	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
+	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + SSEVector(_mm_set1_epi32(0xc19bf174)) + W[15];	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
+                                                                               
+	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + SSEVector(_mm_set1_epi32(0xe49b69c1)) + W[16];	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
+	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + SSEVector(_mm_set1_epi32(0xefbe4786)) + W[17];	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
+	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + SSEVector(_mm_set1_epi32(0x0fc19dc6)) + W[18];	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
+	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + SSEVector(_mm_set1_epi32(0x240ca1cc)) + W[19];	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
+	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + SSEVector(_mm_set1_epi32(0x2de92c6f)) + W[20];	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
+	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + SSEVector(_mm_set1_epi32(0x4a7484aa)) + W[21];	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
+	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + SSEVector(_mm_set1_epi32(0x5cb0a9dc)) + W[22];	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
+	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + SSEVector(_mm_set1_epi32(0x76f988da)) + W[23];	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
+                                                                               
+	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + SSEVector(_mm_set1_epi32(0x983e5152)) + W[24];	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
+	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + SSEVector(_mm_set1_epi32(0xa831c66d)) + W[25];	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
+	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + SSEVector(_mm_set1_epi32(0xb00327c8)) + W[26];	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
+	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + SSEVector(_mm_set1_epi32(0xbf597fc7)) + W[27];	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
+	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + SSEVector(_mm_set1_epi32(0xc6e00bf3)) + W[28];	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
+	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + SSEVector(_mm_set1_epi32(0xd5a79147)) + W[29];	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
+	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + SSEVector(_mm_set1_epi32(0x06ca6351)) + W[30];	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
+	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + SSEVector(_mm_set1_epi32(0x14292967)) + W[31];	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
+                                                                               
+	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + SSEVector(_mm_set1_epi32(0x27b70a85)) + W[32];	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
+	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + SSEVector(_mm_set1_epi32(0x2e1b2138)) + W[33];	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
+	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + SSEVector(_mm_set1_epi32(0x4d2c6dfc)) + W[34];	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
+	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + SSEVector(_mm_set1_epi32(0x53380d13)) + W[35];	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
+	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + SSEVector(_mm_set1_epi32(0x650a7354)) + W[36];	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
+	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + SSEVector(_mm_set1_epi32(0x766a0abb)) + W[37];	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
+	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + SSEVector(_mm_set1_epi32(0x81c2c92e)) + W[38];	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
+	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + SSEVector(_mm_set1_epi32(0x92722c85)) + W[39];	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
+                                                                               
+	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + SSEVector(_mm_set1_epi32(0xa2bfe8a1)) + W[40];	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
+	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + SSEVector(_mm_set1_epi32(0xa81a664b)) + W[41];	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
+	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + SSEVector(_mm_set1_epi32(0xc24b8b70)) + W[42];	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
+	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + SSEVector(_mm_set1_epi32(0xc76c51a3)) + W[43];	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
+	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + SSEVector(_mm_set1_epi32(0xd192e819)) + W[44];	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
+	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + SSEVector(_mm_set1_epi32(0xd6990624)) + W[45];	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
+	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + SSEVector(_mm_set1_epi32(0xf40e3585)) + W[46];	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
+	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + SSEVector(_mm_set1_epi32(0x106aa070)) + W[47];	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
+                                                                               
+	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + SSEVector(_mm_set1_epi32(0x19a4c116)) + W[48];	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
+	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + SSEVector(_mm_set1_epi32(0x1e376c08)) + W[49];	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
+	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + SSEVector(_mm_set1_epi32(0x2748774c)) + W[50];	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
+	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + SSEVector(_mm_set1_epi32(0x34b0bcb5)) + W[51];	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
+	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + SSEVector(_mm_set1_epi32(0x391c0cb3)) + W[52];	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
+	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + SSEVector(_mm_set1_epi32(0x4ed8aa4a)) + W[53];	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
+	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + SSEVector(_mm_set1_epi32(0x5b9cca4f)) + W[54];	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
+	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + SSEVector(_mm_set1_epi32(0x682e6ff3)) + W[55];	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
+                                                                               
+	t1 = h + Sigma1SSE(e) + ChSSE(e,f,g) + SSEVector(_mm_set1_epi32(0x748f82ee)) + W[56];	t2 = Sigma0SSE(a) + MajSSE(a,b,c);    d = d + t1;    h=t1+t2;
+	t1 = g + Sigma1SSE(d) + ChSSE(d,e,f) + SSEVector(_mm_set1_epi32(0x78a5636f)) + W[57];	t2 = Sigma0SSE(h) + MajSSE(h,a,b);    c = c + t1;    g=t1+t2;
+	t1 = f + Sigma1SSE(c) + ChSSE(c,d,e) + SSEVector(_mm_set1_epi32(0x84c87814)) + W[58];	t2 = Sigma0SSE(g) + MajSSE(g,h,a);    b = b + t1;    f=t1+t2;
+	t1 = e + Sigma1SSE(b) + ChSSE(b,c,d) + SSEVector(_mm_set1_epi32(0x8cc70208)) + W[59];	t2 = Sigma0SSE(f) + MajSSE(f,g,h);    a = a + t1;    e=t1+t2;
+	t1 = d + Sigma1SSE(a) + ChSSE(a,b,c) + SSEVector(_mm_set1_epi32(0x90befffa)) + W[60];	t2 = Sigma0SSE(e) + MajSSE(e,f,g);    h = h + t1;    d=t1+t2;
+	t1 = c + Sigma1SSE(h) + ChSSE(h,a,b) + SSEVector(_mm_set1_epi32(0xa4506ceb)) + W[61];	t2 = Sigma0SSE(d) + MajSSE(d,e,f);    g = g + t1;    c=t1+t2;
+	t1 = b + Sigma1SSE(g) + ChSSE(g,h,a) + SSEVector(_mm_set1_epi32(0xbef9a3f7)) + W[62];	t2 = Sigma0SSE(c) + MajSSE(c,d,e);    f = f + t1;    b=t1+t2;
+	t1 = a + Sigma1SSE(f) + ChSSE(f,g,h) + SSEVector(_mm_set1_epi32(0xc67178f2)) + W[63];	t2 = Sigma0SSE(b) + MajSSE(b,c,d);    e = e + t1;    a=t1+t2;
 
     output[0] = state[0] + a;
     output[1] = state[1] + b; 
@@ -264,7 +206,7 @@ static void sha256_blockSSEu(SSEVector* output, const SSEVector* state, const SS
     output[7] = state[7] + h;
 }
 
-static inline void xor_salsa8SSE(SSEVector B[16], const SSEVector Bx[16])
+static inline void xor_salsa8SSE(SSEVector B[16], SSEVector Bx[16])
 {
 	SSEVector x00,x01,x02,x03,x04,x05,x06,x07,x08,x09,x10,x11,x12,x13,x14,x15;
 	int i;
