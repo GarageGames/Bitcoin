@@ -32,7 +32,7 @@ int _tmain(int argc, _TCHAR* argv[])
     int threadCount = sysinfo.dwNumberOfProcessors - 1;
     //threadCount = 1;
 
-    float gpuPercentage = 50;
+    float gpuPercentage = 0;
 
 #ifdef MINER_DLL
     F2M_Initialize();
@@ -98,7 +98,7 @@ int _tmain(int argc, _TCHAR* argv[])
             F2M_Work* work = conn->GetWork();
             if( work )
             {
-                printf("starting work, %d hashes\n", work->hashCount);
+                printf("starting work, %d hashes/sec\n", threadManager->GetHashRate());
                 threadManager->StartWork(work);
             }
         }

@@ -1,4 +1,4 @@
-CC=icpc
+CC=gcc
 CFLAGS=-c -Wall -static -I include -D LINUX -D_REENTRANT -msse4.1 -g
 OUTDIR=LinuxBuild
 OUTDIRD=LinuxBuildD

@@ -1,4 +1,4 @@
-CC=icpc
+CC=gcc
 CFLAGS=-c -Wall -I ../MinerLib_cpp/include -D LINUX -D_REENTRANT -msse4.1 -g
 LFLAGS=-Wall -g
 RLIBDIRS=-L ../MinerLib_cpp/LinuxBuild/ 
