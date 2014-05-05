@@ -34,6 +34,7 @@ public:     // Members public so they can be accessed by threads directly
     bool            mSolutionFound;
     
     void*           mThreadData;
+    int				mThreadIndex;
 };
 
 #endif

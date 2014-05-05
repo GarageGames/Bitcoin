@@ -59,7 +59,7 @@
     #define SOCKET_CLOSE    close
     #define SOCKET          int
 
-    typedef long long __int64;
+    //typedef long long __int64;
 
 	#define SSE_MINING
     #define HAS_SIMD_IMPLEMENTATION 1

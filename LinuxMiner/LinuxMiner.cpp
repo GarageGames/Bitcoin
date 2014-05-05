@@ -9,6 +9,7 @@
 
 static const char* HostAddress = "ronsTestMachine.cloudapp.net";
 
+#include <F2M_Timer.h>
 int main(int argc,char** argv)
 {
 	int numCPUs = sysconf( _SC_NPROCESSORS_ONLN );
@@ -16,8 +17,7 @@ int main(int argc,char** argv)
 	if( threadCount < 1 )
 		threadCount = 1;
 
-	/*
-	threadCount = 1;
+	//threadCount = 2;
 	printf("CPUS: %d, Threads: %d\n", numCPUs, threadCount);
 	if( numCPUs > threadCount )
 	{
@@ -37,7 +37,7 @@ int main(int argc,char** argv)
 		CPU_ZERO(&cpuset);
 		CPU_SET(7, &cpuset);
 
-		//pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+		pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
 
 		CPU_ZERO(&cpuset);
 
@@ -51,7 +51,7 @@ int main(int argc,char** argv)
 			}
 		}
 	}
-	*/
+
 
 	bool testNormal = F2M_TestStandard();
 	bool testSSE = F2M_TestSSE();

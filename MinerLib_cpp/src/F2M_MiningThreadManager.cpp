@@ -43,6 +43,8 @@ F2M_MiningThreadManager::~F2M_MiningThreadManager()
     delete mTimer;
 }
 
+#include <stdio.h>
+
 void F2M_MiningThreadManager::Update(F2M_MinerConnection* connection)
 {
     if( mCurrentWork )
@@ -93,6 +95,7 @@ void F2M_MiningThreadManager::Update(F2M_MinerConnection* connection)
             mCurrentWork = 0;
             
             mTimer->Stop();
+            printf("Duration: %f  ", mTimer->GetDuration());
             mHashRate = (unsigned int)((double)hashes / mTimer->GetDuration());
         }
     }

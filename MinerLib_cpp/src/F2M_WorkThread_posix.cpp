@@ -59,14 +59,19 @@ void F2M_WorkThread::InternalInit(int threadIndex)
     pthread_attr_init(&td->mThreadAttr);
     pthread_attr_setstacksize(&td->mThreadAttr, 1024 * 1024 * 2);
     pthread_attr_setdetachstate(&td->mThreadAttr, PTHREAD_CREATE_JOINABLE);
+    pthread_attr_setscope(&td->mThreadAttr, PTHREAD_SCOPE_SYSTEM);
     pthread_create(&td->mThread, &td->mThreadAttr, HashWorkThread, this);
+    mThreadData = td;
 
     cpu_set_t cpuset;
     CPU_ZERO(&cpuset);
-    CPU_SET(threadIndex * 2, &cpuset);
+    CPU_SET(threadIndex, &cpuset);
 
-    //pthread_setaffinity_np(td->mThread, sizeof(cpu_set_t), &cpuset);
-    mThreadData = td;
+    pthread_setaffinity_np(td->mThread, sizeof(cpu_set_t), &cpuset);
+
+    sched_param params;
+    params.sched_priority = sched_get_priority_max(SCHED_FIFO);
+    pthread_setschedparam(td->mThread, SCHED_FIFO, &params);
 }
 
 void F2M_WorkThread::InternalDestroy()
@@ -99,29 +104,4 @@ bool F2M_WorkThread::WantsThreadExit()
 {
     PosixThreadData* td = (PosixThreadData*)mThreadData;
     return td->mKill;
-}
-
-void F2M_WorkThread::ScryptHashes_SSE()
-{
-#ifdef SSE_MINING
-    __int64 end = mHashStart + mHashCount;
-    F2M_ScryptDataSSE* scryptData = F2M_ScryptInitSSE(mWork);
-    for( __int64 i = mHashStart; i < end; i += 4 )
-    {
-        if( WantsThreadExit() )
-            break;
-        
-        unsigned int inonce = (unsigned int)i;
-        __m128i nonce = _mm_set_epi32(inonce, inonce + 1, inonce + 2, inonce + 3);
-        int success = F2M_ScryptHashSSE(nonce, mWork, scryptData);
-        mHashesDone += 4;
-        if( success >= 0 )
-        {
-            mSolution = inonce + success;
-            mSolutionFound = true;
-            break;
-        }
-    }
-    F2M_ScryptCleanupSSE(scryptData);
-#endif
 }

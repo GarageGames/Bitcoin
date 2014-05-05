@@ -46,7 +46,7 @@ double F2M_Timer::GetDuration()
 		temp.tv_nsec = data->end.tv_nsec - data->start.tv_nsec;
 	}
 
-    double seconds = temp.tv_sec + (temp.tv_nsec / 1000000000);
+    double seconds = (double)temp.tv_sec + ((double)temp.tv_nsec / 1000000000.0);
 
     return seconds;
 }

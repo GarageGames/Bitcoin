@@ -7,6 +7,7 @@ F2M_WorkThread::F2M_WorkThread(int threadIndex)
 {
     mWork = new F2M_Work;
     mHashCount = 0;
+    mThreadIndex = threadIndex;
 
     InternalInit(threadIndex);
 }

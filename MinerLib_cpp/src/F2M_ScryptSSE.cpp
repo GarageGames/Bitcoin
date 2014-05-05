@@ -5,6 +5,9 @@
 #include <smmintrin.h>
 #include <string.h>
 
+#include <stdio.h>
+#include "F2M_Timer.h"
+
 #ifdef WIN32
 typedef __m128i SSEVector;
 #else
@@ -265,10 +268,197 @@ static inline void xor_salsa8SSE(SSEVector B[16], const SSEVector Bx[16])
 	B[15] = B[15] + x15;
 }
 
+void xor_salsaSSE(SSEVector* B)
+{
+	SSEVector x00,x01,x02,x03,x04,x05,x06,x07,x08,x09,x10,x11,x12,x13,x14,x15;
+	int i;
 
+	x00 = B[ 0] = (B[ 0] ^ B[16]);
+	x01 = B[ 1] = (B[ 1] ^ B[17]);
+	x02 = B[ 2] = (B[ 2] ^ B[18]);
+	x03 = B[ 3] = (B[ 3] ^ B[19]);
+	x04 = B[ 4] = (B[ 4] ^ B[20]);
+	x05 = B[ 5] = (B[ 5] ^ B[21]);
+	x06 = B[ 6] = (B[ 6] ^ B[22]);
+	x07 = B[ 7] = (B[ 7] ^ B[23]);
+	x08 = B[ 8] = (B[ 8] ^ B[24]);
+	x09 = B[ 9] = (B[ 9] ^ B[25]);
+	x10 = B[10] = (B[10] ^ B[26]);
+	x11 = B[11] = (B[11] ^ B[27]);
+	x12 = B[12] = (B[12] ^ B[28]);
+	x13 = B[13] = (B[13] ^ B[29]);
+	x14 = B[14] = (B[14] ^ B[30]);
+	x15 = B[15] = (B[15] ^ B[31]);
+		for (i = 0; i < 8; i += 2) {
+			/* Operate on columns. */
+			x04 = x04 ^ ROTATESSE(x00 + x12,  7);  x09 = x09 ^ ROTATESSE(x05 + x01,  7);
+			x14 = x14 ^ ROTATESSE(x10 + x06,  7);  x03 = x03 ^ ROTATESSE(x15 + x11,  7);
+
+			x08 = x08 ^ ROTATESSE(x04 + x00,  9);  x13 = x13 ^ ROTATESSE(x09 + x05,  9);
+			x02 = x02 ^ ROTATESSE(x14 + x10,  9);  x07 = x07 ^ ROTATESSE(x03 + x15,  9);
+
+			x12 = x12 ^ ROTATESSE(x08 + x04, 13);  x01 = x01 ^ ROTATESSE(x13 + x09, 13);
+			x06 = x06 ^ ROTATESSE(x02 + x14, 13);  x11 = x11 ^ ROTATESSE(x07 + x03, 13);
+
+			x00 = x00 ^ ROTATESSE(x12 + x08, 18);  x05 = x05 ^ ROTATESSE(x01 + x13, 18);
+			x10 = x10 ^ ROTATESSE(x06 + x02, 18);  x15 = x15 ^ ROTATESSE(x11 + x07, 18);
+
+			/* Operate on rows. */
+			x01 = x01 ^ ROTATESSE(x00 + x03,  7);  x06 = x06 ^ ROTATESSE(x05 + x04,  7);
+			x11 = x11 ^ ROTATESSE(x10 + x09,  7);  x12 = x12 ^ ROTATESSE(x15 + x14,  7);
+
+			x02 = x02 ^ ROTATESSE(x01 + x00,  9);  x07 = x07 ^ ROTATESSE(x06 + x05,  9);
+			x08 = x08 ^ ROTATESSE(x11 + x10,  9);  x13 = x13 ^ ROTATESSE(x12 + x15,  9);
+
+			x03 = x03 ^ ROTATESSE(x02 + x01, 13);  x04 = x04 ^ ROTATESSE(x07 + x06, 13);
+			x09 = x09 ^ ROTATESSE(x08 + x11, 13);  x14 = x14 ^ ROTATESSE(x13 + x12, 13);
+
+			x00 = x00 ^ ROTATESSE(x03 + x02, 18);  x05 = x05 ^ ROTATESSE(x04 + x07, 18);
+			x10 = x10 ^ ROTATESSE(x09 + x08, 18);  x15 = x15 ^ ROTATESSE(x14 + x13, 18);
+		}
+		B[ 0] = B[ 0] + x00;
+		B[ 1] = B[ 1] + x01;
+		B[ 2] = B[ 2] + x02;
+		B[ 3] = B[ 3] + x03;
+		B[ 4] = B[ 4] + x04;
+		B[ 5] = B[ 5] + x05;
+		B[ 6] = B[ 6] + x06;
+		B[ 7] = B[ 7] + x07;
+		B[ 8] = B[ 8] + x08;
+		B[ 9] = B[ 9] + x09;
+		B[10] = B[10] + x10;
+		B[11] = B[11] + x11;
+		B[12] = B[12] + x12;
+		B[13] = B[13] + x13;
+		B[14] = B[14] + x14;
+		B[15] = B[15] + x15;
+
+		x00 = B[16] = (B[16] ^ B[ 0]);
+		x01 = B[17] = (B[17] ^ B[ 1]);
+		x02 = B[18] = (B[18] ^ B[ 2]);
+		x03 = B[19] = (B[19] ^ B[ 3]);
+		x04 = B[20] = (B[20] ^ B[ 4]);
+		x05 = B[21] = (B[21] ^ B[ 5]);
+		x06 = B[22] = (B[22] ^ B[ 6]);
+		x07 = B[23] = (B[23] ^ B[ 7]);
+		x08 = B[24] = (B[24] ^ B[ 8]);
+		x09 = B[25] = (B[25] ^ B[ 9]);
+		x10 = B[26] = (B[26] ^ B[10]);
+		x11 = B[27] = (B[27] ^ B[11]);
+		x12 = B[28] = (B[28] ^ B[12]);
+		x13 = B[29] = (B[29] ^ B[13]);
+		x14 = B[30] = (B[30] ^ B[14]);
+		x15 = B[31] = (B[31] ^ B[15]);
+				for (i = 0; i < 8; i += 2) {
+					/* Operate on columns. */
+					x04 = x04 ^ ROTATESSE(x00 + x12,  7);  x09 = x09 ^ ROTATESSE(x05 + x01,  7);
+					x14 = x14 ^ ROTATESSE(x10 + x06,  7);  x03 = x03 ^ ROTATESSE(x15 + x11,  7);
+
+					x08 = x08 ^ ROTATESSE(x04 + x00,  9);  x13 = x13 ^ ROTATESSE(x09 + x05,  9);
+					x02 = x02 ^ ROTATESSE(x14 + x10,  9);  x07 = x07 ^ ROTATESSE(x03 + x15,  9);
+
+					x12 = x12 ^ ROTATESSE(x08 + x04, 13);  x01 = x01 ^ ROTATESSE(x13 + x09, 13);
+					x06 = x06 ^ ROTATESSE(x02 + x14, 13);  x11 = x11 ^ ROTATESSE(x07 + x03, 13);
+
+					x00 = x00 ^ ROTATESSE(x12 + x08, 18);  x05 = x05 ^ ROTATESSE(x01 + x13, 18);
+					x10 = x10 ^ ROTATESSE(x06 + x02, 18);  x15 = x15 ^ ROTATESSE(x11 + x07, 18);
+
+					/* Operate on rows. */
+					x01 = x01 ^ ROTATESSE(x00 + x03,  7);  x06 = x06 ^ ROTATESSE(x05 + x04,  7);
+					x11 = x11 ^ ROTATESSE(x10 + x09,  7);  x12 = x12 ^ ROTATESSE(x15 + x14,  7);
+
+					x02 = x02 ^ ROTATESSE(x01 + x00,  9);  x07 = x07 ^ ROTATESSE(x06 + x05,  9);
+					x08 = x08 ^ ROTATESSE(x11 + x10,  9);  x13 = x13 ^ ROTATESSE(x12 + x15,  9);
+
+					x03 = x03 ^ ROTATESSE(x02 + x01, 13);  x04 = x04 ^ ROTATESSE(x07 + x06, 13);
+					x09 = x09 ^ ROTATESSE(x08 + x11, 13);  x14 = x14 ^ ROTATESSE(x13 + x12, 13);
+
+					x00 = x00 ^ ROTATESSE(x03 + x02, 18);  x05 = x05 ^ ROTATESSE(x04 + x07, 18);
+					x10 = x10 ^ ROTATESSE(x09 + x08, 18);  x15 = x15 ^ ROTATESSE(x14 + x13, 18);
+				}
+				B[16] = B[16] + x00;
+				B[17] = B[17] + x01;
+				B[18] = B[18] + x02;
+				B[19] = B[19] + x03;
+				B[20] = B[20] + x04;
+				B[21] = B[21] + x05;
+				B[22] = B[22] + x06;
+				B[23] = B[23] + x07;
+				B[24] = B[24] + x08;
+				B[25] = B[25] + x09;
+				B[26] = B[26] + x10;
+				B[27] = B[27] + x11;
+				B[28] = B[28] + x12;
+				B[29] = B[29] + x13;
+				B[30] = B[30] + x14;
+				B[31] = B[31] + x15;
+}
+
+void ScryptPopV(SSEVector* X, SSEVector* V)
+{
+	for (int i = 0; i < 1024; i++)
+    {
+        for( int j = 0; j < 32; j++ )
+            V[(i * 32) + j] = X[j];
+		//xor_salsa8SSE(&X[0], &X[16]);
+		//xor_salsa8SSE(&X[16], &X[0]);
+        xor_salsaSSE(X);
+	}
+}
+
+void ScryptUseV(SSEVector* X, SSEVector* V)
+{
+	SSEVector const1023 = _mm_set1_epi32(0x3FF);
+	SSEVector const32 = _mm_set1_epi32(32);
+	SSEVector quadMask1 = _mm_set_epi32(0xFFFFFFFF, 0, 0, 0);
+	SSEVector quadMask2 = _mm_set_epi32(0, 0xFFFFFFFF, 0, 0);
+	SSEVector quadMask3 = _mm_set_epi32(0, 0, 0xFFFFFFFF, 0);
+	SSEVector quadMask4 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
+	for (int i = 0; i < 1024; i++)
+	{
+		SSEVector lessThan1024 = (X[16] & const1023);
+		SSEVector j = vmul(const32, lessThan1024);
+		for (unsigned int k = 0; k < 32; k++)
+		{
+			SSEVector vk = _mm_set1_epi32(k);
+			SSEVector idx = j + vk;
+
+			__m128 abcd;
+			_mm_store_si128((__m128i*)&abcd, idx);
+			unsigned int* pieces = (unsigned int*)&abcd;
+
+			SSEVector Va = V[pieces[3]] & quadMask1;
+			SSEVector Vb = V[pieces[2]] & quadMask2;
+			SSEVector Vc = V[pieces[1]] & quadMask3;
+			SSEVector Vd = V[pieces[0]] & quadMask4;
+			SSEVector vtotal = Va | Vb | Vc | Vd;
+			X[k] = X[k] ^ vtotal;
+		}
+		//xor_salsa8SSE(&X[0], &X[16]);
+		//xor_salsa8SSE(&X[16], &X[0]);
+		xor_salsaSSE(X);
+	}
+}
+
+void ScryptCore(SSEVector* bp)
+{
+	SSEVector X[32];
+	SSEVector V[1024 * 32];
+		for (int i = 0; i < 32; i++)
+	        X[i] = ByteReverseSSE(bp[i]);
+
+	ScryptPopV(X, V);
+	ScryptUseV(X, V);
+
+
+	    for (int i = 0; i < 32; i++)
+	        bp[i] = ByteReverseSSE(X[i]);
+}
 
 void ScryptHashSSE(F2M_ScryptDataSSE* data)
 {
+	//F2M_Timer t1, t2, t3;
+	//t1.Start();
     SSEVector inner[8];
     SSEVector outer[8];
     sha256_blockSSEu(inner, staticHashSSE, (const SSEVector*)data->input);
@@ -295,57 +485,23 @@ void ScryptHashSSE(F2M_ScryptDataSSE* data)
         sha256_blockSSEu((SSEVector*)data->tempHash, salted, (const SSEVector*)data->inputB2);
         sha256_blockSSEu(&bp[i * 8], outer, (const SSEVector*)data->tempHash);
     }
+    //t1.Stop();
+    //t2.Start();
 	
-    SSEVector X[32];
-    SSEVector V[1024 * 32];
-	for (int i = 0; i < 32; i++)
-        X[i] = ByteReverseSSE(bp[i]);
 
-	for (int i = 0; i < 1024; i++) 
-    {
-        for( int j = 0; j < 32; j++ )
-            V[(i * 32) + j] = X[j];
-		xor_salsa8SSE(&X[0], &X[16]);
-		xor_salsa8SSE(&X[16], &X[0]);
-	}
-
-    SSEVector const1023 = _mm_set1_epi32(0x3FF);
-    SSEVector const32 = _mm_set1_epi32(32);
-    SSEVector quadMask1 = _mm_set_epi32(0xFFFFFFFF, 0, 0, 0);
-    SSEVector quadMask2 = _mm_set_epi32(0, 0xFFFFFFFF, 0, 0);
-    SSEVector quadMask3 = _mm_set_epi32(0, 0, 0xFFFFFFFF, 0);
-    SSEVector quadMask4 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
-	for (int i = 0; i < 1024; i++) 
-    {
-        SSEVector lessThan1024 = (X[16] & const1023);
-		SSEVector j = vmul(const32, lessThan1024);
-		for (unsigned int k = 0; k < 32; k++)
-        {
-            SSEVector vk = _mm_set1_epi32(k);
-            SSEVector idx = j + vk;
-
-            __m128 abcd;
-            _mm_store_si128((__m128i*)&abcd, idx);
-            unsigned int* pieces = (unsigned int*)&abcd;
-            SSEVector Va = V[pieces[3]] & quadMask1;
-            SSEVector Vb = V[pieces[2]] & quadMask2;
-            SSEVector Vc = V[pieces[1]] & quadMask3;
-            SSEVector Vd = V[pieces[0]] & quadMask4;
-            SSEVector vtotal = Va | Vb | Vc | Vd;
-            X[k] = X[k] ^ vtotal;
-        }
-		xor_salsa8SSE(&X[0], &X[16]);
-		xor_salsa8SSE(&X[16], &X[0]);
-	}
-
-    for (int i = 0; i < 32; i++)
-        bp[i] = ByteReverseSSE(X[i]);
+    ScryptCore(bp);
+    //t2.Stop();
+    //t3.Start();
     
+
     sha256_blockSSEu(salted, inner, bp);
     sha256_blockSSEu(salted, salted, bp + 16);
 
     sha256_blockSSEu((SSEVector*)data->tempHash, salted, (const SSEVector*)data->dataBuffer2);
     sha256_blockSSEu((SSEVector*)data->output, outer, (const SSEVector*)data->tempHash);
+
+    //t3.Stop();
+    //printf("t1: %f, t2: %f, t3: %f\n", t1.GetDuration() * 1000, t2.GetDuration() * 1000, t3.GetDuration() * 1000);
 }
 
 F2M_ScryptDataSSE* F2M_ScryptInitSSE(F2M_Work* work)
@@ -446,6 +602,9 @@ int F2M_ScryptHashSSE(__m128i nonce,  F2M_Work* work, F2M_ScryptDataSSE* data)
 
 void F2M_ScryptHashWork_SIMD(F2M_WorkThread* thread)
 {
+	//F2M_Timer t1, t2;
+	//t1.Start();
+
     __int64 end = thread->mHashStart + thread->mHashCount;
     F2M_ScryptDataSSE* scryptData = F2M_ScryptInitSSE(thread->mWork);
     for( __int64 i = thread->mHashStart; i < end; i += 4 )
@@ -455,7 +614,12 @@ void F2M_ScryptHashWork_SIMD(F2M_WorkThread* thread)
 
         unsigned int inonce = (unsigned int)i;
         __m128i nonce = _mm_set_epi32(inonce, inonce + 1, inonce + 2, inonce + 3);
+        //t1.Stop();
+        //t2.Start();
         int success = F2M_ScryptHashSSE(nonce, thread->mWork, scryptData);
+        //t2.Stop();
+        //printf("Thread(%d) - t1: %f, t2: %f\n", thread->mThreadIndex, t1.GetDuration() * 1000.0, t2.GetDuration() * 1000.0);
+        //t1.Start();
         thread->mHashesDone += 4;
         if( success >= 0 )
         {
