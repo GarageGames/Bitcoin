@@ -29,9 +29,9 @@ namespace HashrateCalculator
         uint mRemoteVersion;
         ulong mRemoteServices;
         ulong mRemoteTimestamp;
-        ulong mRemoteNodeID;
+        ulong mRemoteNodeNOnce;
         string mRemoteUserAgent;
-        uint mRemoteLastBlock;
+        public uint mRemoteHeight;
 
         public NodeConnection(Bitcoin owner, string nodeAddress, ushort port = 8333, uint protocolVersion = 0x00011171, uint networkID = 0xD9B4BEF9)
         {
@@ -67,18 +67,32 @@ namespace HashrateCalculator
             Connect(nodeAddress, port);
         }
 
+        public void Destroy()
+        {
+            mSocket.Close();
+            mThread.Abort();
+        }
+
         public bool IsConnected() { return mConnected; }
 
         void Connect(string nodeAddress, ushort port = 8333)
         {
             // Connect to remote host
-            mSocket.Connect(nodeAddress, port);
+            try
+            {
+                mSocket.Connect(nodeAddress, port);
+                Console.WriteLine("connected to: " + nodeAddress);
 
-            // Start the read thread
-            mThread.Start();
+                // Start the read thread
+                mThread.Start();
 
-            // Send version packet
-            SendVersionPacket();
+                // Send version packet
+                SendVersionPacket();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         void SendVersionPacket()
@@ -128,14 +142,14 @@ namespace HashrateCalculator
             w.Write("/Satoshi:0.8.6/".ToArray());
 
             // start_height
-            w.Write((int)0x00045768);
+            w.Write(mOwner.mCurrentHeight);
 
             byte[] packetData = stream.ToArray();
             SendPacket("version", packetData);
             w.Close();
         }
 
-        void SendPacket(string packetID, byte[] payload)
+        public void SendPacket(string packetID, byte[] payload)
         {
             byte[] hash = Program.GenerateHash(payload);
 
@@ -184,18 +198,18 @@ namespace HashrateCalculator
             return (hashVal == checksum);
         }
 
-        public void RequestData(List<Block> blocks)
+        public void RequestBlocks(BlockHeader[] headers)
         {
             MemoryStream stream = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(stream);
 
-            int count = blocks.Count;
+            int count = headers.Length;
             Program.WriteVarInt(bw, (ulong)count);
-            foreach (Block b in blocks)
+            foreach (BlockHeader b in headers)
             {
                 const int blockType = 2;
                 bw.Write(blockType);
-                bw.Write(b.Hash);
+                bw.Write(b.mHash);
             }
             SendPacket("getdata", stream.ToArray());
 
@@ -206,6 +220,11 @@ namespace HashrateCalculator
         {
             MemoryStream stream = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(stream);
+
+            if (origin == null)
+            {
+                origin = new byte[32];
+            }
 
 
             bw.Write(mProtocolVersion);
@@ -226,18 +245,35 @@ namespace HashrateCalculator
             mRemoteVersion = br.ReadUInt32();
             mRemoteServices = br.ReadUInt64();
             mRemoteTimestamp = br.ReadUInt64();
-            mRemoteNodeID = br.ReadUInt64();
 
-            byte clientNameLen = br.ReadByte();
-            char[] clientName = br.ReadChars(clientNameLen);
+            {
+                //uint addrA_time = br.ReadUInt32();
+                ulong addrA_services = br.ReadUInt64();
+                byte[] addrA_ip = br.ReadBytes(16);
+                ushort addrA_port = br.ReadUInt16();
+            }
+
+            {
+                //uint addrB_time = br.ReadUInt32();
+                ulong addrB_services = br.ReadUInt64();
+                byte[] addrB_ip = br.ReadBytes(16);
+                ushort addrB_port = br.ReadUInt16();
+            }
+            mRemoteNodeNOnce = br.ReadUInt64();
+
+            ulong nameLen = Program.ReadVarInt(br);
+            char[] clientName = br.ReadChars((int)nameLen);
             mRemoteUserAgent = new string(clientName);
 
-            mRemoteLastBlock = br.ReadUInt32();
+            mRemoteHeight = br.ReadUInt32();
             br.Close();
 
             // Send verack
             byte[] verackData = new byte[0];
             SendPacket("verack", verackData);
+
+            mOwner.VersionRecieved(this);
+            Console.WriteLine("Remote Version: " + mRemoteVersion);
         }
 
         void PH_Verack(byte[] payload)
@@ -284,12 +320,11 @@ namespace HashrateCalculator
 
         void PH_Block(byte[] payload)
         {
-            Console.WriteLine("PH_Block");
+            mOwner.HandleBlockPacket(this, payload);
         }
 
         void PH_Headers(byte[] payload)
         {
-            Console.WriteLine("PH_Headers");
             mOwner.HandleHeadersPacket(this, payload);
         }
 
@@ -347,20 +382,20 @@ namespace HashrateCalculator
 
             int bytesConsumed = 0;
 
-            while (stream.Position < size)
+            while (stream.Position + 24 < size)
             {
-                uint magic = br.ReadUInt32();
+                uint networkID = br.ReadUInt32();
                 string packetID = Program.ReadString(br, 12);
                 uint length = br.ReadUInt32();
                 uint checksum = br.ReadUInt32();
-                if (length > size)
+                if (stream.Position + length > size)
                 {
                     break;
                 }
 
                 Console.WriteLine(packetID);
 
-                if (magic == mNetworkID)
+                if (networkID == mNetworkID)
                 {
                     byte[] payload = br.ReadBytes((int)length);
 
@@ -382,7 +417,7 @@ namespace HashrateCalculator
                         Console.WriteLine("Failed checksum!");
                 }
                 else
-                    Console.WriteLine("Failed ID Check");
+                    Console.WriteLine("Failed ID Check, Network ID: " + networkID);
 
                 bytesConsumed += 24 + (int)length;
             }

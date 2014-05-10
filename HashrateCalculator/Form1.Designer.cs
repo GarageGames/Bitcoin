@@ -28,111 +28,129 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.Calculate = new System.Windows.Forms.Button();
-            this.lblDifficulty = new System.Windows.Forms.Label();
-            this.lblHashrate = new System.Windows.Forms.Label();
+            this.currencyList = new System.Windows.Forms.ListView();
+            this.columnHeader_Name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_Symbol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_USDPerDay = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_USDPerCoin = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_BTCPerCoin = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_Hashrate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_BlockTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_BlocksPerDay = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_CoinsPerBlock = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label1 = new System.Windows.Forms.Label();
-            this.CurrencyBox = new System.Windows.Forms.ComboBox();
-            this.difficultyBox = new System.Windows.Forms.TextBox();
-            this.hashrateBox = new System.Windows.Forms.TextBox();
-            this.blocksPerDayBox = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.hashrate = new System.Windows.Forms.TextBox();
+            this.columnHeader_Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
-            // Calculate
+            // currencyList
             // 
-            this.Calculate.Location = new System.Drawing.Point(143, 300);
-            this.Calculate.Name = "Calculate";
-            this.Calculate.Size = new System.Drawing.Size(75, 23);
-            this.Calculate.TabIndex = 4;
-            this.Calculate.Text = "Calculate";
-            this.Calculate.UseVisualStyleBackColor = true;
-            this.Calculate.Click += new System.EventHandler(this.Calculate_Click);
+            this.currencyList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader_Name,
+            this.columnHeader_Symbol,
+            this.columnHeader_USDPerDay,
+            this.columnHeader_USDPerCoin,
+            this.columnHeader_BTCPerCoin,
+            this.columnHeader_Hashrate,
+            this.columnHeader_BlockTime,
+            this.columnHeader_BlocksPerDay,
+            this.columnHeader_CoinsPerBlock,
+            this.columnHeader_Status});
+            this.currencyList.FullRowSelect = true;
+            this.currencyList.GridLines = true;
+            this.currencyList.Location = new System.Drawing.Point(12, 44);
+            this.currencyList.Name = "currencyList";
+            this.currencyList.Size = new System.Drawing.Size(1294, 384);
+            this.currencyList.TabIndex = 0;
+            this.currencyList.UseCompatibleStateImageBehavior = false;
+            this.currencyList.View = System.Windows.Forms.View.Details;
+            this.currencyList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.currencyList_MouseDoubleClick);
             // 
-            // lblDifficulty
+            // columnHeader_Name
             // 
-            this.lblDifficulty.AutoSize = true;
-            this.lblDifficulty.Location = new System.Drawing.Point(437, 30);
-            this.lblDifficulty.Name = "lblDifficulty";
-            this.lblDifficulty.Size = new System.Drawing.Size(50, 13);
-            this.lblDifficulty.TabIndex = 5;
-            this.lblDifficulty.Text = "Difficulty:";
+            this.columnHeader_Name.Text = "Name";
+            this.columnHeader_Name.Width = 100;
             // 
-            // lblHashrate
+            // columnHeader_Symbol
             // 
-            this.lblHashrate.AutoSize = true;
-            this.lblHashrate.Location = new System.Drawing.Point(416, 56);
-            this.lblHashrate.Name = "lblHashrate";
-            this.lblHashrate.Size = new System.Drawing.Size(71, 13);
-            this.lblHashrate.TabIndex = 6;
-            this.lblHashrate.Text = "Est Hashrate:";
+            this.columnHeader_Symbol.Text = "Symbol";
+            this.columnHeader_Symbol.Width = 48;
+            // 
+            // columnHeader_USDPerDay
+            // 
+            this.columnHeader_USDPerDay.Text = "$/day";
+            this.columnHeader_USDPerDay.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.columnHeader_USDPerDay.Width = 115;
+            // 
+            // columnHeader_USDPerCoin
+            // 
+            this.columnHeader_USDPerCoin.Text = "$ value";
+            this.columnHeader_USDPerCoin.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.columnHeader_USDPerCoin.Width = 145;
+            // 
+            // columnHeader_BTCPerCoin
+            // 
+            this.columnHeader_BTCPerCoin.Text = "BTC Value";
+            this.columnHeader_BTCPerCoin.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.columnHeader_BTCPerCoin.Width = 170;
+            // 
+            // columnHeader_Hashrate
+            // 
+            this.columnHeader_Hashrate.Text = "Hashrate";
+            this.columnHeader_Hashrate.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.columnHeader_Hashrate.Width = 100;
+            // 
+            // columnHeader_BlockTime
+            // 
+            this.columnHeader_BlockTime.Text = "BlockTime";
+            this.columnHeader_BlockTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.columnHeader_BlockTime.Width = 99;
+            // 
+            // columnHeader_BlocksPerDay
+            // 
+            this.columnHeader_BlocksPerDay.Text = "Blocks/Day";
+            this.columnHeader_BlocksPerDay.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.columnHeader_BlocksPerDay.Width = 112;
+            // 
+            // columnHeader_CoinsPerBlock
+            // 
+            this.columnHeader_CoinsPerBlock.Text = "Coins/Block";
+            this.columnHeader_CoinsPerBlock.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.columnHeader_CoinsPerBlock.Width = 114;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(31, 38);
+            this.label1.Location = new System.Drawing.Point(12, 19);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(49, 13);
-            this.label1.TabIndex = 7;
-            this.label1.Text = "Currency";
+            this.label1.Size = new System.Drawing.Size(50, 13);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "Hashrate";
             // 
-            // CurrencyBox
+            // hashrate
             // 
-            this.CurrencyBox.FormattingEnabled = true;
-            this.CurrencyBox.Location = new System.Drawing.Point(86, 30);
-            this.CurrencyBox.Name = "CurrencyBox";
-            this.CurrencyBox.Size = new System.Drawing.Size(230, 21);
-            this.CurrencyBox.TabIndex = 8;
+            this.hashrate.Location = new System.Drawing.Point(68, 12);
+            this.hashrate.Name = "hashrate";
+            this.hashrate.Size = new System.Drawing.Size(169, 20);
+            this.hashrate.TabIndex = 2;
+            this.hashrate.Text = "225000";
             // 
-            // difficultyBox
+            // columnHeader_Status
             // 
-            this.difficultyBox.Location = new System.Drawing.Point(493, 23);
-            this.difficultyBox.Name = "difficultyBox";
-            this.difficultyBox.ReadOnly = true;
-            this.difficultyBox.Size = new System.Drawing.Size(316, 20);
-            this.difficultyBox.TabIndex = 9;
-            // 
-            // hashrateBox
-            // 
-            this.hashrateBox.Location = new System.Drawing.Point(493, 49);
-            this.hashrateBox.Name = "hashrateBox";
-            this.hashrateBox.ReadOnly = true;
-            this.hashrateBox.Size = new System.Drawing.Size(316, 20);
-            this.hashrateBox.TabIndex = 10;
-            // 
-            // blocksPerDayBox
-            // 
-            this.blocksPerDayBox.Location = new System.Drawing.Point(493, 75);
-            this.blocksPerDayBox.Name = "blocksPerDayBox";
-            this.blocksPerDayBox.ReadOnly = true;
-            this.blocksPerDayBox.Size = new System.Drawing.Size(316, 20);
-            this.blocksPerDayBox.TabIndex = 11;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(404, 78);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(83, 13);
-            this.label2.TabIndex = 12;
-            this.label2.Text = "Blocks Per Day:";
+            this.columnHeader_Status.Text = "Status";
+            this.columnHeader_Status.Width = 200;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(966, 335);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.blocksPerDayBox);
-            this.Controls.Add(this.hashrateBox);
-            this.Controls.Add(this.difficultyBox);
-            this.Controls.Add(this.CurrencyBox);
+            this.ClientSize = new System.Drawing.Size(1318, 440);
+            this.Controls.Add(this.hashrate);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.lblHashrate);
-            this.Controls.Add(this.lblDifficulty);
-            this.Controls.Add(this.Calculate);
+            this.Controls.Add(this.currencyList);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Coin Values";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -140,15 +158,20 @@
 
         #endregion
 
-        private System.Windows.Forms.Button Calculate;
-        private System.Windows.Forms.Label lblDifficulty;
-        private System.Windows.Forms.Label lblHashrate;
+        private System.Windows.Forms.ListView currencyList;
+        private System.Windows.Forms.ColumnHeader columnHeader_Name;
+        private System.Windows.Forms.ColumnHeader columnHeader_Symbol;
+        private System.Windows.Forms.ColumnHeader columnHeader_USDPerDay;
+        private System.Windows.Forms.ColumnHeader columnHeader_USDPerCoin;
+        private System.Windows.Forms.ColumnHeader columnHeader_BTCPerCoin;
+        private System.Windows.Forms.ColumnHeader columnHeader_Hashrate;
+        private System.Windows.Forms.ColumnHeader columnHeader_BlockTime;
+        private System.Windows.Forms.ColumnHeader columnHeader_BlocksPerDay;
+        private System.Windows.Forms.ColumnHeader columnHeader_CoinsPerBlock;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox CurrencyBox;
-        private System.Windows.Forms.TextBox difficultyBox;
-        private System.Windows.Forms.TextBox hashrateBox;
-        private System.Windows.Forms.TextBox blocksPerDayBox;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox hashrate;
+        private System.Windows.Forms.ColumnHeader columnHeader_Status;
+
     }
 }
 

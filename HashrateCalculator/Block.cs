@@ -5,16 +5,16 @@ using System.Text;
 
 namespace HashrateCalculator
 {
-    public class Block : NetworkDataObject
+    public class Block
     {
+        public string mHash;
 
-        public Block(NetworkDataObject.DataStatus status = NetworkDataObject.DataStatus.NoData) : base(status)
-        {
-        }
+        public BlockHeader mHeader;
+        public List<Transaction> mTransactions;
 
-        public Block(byte[] hash, NetworkDataObject.DataStatus status = NetworkDataObject.DataStatus.NoData)
-            : base(hash, status)
+        public Block()
         {
+            mTransactions = new List<Transaction>();
         }
 
     }

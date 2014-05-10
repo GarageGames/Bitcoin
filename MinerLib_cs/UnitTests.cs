@@ -28,8 +28,9 @@ namespace MinerLib_cs
             Array.Copy(sData, work.data, 32);
             Array.Copy(sTarget, work.target, 8);
 
-            Scrypt scrypt = new Scrypt(work);
+            Scrypt scrypt = new Scrypt(work);            
             bool result = scrypt.Hash(sNOnce);
+            
 
             return result;
         }
