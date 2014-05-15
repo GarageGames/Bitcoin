@@ -80,14 +80,24 @@ namespace HashrateCalculator
             // Connect to remote host
             try
             {
+                Console.WriteLine("Connecting to: " + nodeAddress);                
                 mSocket.Connect(nodeAddress, port);
-                Console.WriteLine("connected to: " + nodeAddress);
+                //IAsyncResult connAsync = mSocket.BeginConnect(nodeAddress, port, null, null);
+                //bool success = connAsync.AsyncWaitHandle.WaitOne(3000, true);
+                //if (success)
+                //{
+                    Console.WriteLine("connected to: " + nodeAddress);
 
-                // Start the read thread
-                mThread.Start();
+                    // Start the read thread
+                    mThread.Start();
 
-                // Send version packet
-                SendVersionPacket();
+                    // Send version packet
+                    SendVersionPacket();
+                //}
+                //else
+                //{
+                //    Console.WriteLine("connnection timeout");
+                //}
             }
             catch (Exception ex)
             {

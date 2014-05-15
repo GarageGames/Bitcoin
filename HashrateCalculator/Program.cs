@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace HashrateCalculator
 {
@@ -166,6 +167,35 @@ namespace HashrateCalculator
             byte[] hash2 = sha.ComputeHash(hash1);
 
             return hash2;
+        }
+
+        public static string ReadWebString(string url)
+        {
+            try
+            {
+                HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
+                HttpWebResponse response = (HttpWebResponse)wr.GetResponse();
+                Stream s = response.GetResponseStream();
+                StreamReader rs = new StreamReader(s, Encoding.GetEncoding("utf-8"));
+
+                string retVal = rs.ReadToEnd();
+                rs.Close();
+
+                int bodyIndex = retVal.IndexOf("<body>", StringComparison.CurrentCultureIgnoreCase);
+                if (bodyIndex >= 0)
+                {
+                    retVal = retVal.Substring(bodyIndex + 6);
+                    retVal = retVal.Substring(0, retVal.IndexOf("</body>", StringComparison.CurrentCultureIgnoreCase));
+                    retVal = retVal.Trim();
+                }
+
+                return retVal;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return null;
         }
     }
 }

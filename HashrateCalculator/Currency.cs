@@ -5,11 +5,19 @@ using System.Text;
 using System.IO;
 using System.Threading;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 namespace HashrateCalculator
 {
-    class Currency
+    public class Currency
     {
         Bitcoin mBC = null;
+        Thread mThread;
+
+        bool mDirty = false;
+        DateTime mLastCryptsyTime;
+        DateTime mLastBCTime;
 
         public string mName;
         public string mIPAddress;
@@ -23,6 +31,7 @@ namespace HashrateCalculator
         public bool mPOS = false;
         public bool mIgnoreSigLen = true;
         public bool mScryptBlockHash = false;
+        public string mCryptsyMarket;
 
         public double mCoinsPerBlock = 0;
         public double mBlocksPerDay = 0;
@@ -40,13 +49,19 @@ namespace HashrateCalculator
             mBC = new Bitcoin();
             mBC.mHistoryTime = 24 * 60 * 60;        // 1 day
             mStatus = "";
+
+            mThread = new Thread(new ThreadStart(ThreadUpdateFunction));
+            mThread.Start();
         }
 
         public void Destroy()
         {
             if( mBC != null )
                 mBC.Destroy();
+            mThread.Abort();
         }
+
+        public bool IsDirty { get { return mDirty; } }
 
         public bool HasStaticData
         {
@@ -85,6 +100,7 @@ namespace HashrateCalculator
                 mPOS = (sr.ReadLine() != "0");
                 mIgnoreSigLen = (sr.ReadLine() != "0");
                 mScryptBlockHash = (sr.ReadLine() != "0");
+                mCryptsyMarket = sr.ReadLine();
             }
 
             sr.Close();  
@@ -135,6 +151,7 @@ namespace HashrateCalculator
             sw.WriteLine(mPOS ? "1" : "0");
             sw.WriteLine(mIgnoreSigLen ? "1" : "0");
             sw.WriteLine(mScryptBlockHash ? "1" : "0");
+            sw.WriteLine(mCryptsyMarket);
             sw.Close();   
 
             // Save block headers
@@ -167,47 +184,58 @@ namespace HashrateCalculator
             }
         }
 
-        public bool FinishCalcHashrate()
+        public void UpdateBitcoinProtocol()
         {
             if (mBC != null && mBC.IsConnected())
             {
-                Block[] blocks = mBC.GetBlocks();
-                if (mPOS)
+                TimeSpan span = DateTime.Now - mLastBCTime;
+                if (span.TotalSeconds > 60)
                 {
-                    // Filter pos blocks out
-                    List<Block> cleanBlocks = new List<Block>();
-                    foreach (Block b in blocks)
+                    Block[] blocks = mBC.GetBlocks();
+                    if (blocks != null)
                     {
-                        if (b.mTransactions.Count > 0)
+                        if (mPOS)
                         {
-                            if (b.mTransactions.Count == 1 || b.mTransactions[0].mOutputs[0].mValue != 0)
-                                cleanBlocks.Add(b);
+                            // Filter pos blocks out
+                            List<Block> cleanBlocks = new List<Block>();
+                            foreach (Block b in blocks)
+                            {
+                                if (b.mTransactions.Count > 0)
+                                {
+                                    if (b.mTransactions.Count == 1 || b.mTransactions[0].mOutputs[0].mValue != 0)
+                                        cleanBlocks.Add(b);
+                                }
+                            }
+                            blocks = cleanBlocks.ToArray();
+                        }
+
+                        if (blocks.Length > 0)
+                        {
+                            UInt64 timeSeconds = Program.UnixTime() - (UInt64)blocks[0].mHeader.mTimestamp;
+                            uint expectedBlocks = (uint)(timeSeconds / mBlockTarget);
+                            int blockCount = blocks.Length;
+
+                            UInt64 max = 4294901760;
+                            uint diffZeros = ((blocks[0].mHeader.mDifficultyBits >> 24) & 0xFF);
+                            int shift = 40 - ((int)(32 - diffZeros) * 8);
+                            UInt64 diffBits = (UInt64)(blocks[0].mHeader.mDifficultyBits & 0x00FFFFFF);
+                            if (shift < 0)
+                                max <<= (0 - shift);
+                            else
+                                diffBits <<= shift;
+                            double difficulty = (double)max / (double)diffBits;
+
+                            double hashrate = (((double)blockCount / (double)expectedBlocks) * difficulty * 4294967296) / (double)mBlockTarget;
+                            if (mHashrate != hashrate)
+                            {
+                                mHashrate = hashrate;
+                                mDirty = true;
+                            }
+                            mLastBCTime = DateTime.Now;
                         }
                     }
-                    blocks = cleanBlocks.ToArray();
-                }
-
-                if (blocks.Length > 0)
-                {
-                    UInt64 timeSeconds = Program.UnixTime() - (UInt64)blocks[0].mHeader.mTimestamp;
-                    uint expectedBlocks = (uint)(timeSeconds / mBlockTarget);
-                    int blockCount = blocks.Length;
-
-                    UInt64 max = 4294901760;
-                    uint diffZeros = ((blocks[0].mHeader.mDifficultyBits >> 24) & 0xFF);
-                    int shift = 40 - ((int)(32 - diffZeros) * 8);
-                    UInt64 diffBits = (UInt64)(blocks[0].mHeader.mDifficultyBits & 0x00FFFFFF);
-                    if (shift < 0)
-                        max <<= (0 - shift);
-                    else
-                        diffBits <<= shift;
-                    double difficulty = (double)max / (double)diffBits;
-
-                    mHashrate = (((double)blockCount / (double)expectedBlocks) * difficulty * 4294967296) / (double)mBlockTarget;
-                    return true;
                 }
             }
-            return false;
         }
 
         public void Update(double btcPrice, double hashrate)
@@ -218,6 +246,58 @@ namespace HashrateCalculator
             double winBlocksPerDay = percentOfNetworkHR * mBlocksPerDay;            
             double coinsPerDay = winBlocksPerDay * mCoinsPerBlock;
             mUSDPerDay = mUSDPerCoin * coinsPerDay;
+
+            mDirty = false;
+        }
+
+        void UpdatePriceData()
+        {
+            TimeSpan span = DateTime.Now - mLastCryptsyTime;
+            if (span.TotalSeconds > 60)
+            {
+                string url = "http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=" + mCryptsyMarket;
+                string priceData = Program.ReadWebString(url);
+                if (priceData != null && priceData.Length > 0)
+                {
+                    int idx = priceData.IndexOf("\"markets\":{");
+                    if (idx >= 0)
+                    {
+                        priceData = priceData.Substring(idx + 11);
+                        idx = priceData.IndexOf(':');
+                        if (idx >= 0)
+                        {
+                            priceData = priceData.Substring(idx + 1);
+                            priceData = priceData.Substring(0, priceData.Length - 3);
+                            Cryptsy.Market mkt = JsonConvert.DeserializeObject<Cryptsy.Market>(priceData);
+                            if (mkt != null)
+                            {
+                                double BTCPerCoin = Convert.ToDouble(mkt.lasttradeprice);
+                                if (mBTCPerCoin != BTCPerCoin)
+                                {
+                                    mBTCPerCoin = BTCPerCoin;
+                                    mDirty = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                mLastCryptsyTime = DateTime.Now;
+            }
+        }
+
+        void ThreadUpdateFunction()
+        {
+            while (true)
+            {
+                // Update network conneciton for hashrate
+                UpdateBitcoinProtocol();
+
+                // Update cryptsy data for btc value
+                UpdatePriceData();
+
+                Thread.Sleep(50);
+            }
         }
 
         /*

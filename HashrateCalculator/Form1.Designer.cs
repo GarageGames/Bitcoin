@@ -38,9 +38,10 @@
             this.columnHeader_BlockTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_BlocksPerDay = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_CoinsPerBlock = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label1 = new System.Windows.Forms.Label();
             this.hashrate = new System.Windows.Forms.TextBox();
-            this.columnHeader_Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.addCoin = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // currencyList
@@ -118,6 +119,11 @@
             this.columnHeader_CoinsPerBlock.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeader_CoinsPerBlock.Width = 114;
             // 
+            // columnHeader_Status
+            // 
+            this.columnHeader_Status.Text = "Status";
+            this.columnHeader_Status.Width = 200;
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -135,16 +141,22 @@
             this.hashrate.TabIndex = 2;
             this.hashrate.Text = "225000";
             // 
-            // columnHeader_Status
+            // addCoin
             // 
-            this.columnHeader_Status.Text = "Status";
-            this.columnHeader_Status.Width = 200;
+            this.addCoin.Location = new System.Drawing.Point(1231, 10);
+            this.addCoin.Name = "addCoin";
+            this.addCoin.Size = new System.Drawing.Size(75, 23);
+            this.addCoin.TabIndex = 3;
+            this.addCoin.Text = "Add Coin";
+            this.addCoin.UseVisualStyleBackColor = true;
+            this.addCoin.Click += new System.EventHandler(this.addCoin_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1318, 440);
+            this.Controls.Add(this.addCoin);
             this.Controls.Add(this.hashrate);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.currencyList);
@@ -171,6 +183,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox hashrate;
         private System.Windows.Forms.ColumnHeader columnHeader_Status;
+        private System.Windows.Forms.Button addCoin;
 
     }
 }

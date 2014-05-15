@@ -28,6 +28,7 @@ namespace HashrateCalculator
         public List<TransactionInput> mInputs;
         public List<TransactionOutput> mOutputs;
         public uint mLockTime;
+        public byte[] mComment;
 
         public Transaction()
         {

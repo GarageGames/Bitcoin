@@ -85,6 +85,9 @@ namespace HashrateCalculator
 
         public Block[] GetBlocks()
         {
+            if (mPullingHeaders)
+                return null;
+
             RemoveOldBlocks();
             PullHeaders();
             return mBlocks.ToArray();
@@ -271,6 +274,11 @@ namespace HashrateCalculator
                         tx.mOutputs.Add(to);
                     }
                     tx.mLockTime = br.ReadUInt32();
+                    if (tx.mVersion > 1)
+                    {
+                        ulong commentLen = Program.ReadVarInt(br);
+                        tx.mComment = br.ReadBytes((int)commentLen);
+                    }
 
                     block.mTransactions.Add(tx);
                 }
@@ -280,6 +288,7 @@ namespace HashrateCalculator
 
         public void HandleInvPacket(NodeConnection node, byte[] payload)
         {
+            /*
             MemoryStream ms = new MemoryStream(payload);
             BinaryReader br = new BinaryReader(ms);
 
@@ -310,6 +319,7 @@ namespace HashrateCalculator
             {
                 node.SendPacket("getdata", outstream.ToArray());
             }
+            */
         }
 
         public void Load(BinaryReader br)

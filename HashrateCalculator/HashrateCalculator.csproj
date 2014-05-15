@@ -52,6 +52,7 @@
     <Compile Include="Bitcoin.cs" />
     <Compile Include="Block.cs" />
     <Compile Include="BlockHeader.cs" />
+    <Compile Include="Cryptsy.cs" />
     <Compile Include="Currency.cs" />
     <Compile Include="CurrencyProperties.cs">
       <SubType>Form</SubType>
