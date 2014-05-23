@@ -213,15 +213,14 @@ namespace MinerLib_cs
 
             work.hashStart = br.ReadUInt32();
             work.hashCount = br.ReadUInt32();
-            br.ReadBytes(32);
-            br.ReadBytes(64);
-            byte[] target = br.ReadBytes(32);
-            Buffer.BlockCopy(target, 0, work.target, 0, 32);
             uint c = br.ReadUInt32();
             if (c == 0)
                 work.hashAlgorithm = Work.Algorithm.SHA256;
             else
                 work.hashAlgorithm = Work.Algorithm.Scrypt;
+            byte[] target = br.ReadBytes(32);
+            Buffer.BlockCopy(target, 0, work.target, 0, 32);
+            
             byte[] blockHeader = br.ReadBytes(128);
             Buffer.BlockCopy(blockHeader, 0, work.data, 0, 128);
 

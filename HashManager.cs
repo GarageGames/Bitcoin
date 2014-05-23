@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CentralMine.NET
 {
-    public class HashManager
+    class HashManager
     {
         public class HashBlock
         {
@@ -22,6 +22,7 @@ namespace CentralMine.NET
         public uint mHashesDone = 0;
         public uint mHashesTotal = 0xFFFFFFFF;
         public uint mHashrate = 0;
+        public bool mExpires = false;
 
         public DateTime mStartTime;
         
@@ -131,6 +132,9 @@ namespace CentralMine.NET
 
         public bool IsExpired()
         {
+            if (!mExpires)
+                return false;
+
             TimeSpan span = DateTime.Now - mStartTime;
             return (span.TotalSeconds > 30);
         }

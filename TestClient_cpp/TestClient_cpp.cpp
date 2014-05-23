@@ -30,7 +30,10 @@ int _tmain(int argc, _TCHAR* argv[])
     SYSTEM_INFO sysinfo;
     GetSystemInfo( &sysinfo );
     int threadCount = sysinfo.dwNumberOfProcessors - 1;
-    //threadCount = 1;
+
+#ifdef _DEBUG
+    threadCount = 1;
+#endif
 
     float gpuPercentage = 0;
 
@@ -81,13 +84,13 @@ int _tmain(int argc, _TCHAR* argv[])
     _CrtMemCheckpoint(&checkpoint);
     while( 1 )
     {
-        if( GetAsyncKeyState(VK_ESCAPE) != 0 )
-            break;
-        if( GetAsyncKeyState(VK_SPACE) != 0 )
-        {
-            _CrtMemDumpAllObjectsSince(&checkpoint);
-            _CrtMemCheckpoint(&checkpoint);
-        }
+        //if( GetAsyncKeyState(VK_ESCAPE) != 0 )
+        //    break;
+        //if( GetAsyncKeyState(VK_SPACE) != 0 )
+        //{
+        //    _CrtMemDumpAllObjectsSince(&checkpoint);
+        //    _CrtMemCheckpoint(&checkpoint);
+        //}
         
 
         // Update connection to server
@@ -95,6 +98,11 @@ int _tmain(int argc, _TCHAR* argv[])
         threadManager->Update(conn);
         if( conn->GetState() == F2M_MinerConnection::Connected )
         {
+            if( conn->WantsStopWork() )
+            {
+                printf("stopping work\n");
+                threadManager->StopWork(conn);
+            }
             F2M_Work* work = conn->GetWork();
             if( work )
             {

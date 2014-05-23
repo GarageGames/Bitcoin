@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace CentralMine.NET
 {
-    public class Listener
+    class Listener
     {
         TcpListener mSocket;
         Thread mThread;

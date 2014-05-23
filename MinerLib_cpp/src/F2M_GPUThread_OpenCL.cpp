@@ -214,3 +214,11 @@ bool F2M_GPUThread::IsWorkDone()
 
     return false;
 }
+
+void F2M_GPUThread::SignalStop()
+{
+    mWorkDoneEvent = 0;
+    if( mScryptData )
+        F2M_ScryptCleanup(mScryptData);
+    mScryptData = 0;
+}

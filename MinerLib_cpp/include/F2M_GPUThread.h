@@ -27,7 +27,8 @@ public:
     void SetPercentage(float percentage);
     
     void StartWork(unsigned int hashStart, unsigned int hashCount, F2M_Work* work);
-    bool IsWorkDone(); 
+    bool IsWorkDone();
+    void SignalStop();
 
 private:
     void DoWork();

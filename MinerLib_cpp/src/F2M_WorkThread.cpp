@@ -31,6 +31,39 @@ void F2M_WorkThread::StartWork(unsigned int hashStart, unsigned int hashCount, F
     InternalStartWork();
 }
 
+void F2M_WorkThread::DoubleSHAHashes()
+{
+    mHashesDone = 0;
+    mSolutionFound = false;
+
+    if( HAS_SIMD_IMPLEMENTATION && F2M_HardwareSupportsSIMD() ) 
+        F2M_DoubleSHAHashWork_SIMD(this);
+    else
+        DoubleSHAHashes_Normal();
+}
+
+void F2M_WorkThread::DoubleSHAHashes_Normal()
+{
+    __int64 end = mHashStart + mHashCount;
+
+    F2M_DoubleSHAData* shaData = F2M_DoubleSHAInit(mWork);
+    for( __int64 i = mHashStart; i < end; i++ )
+    {
+        if( WantsThreadStop() )
+            break;
+
+        mHashesDone++;
+        bool success = F2M_DoubleSHAHash((unsigned int)i, mWork, shaData);
+        if( success )
+        {
+            mSolution = (unsigned int)i;
+            mSolutionFound = true;
+            break;
+        }
+    }
+    F2M_DoubleSHACleanup(shaData);
+}
+
 void F2M_WorkThread::ScryptHashes()
 {
     mHashesDone = 0;
@@ -48,7 +81,7 @@ void F2M_WorkThread::ScryptHashes_Normal()
     F2M_ScryptData* scryptData = F2M_ScryptInit(mWork);
     for( __int64 i = mHashStart; i < end; i++ )
     {
-        if( WantsThreadExit() )
+        if( WantsThreadStop() )
             break;
 
         mHashesDone++;

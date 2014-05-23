@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace CentralMine.NET
 {
-    public class Client
+    class Client
     {
         enum Type
         {
@@ -48,7 +48,7 @@ namespace CentralMine.NET
         public bool mStatusClient;
         public bool mClientInfoRequested = false;
 
-        public Block mCurrentBlock;
+        public WorkBlock mCurrentBlock;
 
         public Client(TcpClient tcp, ClientManager manager)
         {
@@ -119,7 +119,7 @@ namespace CentralMine.NET
             json += "\"state\": \"" + mState.ToString() +  "\",";
             json += "\"type\": \"" + mType.ToString() + "\",";
             json += "\"hashrate\": \"" + mHashrate + "\",";
-            json += "\"currency\": \"" + ((mCurrentBlock == null) ? "unknown" : mCurrentBlock.mCurrency.ToString()) + "\",";
+            json += "\"currency\": \"" + "unknown" + "\",";
             json += "\"agent\": \"" + mAgent + "\",";
             json += "\"platform\": \"" + mPlatform + "\",";
             json += "\"location\": \"" + mLocation + "\"";
@@ -128,7 +128,7 @@ namespace CentralMine.NET
             return json;
         }
 
-        public void SendWork(HashManager.HashBlock hashBlock, Block block)
+        public void SendWork(HashManager.HashBlock hashBlock, WorkBlock block)
         {
             mHashBlock = hashBlock;
 
@@ -137,15 +137,9 @@ namespace CentralMine.NET
             bw.Write((byte)3);
             bw.Write(hashBlock.Start);
             bw.Write(hashBlock.Count);
-            bw.Write(block.midstate);
-            bw.Write(block.data64);
+            bw.Write((int)block.mAlgorithm);
             bw.Write(block.target);
-
-            if (mVersion > 0)
-            {
-                bw.Write((int)block.mCurrency);
-                bw.Write(block.data);
-            }
+            bw.Write(block.data);
 
             SendPacket(stream.ToArray());
             bw.Close();
@@ -158,7 +152,7 @@ namespace CentralMine.NET
         public void StopWork()
         {
             byte[] data = new byte[1];
-            data[1] = 4;
+            data[0] = 4;
             SendPacket(data);
             mState = State.Stopping;
         }

@@ -29,7 +29,8 @@ namespace HashrateCalculator
 
         public Form1()
         {
-            InitializeComponent();            
+            InitializeComponent();         
+   
 
             mCurrencies = new Dictionary<string, Currency>();
 

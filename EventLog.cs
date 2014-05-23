@@ -10,7 +10,7 @@ using MySql.Data.MySqlClient;
 
 namespace CentralMine.NET
 {
-    public class EventLog
+    class EventLog
     {
         public enum EventType
         {

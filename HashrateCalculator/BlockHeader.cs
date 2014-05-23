@@ -99,11 +99,6 @@ namespace HashrateCalculator
             else
             {
                 // SHA 256
-                uint[] temp = new uint[20];
-                Buffer.BlockCopy(data, 0, temp, 0, 80);
-                for (int i = 0; i < 20; i++)
-                    temp[i] = Program.Byteswap(temp[i]);
-                Buffer.BlockCopy(temp, 0, data, 0, 80);
                 mHash = Scrypt.SHA2562(data);
             }
         }

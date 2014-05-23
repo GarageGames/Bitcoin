@@ -31,3 +31,7 @@ bool F2M_GPUThread::IsWorkDone()
 {
     return true;
 }
+
+void F2M_GPUThread::SignalStop()
+{
+}

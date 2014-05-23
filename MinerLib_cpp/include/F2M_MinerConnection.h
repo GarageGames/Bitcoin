@@ -29,6 +29,7 @@ public:
     ConnectionState GetState()  { return mConnectionState; }
     bool CanRead()              { return mCanRead; }
     bool CanWrite()             { return mCanWrite; }
+    bool WantsStopWork()        { return mStopWork; }
 
 private:
     void SetupSocket();
@@ -44,6 +45,7 @@ protected:
     time_t mAliveTime;
     bool mCanRead;
     bool mCanWrite;
+    bool mStopWork;
 
     unsigned int mHashChunkSize;
     const char* mAgent;

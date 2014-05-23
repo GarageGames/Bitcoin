@@ -67,6 +67,12 @@
     <ClCompile Include="src\F2M_Utils_x86.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\F2M_DoubleSHA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\F2M_DoubleSHASSE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\F2M_MinerConnection.h">

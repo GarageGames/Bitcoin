@@ -48,21 +48,30 @@ namespace MinerLib_cs
             dataBuffer[2] = work.data[18];
             dataBuffer[3] = work.data[19];
 
-            uint difficulty = work.data[18];
-            uint diffZeros = 32 - (difficulty & 0xFF);
+
+            byte[] diffTarget = new byte[32];
+            Buffer.BlockCopy(work.target, 0, diffTarget, 0, 32);
+
+            uint diffZeros = 0;
+            for (int i = 31; i >= 0; i--)
+            {
+                if (diffTarget[i] != 0)
+                    break;
+                diffZeros++;
+            }
             switch (diffZeros)
             {
                 case 0:
                     outputMask = 0;
                     break;
                 case 1:
-                    outputMask = 0xFF000000;
+                    outputMask = 0x00FFFFFF;
                     break;
                 case 2:
-                    outputMask = 0xFFFF0000;
+                    outputMask = 0x0000FFFF;
                     break;
                 case 3:
-                    outputMask = 0x00FFFFFF;
+                    outputMask = 0xFF000000;
                     break;
                 default:
                     outputMask = 0xFFFFFFFF;
@@ -167,31 +176,50 @@ namespace MinerLib_cs
 
         public static byte[] SHA2562(byte[] input)
         {
-            if (input.Length != 80)
+            if (input.Length <= 0)
                 return null;
 
-            uint[] data = new uint[16];
-            uint[] temp = new uint[16];
+            ulong bitsIn = (ulong)input.Length << 3;
 
-            Buffer.BlockCopy(input, 0, data, 0, 64);
-            sha256_block(temp, staticHash, data);
+            int paddedLength = (input.Length + 9);
+            int paddedBlocks = paddedLength / 64;
+            if (paddedLength % 64 > 0)
+                paddedBlocks++;
+            paddedLength = paddedBlocks * 64;
 
-            for (int i = 0; i < 16; i++)
-                data[i] = 0;  
-            Buffer.BlockCopy(input, 64, data, 0, 16);
-            data[4] = 0x80000000;
-            data[15] = 0x00000280;
-            sha256_block(temp, temp, data);
-            
-            temp[8] = 0x80000000;
-            temp[15] = 0x00000100;
-            sha256_block(temp, staticHash, temp);
+            byte[] paddedData = new byte[paddedLength];
+            Array.Copy(input, paddedData, input.Length);
+            paddedData[input.Length] = 0x80;
+            for (int i = input.Length + 1; i < paddedLength - 8; i++)
+                paddedData[i] = 0;
+            int paddedInts = paddedLength / 4;
+            uint[] data = new uint[paddedInts];
+            Buffer.BlockCopy(paddedData, 0, data, 0, paddedLength - 8);
+            data[paddedInts - 2] = (uint)(bitsIn >> 32);
+            data[paddedInts - 1] = (uint)(bitsIn);
+
+            for (int i = 0; i < paddedInts - 2; i++)
+                data[i] = ByteReverse(data[i]);
+
+            uint[] state = new uint[16];
+            Array.Copy(staticHash, state, 8);
+
+            for (int i = 0; i < paddedBlocks; i++)
+            {
+                sha256_block(state, state, data, (uint)(i * 16));
+            }
+
+            for (int i = 9; i < 15; i++)
+                state[i] = 0;
+            state[8] = 0x80000000;
+            state[15] = 0x00000100;
+            sha256_block(state, staticHash, state);
 
             for (int i = 0; i < 8; i++)
-                temp[i] = ByteReverse(temp[i]);
-            
+                state[i] = ByteReverse(state[i]);
+
             byte[] output = new byte[32];
-            Buffer.BlockCopy(temp, 0, output, 0, 32);
+            Buffer.BlockCopy(state, 0, output, 0, 32);
             return output;
         }
 

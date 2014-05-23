@@ -50,7 +50,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Block.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="MiningTarget.cs" />
+    <Compile Include="PoolInfo.cs" />
+    <Compile Include="WalletInfo.cs" />
+    <Compile Include="WorkBlock.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="ClientManager.cs" />
     <Compile Include="Email.cs" />
@@ -62,10 +66,15 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="HashManager.cs" />
+    <Compile Include="JobInfo.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="US_Stratum.cs" />
     <Compile Include="Unhash.cs" />
+    <Compile Include="Upstream.cs" />
+    <Compile Include="US_Wallet.cs" />
+    <Compile Include="Utils.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -92,6 +101,10 @@
     <ProjectReference Include="..\bitnet-code\Bitnet.Client\Bitnet.Client.csproj">
       <Project>{90D3E431-02DF-432F-9F09-ED6E934BACD2}</Project>
       <Name>Bitnet.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="MinerLib_cs\MinerLib_cs.csproj">
+      <Project>{B6133F1D-10EF-4BF9-8F88-51C6070FC47C}</Project>
+      <Name>MinerLib_cs</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

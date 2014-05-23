@@ -43,6 +43,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Android'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release DLL|Android'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\F2M_DoubleSHA.cpp" />
+    <ClCompile Include="src\F2M_DoubleSHASSE.cpp" />
     <ClCompile Include="src\F2M_GPUThread_none.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'">true</ExcludedFromBuild>

@@ -14,8 +14,9 @@ public:
     ~F2M_MiningThreadManager();
 
 
-    void Update(F2M_MinerConnection* connection);
+    bool Update(F2M_MinerConnection* connection);
     void StartWork(F2M_Work* work);
+    void StopWork(F2M_MinerConnection* connection);
 
     unsigned int GetHashRate()  { return mHashRate; }
 

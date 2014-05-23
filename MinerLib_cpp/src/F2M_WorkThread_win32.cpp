@@ -4,6 +4,7 @@
 
 struct WinThreadData
 {
+    HANDLE          mStop;
     HANDLE          mKill;
     HANDLE          mDead;
     HANDLE          mWorkToDo;
@@ -26,9 +27,10 @@ DWORD WINAPI HashWorkThread(void* param)
         {
             // There is work to be done!
             //printf("Thread(%d) starting work\n", tinfo->mThreadId);
-            switch( tinfo->mWork->currency )
+            switch( tinfo->mWork->algorithm )
             {
                 case 0:     // SHA256^2
+                    tinfo->DoubleSHAHashes();
                     break;
                 case 1:     // Scrypt
                 case 2:                    
@@ -53,6 +55,7 @@ DWORD WINAPI HashWorkThread(void* param)
 void F2M_WorkThread::InternalInit(int threadIndex)
 {
     WinThreadData* td = new WinThreadData;
+    td->mStop = CreateEvent(NULL, FALSE, FALSE, NULL);
     td->mKill = CreateEvent(NULL, TRUE, FALSE, NULL);
     td->mDead = CreateEvent(NULL, FALSE, FALSE, NULL);
     td->mWorkToDo = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -66,8 +69,10 @@ void F2M_WorkThread::InternalDestroy()
     WinThreadData* td = (WinThreadData*)mThreadData;
 
     // Stop the thread
+    SetEvent(td->mStop);
     SetEvent(td->mKill);
     WaitForSingleObject(td->mDead, INFINITE);
+    CloseHandle(td->mStop);
     CloseHandle(td->mKill);
     CloseHandle(td->mDead);
     CloseHandle(td->mWorkToDo);
@@ -90,8 +95,14 @@ bool F2M_WorkThread::IsWorkDone()
     return (WaitForSingleObject(td->mWorkDone, 0) == WAIT_OBJECT_0);
 }
 
-bool F2M_WorkThread::WantsThreadExit()
+bool F2M_WorkThread::WantsThreadStop()
 {
     WinThreadData* td = (WinThreadData*)mThreadData;
-    return (WaitForSingleObject(td->mKill, 0) == WAIT_OBJECT_0);
+    return (WaitForSingleObject(td->mStop, 0) == WAIT_OBJECT_0);
+}
+
+void F2M_WorkThread::SignalStop()
+{
+    WinThreadData* td = (WinThreadData*)mThreadData;
+    SetEvent(td->mStop);
 }

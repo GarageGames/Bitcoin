@@ -15,6 +15,7 @@ F2M_MinerConnection::F2M_MinerConnection(unsigned int hashChunkSize, const char*
     mAgent = agent;
     mPlatform = platform;
     mLocation = location;
+    mStopWork = false;
 
     // Starup network subsystem
     F2M_NetInit();
@@ -100,9 +101,11 @@ void F2M_MinerConnection::Update()
                 {
                     case 3:     // Work Command
                         ProcessWorkCommand(dataPtr);
-                        consumed = 269;
+                        consumed = 173;
                         break;
                     case 4:     // Stop Command
+                        mStopWork = true;
+                        consumed = 1;
                         break;
                     case 5:     // Ping
                         SendPing();
@@ -268,4 +271,5 @@ void F2M_MinerConnection::SendWorkComplete(bool solutionFound, unsigned int solu
     *(unsigned int*)&packetData[6] = hashesDone;
 
     SendPacket(packetData, sizeof(packetData));
+    mStopWork = false;
 }

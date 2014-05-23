@@ -12,15 +12,18 @@ public:
     void StartWork(unsigned int hashStart, unsigned int hashCount, F2M_Work* work);
 
     bool IsWorkDone();
+    void SignalStop();
     
+    void DoubleSHAHashes();
     void ScryptHashes();
-    bool WantsThreadExit();
+    bool WantsThreadStop();
 
 protected:
     void InternalInit(int threadIndex);
     void InternalDestroy();
     void InternalStartWork();
 
+    void DoubleSHAHashes_Normal();
     void ScryptHashes_Normal();
 
 

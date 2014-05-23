@@ -43,10 +43,10 @@ F2M_MiningThreadManager::~F2M_MiningThreadManager()
     delete mTimer;
 }
 
-#include <stdio.h>
-
-void F2M_MiningThreadManager::Update(F2M_MinerConnection* connection)
+bool F2M_MiningThreadManager::Update(F2M_MinerConnection* connection)
 {
+    bool bDoingWork = false;
+
     if( mCurrentWork )
     {
         // Doing work, check to see if all threads done
@@ -98,7 +98,11 @@ void F2M_MiningThreadManager::Update(F2M_MinerConnection* connection)
             printf("Duration: %f  ", mTimer->GetDuration());
             mHashRate = (unsigned int)((double)hashes / mTimer->GetDuration());
         }
+        else
+            bDoingWork = true;
     }
+
+    return bDoingWork;
 }
 
 void F2M_MiningThreadManager::StartWork(F2M_Work* work)
@@ -137,4 +141,15 @@ void F2M_MiningThreadManager::StartWork(F2M_Work* work)
         mThreads[i]->StartWork(hashStart, hashes, work);
         hashStart += hashes;
     }
+}
+
+void F2M_MiningThreadManager::StopWork(F2M_MinerConnection* conn)
+{
+    if( mGPUThread )
+        mGPUThread->SignalStop();
+    for( int i = 0; i < mThreadCount; i++ )
+        mThreads[i]->SignalStop();
+
+    while( Update(conn) )
+        Sleep(10);
 }

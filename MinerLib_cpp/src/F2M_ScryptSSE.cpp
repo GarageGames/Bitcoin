@@ -5,17 +5,7 @@
 #include <smmintrin.h>
 #include <string.h>
 
-#ifdef WIN32
-typedef __m128i SSEVector;
-#else
-struct SSEVector
-{
-	SSEVector() {}
-	SSEVector(__m128i iv) { v = iv; }
-	operator __m128i() { return v; }
-	__m128i v;
-};
-#endif
+extern unsigned int ComputeOutputMask(F2M_Work* work);
 
 
 PRE_ALIGN(32) unsigned int staticHashw[] POST_ALIGN(32) =
@@ -29,13 +19,7 @@ PRE_ALIGN(32) unsigned int staticHashw[] POST_ALIGN(32) =
     0x1f83d9ab, 0x1f83d9ab,0x1f83d9ab,0x1f83d9ab,
     0x5be0cd19, 0x5be0cd19,0x5be0cd19,0x5be0cd19
 };
-static const SSEVector* staticHashSSE = (SSEVector*)staticHashw;
-
-inline unsigned int ByteReverse(unsigned int value)
-{
-    value = ((value & 0xFF00FF00) >> 8) | ((value & 0x00FF00FF) << 8);
-    return (value<<16) | (value>>16);
-}
+const SSEVector* staticHashSSE = (SSEVector*)staticHashw;
 
 inline SSEVector vlsh(SSEVector a, int b)
 {
@@ -103,7 +87,7 @@ inline SSEVector ByteReverseSSE(SSEVector value)
 #define ChSSE(x,y,z)   ((SSEVector)_mm_xor_si128(_mm_and_si128(x, y), _mm_andnot_si128(x, z)))
 #define MajSSE(x,y,z)  (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
 
-static void sha256_blockSSEu(SSEVector* output, const SSEVector* state, const SSEVector* input)
+void sha256_blockSSEu(SSEVector* output, const SSEVector* state, const SSEVector* input)
 {
 	SSEVector a, b, c, d, e, f, g, h, t1, t2;
 	SSEVector W[64];
@@ -514,27 +498,9 @@ F2M_ScryptDataSSE* F2M_ScryptInitSSE(F2M_Work* work)
 
     data->tempHash[8] = _mm_set1_epi32(0x80000000);
     data->tempHash[15] = _mm_set1_epi32(0x00000300);
-    
-    unsigned int difficulty = work->dataFull[18];
-    unsigned diffZeros = 32 - (difficulty & 0xFF);
-    switch( diffZeros )
-    {
-        case 0:
-            data->outputMask = _mm_set1_epi32(0);
-            break;
-        case 1:
-            data->outputMask = _mm_set1_epi32(0xFF000000);
-            break;
-        case 2:
-            data->outputMask = _mm_set1_epi32(0xFFFF0000);
-            break;
-        case 3:
-            data->outputMask = _mm_set1_epi32(0x00FFFFFF);
-            break;
-        default:
-            data->outputMask = _mm_set1_epi32(0xFFFFFFFF);
-            break;
-    }
+
+    unsigned int outputMask = ComputeOutputMask(work);
+    data->outputMask = _mm_set1_epi32(outputMask);
 
     return data;
 }
@@ -587,7 +553,7 @@ void F2M_ScryptHashWork_SIMD(F2M_WorkThread* thread)
     F2M_ScryptDataSSE* scryptData = F2M_ScryptInitSSE(thread->mWork);
     for( __int64 i = thread->mHashStart; i < end; i += 4 )
     {
-        if( thread->WantsThreadExit() )
+        if( thread->WantsThreadStop() )
             break;
 
         unsigned int inonce = (unsigned int)i;
