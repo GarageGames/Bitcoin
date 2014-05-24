@@ -13,8 +13,8 @@ extern void sha256_blockSSEu(SSEVector* output, const SSEVector* state, const SS
 int F2M_DoubleSHAHashSSE(__m128i nonce,  F2M_Work* work, F2M_DoubleSHADataSSE* data)
 {
     data->input[3] = nonce;
-    sha256_blockSSEu(data->workBuffer, data->midstate, data->input);
-    sha256_blockSSEu(data->workBuffer, staticHashSSE, data->workBuffer);
+    sha256_blockSSEu((SSEVector*)data->workBuffer, (const SSEVector*)data->midstate, (const SSEVector*)data->input);
+    sha256_blockSSEu((SSEVector*)data->workBuffer, staticHashSSE, (const SSEVector*)data->workBuffer);
 
 
     SSEVector shifted = _mm_shuffle_epi32(data->workBuffer[7], 0x93);
@@ -62,7 +62,7 @@ F2M_DoubleSHADataSSE* F2M_DoubleSHAInitSSE(F2M_Work* work)
     }
 
     // Compute midstate
-    sha256_blockSSEu(data->midstate, staticHashSSE, input);
+    sha256_blockSSEu((SSEVector*)data->midstate, staticHashSSE, (const SSEVector*)input);
 
     // Setup workbuffer
     memset(data->workBuffer, 0, sizeof(data->workBuffer));

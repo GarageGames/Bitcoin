@@ -12,6 +12,9 @@
 		6F880A4F190F00E9008AF623 /* F2M_Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F880A4E190F00E9008AF623 /* F2M_Utils.cpp */; };
 		6F880A51190F1ED0008AF623 /* F2M_UnitTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F880A50190F1ED0008AF623 /* F2M_UnitTest.cpp */; };
 		6F880A53190F1ED9008AF623 /* F2M_UnitTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 6F880A52190F1ED9008AF623 /* F2M_UnitTest.h */; };
+		6F880A5819301648008AF623 /* F2M_DoubleSHA.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F880A5619301648008AF623 /* F2M_DoubleSHA.cpp */; };
+		6F880A5919301648008AF623 /* F2M_DoubleSHASSE.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F880A5719301648008AF623 /* F2M_DoubleSHASSE.cpp */; };
+		6F880A5B193018D7008AF623 /* F2M_Utils_x86.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F880A5A193018D7008AF623 /* F2M_Utils_x86.cpp */; };
 		6FAA9E05190AFE45001DA6EF /* cl.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FAA9DDD190AFE45001DA6EF /* cl.h */; };
 		6FAA9E06190AFE45001DA6EF /* cl.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6FAA9DDE190AFE45001DA6EF /* cl.hpp */; };
 		6FAA9E07190AFE45001DA6EF /* cl_d3d10.h in Headers */ = {isa = PBXBuildFile; fileRef = 6FAA9DDF190AFE45001DA6EF /* cl_d3d10.h */; };
@@ -50,6 +53,9 @@
 		6F880A4E190F00E9008AF623 /* F2M_Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = F2M_Utils.cpp; sourceTree = "<group>"; };
 		6F880A50190F1ED0008AF623 /* F2M_UnitTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = F2M_UnitTest.cpp; sourceTree = "<group>"; };
 		6F880A52190F1ED9008AF623 /* F2M_UnitTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F2M_UnitTest.h; sourceTree = "<group>"; };
+		6F880A5619301648008AF623 /* F2M_DoubleSHA.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = F2M_DoubleSHA.cpp; sourceTree = "<group>"; };
+		6F880A5719301648008AF623 /* F2M_DoubleSHASSE.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = F2M_DoubleSHASSE.cpp; sourceTree = "<group>"; };
+		6F880A5A193018D7008AF623 /* F2M_Utils_x86.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = F2M_Utils_x86.cpp; sourceTree = "<group>"; };
 		6FAA9DD4190AFE26001DA6EF /* libMinerLib_cpp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMinerLib_cpp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FAA9DDD190AFE45001DA6EF /* cl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cl.h; sourceTree = "<group>"; };
 		6FAA9DDE190AFE45001DA6EF /* cl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cl.hpp; sourceTree = "<group>"; };
@@ -158,6 +164,9 @@
 		6FAA9DF4190AFE45001DA6EF /* src */ = {
 			isa = PBXGroup;
 			children = (
+				6F880A5A193018D7008AF623 /* F2M_Utils_x86.cpp */,
+				6F880A5619301648008AF623 /* F2M_DoubleSHA.cpp */,
+				6F880A5719301648008AF623 /* F2M_DoubleSHASSE.cpp */,
 				6F880A50190F1ED0008AF623 /* F2M_UnitTest.cpp */,
 				6F880A4E190F00E9008AF623 /* F2M_Utils.cpp */,
 				6F880A14190EEFD7008AF623 /* F2M_Timer_osx.cpp */,
@@ -272,6 +281,9 @@
 				6F880A15190EEFD7008AF623 /* F2M_Timer_osx.cpp in Sources */,
 				6F880A4F190F00E9008AF623 /* F2M_Utils.cpp in Sources */,
 				6F880A51190F1ED0008AF623 /* F2M_UnitTest.cpp in Sources */,
+				6F880A5819301648008AF623 /* F2M_DoubleSHA.cpp in Sources */,
+				6F880A5919301648008AF623 /* F2M_DoubleSHASSE.cpp in Sources */,
+				6F880A5B193018D7008AF623 /* F2M_Utils_x86.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -151,5 +151,5 @@ void F2M_MiningThreadManager::StopWork(F2M_MinerConnection* conn)
         mThreads[i]->SignalStop();
 
     while( Update(conn) )
-        Sleep(10);
+        F2M_Sleep(10);
 }

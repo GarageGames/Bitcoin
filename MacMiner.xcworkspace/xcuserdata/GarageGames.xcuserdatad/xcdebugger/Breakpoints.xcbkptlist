@@ -8,13 +8,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "MinerLib_cpp/src/F2M_WorkThread_posix.cpp"
-         timestampString = "420396710.464297"
+         timestampString = "422582511.290012"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "102"
-         endingLineNumber = "102"
-         landmarkName = "F2M_WorkThread::ScryptHashes_SSE()"
-         landmarkType = "5">
+         startingLineNumber = "105"
+         endingLineNumber = "105">
       </FileBreakpoint>
    </FileBreakpoints>
 </Bucket>

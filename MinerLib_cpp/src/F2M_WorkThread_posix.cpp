@@ -9,6 +9,7 @@ struct PosixThreadData
 {
     pthread_t       mThread;
     pthread_attr_t  mThreadAttr;
+    volatile bool   mStop;
     volatile bool   mKill;
     volatile bool   mWorkDone;
     volatile bool   mWorkToDo;
@@ -27,7 +28,7 @@ void* HashWorkThread(void* param)
         if( td->mWorkToDo )
         {
             // There is work to be done!
-            switch( tinfo->mWork->currency )
+            switch( tinfo->mWork->algorithm )
             {
                 case 0:     // SHA256^2
                     break;
@@ -40,11 +41,12 @@ void* HashWorkThread(void* param)
             }
 
             // All done
+            td->mStop = false;
             td->mWorkToDo = false;
             td->mWorkDone = true;
         }
 
-        pthread_yield();
+        //pthread_yield();
     }
     
     return 0;
@@ -53,6 +55,7 @@ void* HashWorkThread(void* param)
 void F2M_WorkThread::InternalInit(int threadIndex)
 {
     PosixThreadData* td = new PosixThreadData;
+    td->mStop = false;
     td->mKill = false;
     td->mWorkToDo = false;
     td->mWorkDone = true;
@@ -63,15 +66,15 @@ void F2M_WorkThread::InternalInit(int threadIndex)
     pthread_create(&td->mThread, &td->mThreadAttr, HashWorkThread, this);
     mThreadData = td;
 
-    cpu_set_t cpuset;
-    CPU_ZERO(&cpuset);
-    CPU_SET(threadIndex, &cpuset);
+    //cpu_set_t cpuset;
+    //CPU_ZERO(&cpuset);
+    //CPU_SET(threadIndex, &cpuset);
 
-    pthread_setaffinity_np(td->mThread, sizeof(cpu_set_t), &cpuset);
+    //pthread_setaffinity_np(td->mThread, sizeof(cpu_set_t), &cpuset);
 
-    sched_param params;
-    params.sched_priority = sched_get_priority_max(SCHED_FIFO);
-    pthread_setschedparam(td->mThread, SCHED_FIFO, &params);
+    //sched_param params;
+    //params.sched_priority = sched_get_priority_max(SCHED_FIFO);
+    //pthread_setschedparam(td->mThread, SCHED_FIFO, &params);
 }
 
 void F2M_WorkThread::InternalDestroy()
@@ -100,8 +103,15 @@ bool F2M_WorkThread::IsWorkDone()
     return td->mWorkDone;
 }
 
-bool F2M_WorkThread::WantsThreadExit()
+bool F2M_WorkThread::WantsThreadStop()
 {
     PosixThreadData* td = (PosixThreadData*)mThreadData;
-    return td->mKill;
+    return td->mStop;
+}
+
+void F2M_WorkThread::SignalStop()
+{
+    PosixThreadData* td = (PosixThreadData*)mThreadData;
+    td->mStop = true;
+    
 }
