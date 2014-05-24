@@ -61,6 +61,11 @@ int main(int argc, const char * argv[])
         threadManager->Update(conn);
         if( conn->GetState() == F2M_MinerConnection::Connected )
         {
+            if( conn->WantsStopWork() )
+            {
+                printf("stopping work");
+                threadManager->StopWork(conn);
+            }
             F2M_Work* work = conn->GetWork();
             if( work )
             {
