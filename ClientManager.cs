@@ -42,12 +42,18 @@ namespace CentralMine.NET
 
         public bool mDumpClients = false;
         public MiningTarget mMiningTarget;
+
+        public long mBlocksSubmitted;
+        public long mBlocksAccepted;
         
         public ClientManager()
         {
             mEventLog = new EventLog();
             mBlacklist = new Dictionary<uint, bool>();
             mBlacklist[0xC425E50F] = true;
+
+            mBlocksSubmitted = 0;
+            mBlocksAccepted = 0;
 
             #region Bitcoin
             MiningTarget bc = new MiningTarget();
@@ -73,7 +79,7 @@ namespace CentralMine.NET
             bg.mPOWAlgorithm = HashAlgorithm.Scrypt;
             bg.mWallet = new WalletInfo();
             bg.mWallet.mRPCAddress = "127.0.0.1";
-            bg.mWallet.mRPCPort = 7692;
+            bg.mWallet.mRPCPort = 8348;
             bg.mWallet.mRPCUser = "rpcuser";
             bg.mWallet.mRPCPass = "rpcpass";
 
@@ -85,12 +91,48 @@ namespace CentralMine.NET
             pi.mPassword = "torque9900";
             bg.mPools.Add(pi);
             #endregion
-            mMiningTarget = bg;
-            //mMiningTarget = bc;
+            #region Gamerscoin
+            MiningTarget gc = new MiningTarget();
+            gc.mName = "Gamerscoin";
+            gc.mPOWAlgorithm = HashAlgorithm.Scrypt;
+            gc.mWallet = new WalletInfo();
+            gc.mWallet.mRPCAddress = "127.0.0.1";
+            gc.mWallet.mRPCPort = 7332;
+            gc.mWallet.mRPCUser = "rpcuser";
+            gc.mWallet.mRPCPass = "rpcpass";
 
+            pi = new PoolInfo();
+            pi.mName = "gamerscoin";
+            pi.mAddress = "gamers-coin.org";
+            pi.mPort = 3333;
+            pi.mUser = "rono.f2mserver";
+            pi.mPassword = "torque9900";
+            gc.mPools.Add(pi);
+            #endregion
+            #region AllMulti
+            MiningTarget multi = new MiningTarget();
+            multi.mName = "Mutli";
+            multi.mPOWAlgorithm = HashAlgorithm.Scrypt;
+
+            pi = new PoolInfo();
+            pi.mName = "WeMineAll";
+            pi.mAddress = "multi2.wemineall.com";
+            pi.mPort = 5555;
+            pi.mUser = "f2mserver.1";
+            pi.mPassword = "x";
+            multi.mPools.Add(pi);
+            #endregion
+            mMiningTarget = gc;
+            //mMiningTarget = bg;
+            //mMiningTarget = bc;
+            //mMiningTarget = multi;
+
+            //mUpstream = new US_Wallet(this);
+            //mUpstream.SetHost(mMiningTarget.mWallet.mRPCAddress, mMiningTarget.mWallet.mRPCPort);
+            //mUpstream.SetCredentials(mMiningTarget.mWallet.mRPCUser, mMiningTarget.mWallet.mRPCPass);
             mUpstream = new US_Stratum(this);
-            mUpstream.SetHost(pi.mAddress, pi.mPort);
-            mUpstream.SetCredentials(pi.mUser, pi.mPassword);
+            mUpstream.SetHost(mMiningTarget.mPools[0].mAddress, mMiningTarget.mPools[0].mPort);
+            mUpstream.SetCredentials(mMiningTarget.mPools[0].mUser, mMiningTarget.mPools[0].mPassword);
 
             //mUpstream = new US_Wallet();
             //mUpstream.SetHost("127.0.0.1", 7332);
@@ -117,6 +159,8 @@ namespace CentralMine.NET
 
         public void Close()
         {
+            mUpstream.Destroy();
+
             // Kill the listener
             mListener.Close();
 
@@ -203,11 +247,12 @@ namespace CentralMine.NET
             block.mHashMan.FinishBlock(solver.mHashBlock);
             solver.mHashBlock = null;
 
-            if (solutionFound)
+            if (solutionFound && mBlock == block)
             {
+                mBlocksSubmitted++;
                 bool success = mUpstream.SubmitWork(block, solution);
-                if (!success)
-                    success = mUpstream.SubmitWork(block, (uint)IPAddress.HostToNetworkOrder((int)solution));
+                //if (!success)
+                //    success = mUpstream.SubmitWork(block, (uint)IPAddress.HostToNetworkOrder((int)solution));
 
                 // Start a new block
                 if (success)
@@ -232,6 +277,7 @@ namespace CentralMine.NET
                     mEventLog.RecordEvent(EventLog.EventType.Upstream, string.Format("Work accepted! solution: {0}, dataString: {1}", solution, data));
 
                     BeginBlock();
+                    mBlocksAccepted++;
                 }
                 else
                 {

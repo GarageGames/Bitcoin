@@ -8,7 +8,7 @@ namespace CentralMine.NET
     class WalletInfo
     {
         public string mRPCAddress;
-        public short mRPCPort;
+        public ushort mRPCPort;
         public string mRPCUser;
         public string mRPCPass;
     }

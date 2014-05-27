@@ -7,13 +7,29 @@
 #include <stdio.h>
 
 
-F2M_GPUThread::F2M_GPUThread(float percentage)
+int F2M_GPUThread::GetGPUCount()
 {
+    //cl_platform_id  platform;
+    //cl_uint num_devices = 0;
+    //cl_int ret = clGetPlatformIDs(1, &platform, 0);
+    //ret = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 0, 0, &num_devices);
+    //return (int)num_devices;
+
+    return 1;
+}
+
+F2M_GPUThread::F2M_GPUThread(float percentage, int deviceNumber)
+{
+    mMaxOutputItems = 0;
+    mGPURate = 1;
+    mLastHashRate = 0;
     mHashRate = 128;
     mTimer = new F2M_Timer();
 
     cl_int ret = clGetPlatformIDs(1, &mPlatform, 0);
-    ret = clGetDeviceIDs(mPlatform, CL_DEVICE_TYPE_GPU, 1, &mDevice, 0);
+    cl_device_id devices[16];
+    ret = clGetDeviceIDs(mPlatform, CL_DEVICE_TYPE_GPU, 16, devices, 0);
+    mDevice = devices[deviceNumber];
     mCtx = clCreateContext(0, 1, &mDevice, 0, 0, &ret);    
     
     // Create the command queue for this device
@@ -112,19 +128,30 @@ void F2M_GPUThread::SetPercentage(float percentage)
     if( mGPUThreadCount < 128 )
         mGPUThreadCount = 128;
 
-    if( mOutputArea )
-    {
-        free(mOutputArea);
-        free(mPositivesArea);
-        clReleaseMemObject(mGPUScratch);
-        clReleaseMemObject(mGPUOutput);
-    }
-    mOutputArea = (unsigned int*)malloc(mGPUThreadCount * 4);
-    mPositivesArea = (unsigned int*)malloc(mGPUThreadCount * 4);
+    mGPUThreadCount = 128 * mGPURate;
 
-    size_t scratchSize = 64 * 1024 * mGPUThreadCount;
-    mGPUScratch = clCreateBuffer(mCtx, CL_MEM_READ_WRITE, scratchSize, 0, &ret);
-    mGPUOutput = clCreateBuffer(mCtx, CL_MEM_WRITE_ONLY, mGPUThreadCount * 4, 0, &ret);
+    if( mGPUThreadCount > mMaxOutputItems )
+    {
+        unsigned int* outArea = (unsigned int*)malloc(mGPUThreadCount * 4);
+        unsigned int* posArea = (unsigned int*)malloc(mGPUThreadCount * 4);
+
+        if( mOutputArea )
+        {
+            memcpy(posArea, mPositivesArea, mMaxOutputItems * 4);
+            free(mOutputArea);
+            free(mPositivesArea);
+            clReleaseMemObject(mGPUScratch);
+            clReleaseMemObject(mGPUOutput);
+        }
+                
+        mMaxOutputItems = mGPUThreadCount;
+        mOutputArea = outArea;
+        mPositivesArea = posArea;
+
+        size_t scratchSize = 64 * 1024 * mGPUThreadCount;
+        mGPUScratch = clCreateBuffer(mCtx, CL_MEM_READ_WRITE, scratchSize, 0, &ret);
+        mGPUOutput = clCreateBuffer(mCtx, CL_MEM_WRITE_ONLY, mGPUThreadCount * 4, 0, &ret);
+    }
         
     ret = clSetKernelArg(mKernel, 1, sizeof(cl_mem), (void*)&mGPUOutput);
     ret = clSetKernelArg(mKernel, 2, sizeof(cl_mem), (void*)&mGPUScratch);
@@ -178,6 +205,22 @@ bool F2M_GPUThread::IsWorkDone()
         }
         mTimer->Stop();
         mHashRate = (unsigned int)(mGPUThreadCount / mTimer->GetDuration());
+        unsigned int hr = mHashRate & 0xFFFFFF00;
+        if( hr > mLastHashRate )
+        {
+            mGPURate++;
+            SetPercentage(0);
+            //printf("setting GPU Rate: %d (%d/%d)\n", mGPURate, hr, mLastHashRate);
+        }
+        else if( hr < mLastHashRate)
+        {
+            mGPURate--;
+            if( mGPURate < 1 )
+                mGPURate = 1;
+            SetPercentage(0);
+            //printf("setting GPU Rate: %d (%d/%d)\n", mGPURate, hr, mLastHashRate);
+        }
+        mLastHashRate = hr;
 
         // Check for the end
         mHashesDone += mGPUThreadCount;
@@ -188,18 +231,22 @@ bool F2M_GPUThread::IsWorkDone()
             DoWork();
         
         // Check all positives
-        for( unsigned int i = 0; i < positive; i++ )
+        if( positive > 0 )
         {
-            if( F2M_ScryptHash(mPositivesArea[i], mWork, mScryptData) )
+            printf("positives: %d\n", positive);
+            for( unsigned int i = 0; i < positive; i++ )
             {
-                mSolutionFound = true;
-                mSolution = mPositivesArea[i];
-                mWorkDoneEvent = 0;
-                F2M_ScryptCleanup(mScryptData);
-                mScryptData = 0;
+                if( F2M_ScryptHash(mPositivesArea[i], mWork, mScryptData) )
+                {
+                    mSolutionFound = true;
+                    mSolution = mPositivesArea[i];
+                    mWorkDoneEvent = 0;
+                    F2M_ScryptCleanup(mScryptData);
+                    mScryptData = 0;
 
-                clFinish(mQ);
-                return true;
+                    clFinish(mQ);
+                    return true;
+                }
             }
         }
 

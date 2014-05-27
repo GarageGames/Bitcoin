@@ -38,13 +38,16 @@ namespace CentralMine.NET
         {
             // Update block info
             if (mTheMan != null && mTheMan.mBlock != null)
-            {
+            {                
                 lblMidstate.Text = "0x" + mTheMan.mBlock.strMidstate;
                 lblData.Text = "0x" + mTheMan.mBlock.strData;
                 lblHash1.Text = "0x" + mTheMan.mBlock.strHash1;
                 lblTarget.Text = "0x" + mTheMan.mBlock.strTarget;
             }
 
+            groupBox1.Text = mTheMan.mMiningTarget.mName;
+            lblSubmitted.Text = "Submitted: " + mTheMan.mBlocksSubmitted.ToString();
+            lblAccepted.Text = "Accepted: " + mTheMan.mBlocksAccepted.ToString();
             lblClients.Text = "Clients: " + mTheMan.mClients.Count;
 
             if (mTheMan.mBlock != null)

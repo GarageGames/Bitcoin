@@ -9,15 +9,21 @@
 
 F2M_MiningThreadManager::F2M_MiningThreadManager(int threadCount, bool useSSE, float gpuPercentage)
 {
-    mThreadCount = threadCount;
-    mThreads = new F2M_WorkThread*[threadCount];
-    for( int i = 0; i < threadCount; i++ )
-        mThreads[i] = new F2M_WorkThread(i);
+    mThreadCount = 0;
+    //mThreadCount = threadCount;
+    //mThreads = new F2M_WorkThread*[threadCount];
+    //for( int i = 0; i < threadCount; i++ )
+    //    mThreads[i] = new F2M_WorkThread(i);
 
+    mGPUThreadCount = 0;
+    mGPUThreads = 0;
     if( gpuPercentage > 0 )
-        mGPUThread = new F2M_GPUThread(gpuPercentage);
-    else
-        mGPUThread = 0;
+    {
+        mGPUThreadCount = F2M_GPUThread::GetGPUCount();
+        mGPUThreads = new F2M_GPUThread*[mGPUThreadCount];
+        for( int i = 0; i < mGPUThreadCount; i++ )
+            mGPUThreads[i] = new F2M_GPUThread(gpuPercentage, i);
+    }
 
     mCurrentWork = 0;
     mHashRate = 0;
@@ -27,15 +33,25 @@ F2M_MiningThreadManager::F2M_MiningThreadManager(int threadCount, bool useSSE, f
 
 F2M_MiningThreadManager::~F2M_MiningThreadManager()
 {
-    for( int i = 0; i < mThreadCount; i++ )
+    if( mThreadCount > 0 )
     {
-        delete mThreads[i];
-        mThreads[i] = 0;
+        for( int i = 0; i < mThreadCount; i++ )
+        {
+            delete mThreads[i];
+            mThreads[i] = 0;
+        }
+        delete[] mThreads;
     }
-    delete[] mThreads;
 
-    if( mGPUThread )
-        delete mGPUThread;
+    if( mGPUThreadCount > 0 )
+    {
+        for( int i = 0; i < mGPUThreadCount; i++ )
+        {
+            delete mGPUThreads[i];
+            mGPUThreads[i] = 0;
+        }
+        delete[] mGPUThreads;
+    }
 
     if( mCurrentWork )
         delete mCurrentWork;
@@ -51,8 +67,14 @@ bool F2M_MiningThreadManager::Update(F2M_MinerConnection* connection)
     {
         // Doing work, check to see if all threads done
         bool threadsAllDone = true;
-        if( mGPUThread )
-            threadsAllDone = mGPUThread->IsWorkDone();
+        for( int i = 0; i < mGPUThreadCount; i++ )
+        {
+            if( !mGPUThreads[i]->IsWorkDone() )
+            {
+                threadsAllDone = false;
+                break;
+            }
+        }
 
         if( threadsAllDone )
         {
@@ -73,11 +95,14 @@ bool F2M_MiningThreadManager::Update(F2M_MinerConnection* connection)
             bool solutionFound = false;
             unsigned int solution = 0;
 
-            if( mGPUThread )
-            {
-                solutionFound = mGPUThread->GetSolutionFound();
-                solution = mGPUThread->GetSolution();
-                hashes += mGPUThread->GetHashesDone();
+            for( int i = 0; i < mGPUThreadCount; i++ )
+            {                
+                hashes += mGPUThreads[i]->GetHashesDone();
+                if( mGPUThreads[i]->GetSolutionFound() )
+                {
+                    solutionFound = true;
+                    solution = mGPUThreads[i]->GetSolution();
+                }
             }
 
             for( int i = 0; i < mThreadCount; i++ )
@@ -116,13 +141,26 @@ void F2M_MiningThreadManager::StartWork(F2M_Work* work)
 
     unsigned int hashStart = work->hashStart;
     unsigned int hashCount = work->hashCount;
+
+    int hashesPerGPU = hashCount / mGPUThreadCount;
+    for( int i = 0; i < mGPUThreadCount; i++ )
+    {
+        unsigned int hashes = hashesPerGPU;
+        if( hashes > hashCount )
+            hashes = hashCount;
+        hashCount -= hashes;
+
+        mGPUThreads[i]->StartWork(hashStart, hashes, work);
+        hashStart += hashes;
+    }
         
+    /*
     if( mGPUThread )
     {
         // Find out how many hashes the GPU wants to do
         unsigned int gpuHashes = mGPUThread->GetHashrate() * 4;
         if( gpuHashes > hashCount )
-            gpuHashes = hashCount / 2;  // GPU wants all of them, limit to half so the server will give us a bigger chunk next time
+            gpuHashes = hashCount;  // GPU wants all of them, limit to half so the server will give us a bigger chunk next time
 
         // Give the GPU its hashes
         mGPUThread->StartWork(hashStart, gpuHashes, work);
@@ -130,23 +168,27 @@ void F2M_MiningThreadManager::StartWork(F2M_Work* work)
         hashStart += gpuHashes;
     }
     
-    unsigned int hashesPerThread = hashCount / mThreadCount;
-    for( int i = 0; i < mThreadCount; i++ )
+    if( mThreadCount > 0 )
     {
-        unsigned int hashes = hashesPerThread;
-        if( hashes > hashCount )
-            hashes = hashCount;
-        hashCount -= hashes;
+        unsigned int hashesPerThread = hashCount / mThreadCount;
+        for( int i = 0; i < mThreadCount; i++ )
+        {
+            unsigned int hashes = hashesPerThread;
+            if( hashes > hashCount )
+                hashes = hashCount;
+            hashCount -= hashes;
 
-        mThreads[i]->StartWork(hashStart, hashes, work);
-        hashStart += hashes;
+            mThreads[i]->StartWork(hashStart, hashes, work);
+            hashStart += hashes;
+        }
     }
+    */
 }
 
 void F2M_MiningThreadManager::StopWork(F2M_MinerConnection* conn)
 {
-    if( mGPUThread )
-        mGPUThread->SignalStop();
+    for( int i = 0; i < mGPUThreadCount; i++ )
+        mGPUThreads[i]->SignalStop();
     for( int i = 0; i < mThreadCount; i++ )
         mThreads[i]->SignalStop();
 

@@ -510,6 +510,15 @@ void F2M_ScryptCleanupSSE(F2M_ScryptDataSSE* scryptData)
     _aligned_free(scryptData);
 }
 
+//#include <stdio.h>
+//void PrintHash(unsigned int* hash)
+//{
+//    char strOut[2048];
+//    sprintf_s(strOut, sizeof(strOut), "%8.8x%8.8x%8.8x%8.8x%8.8x%8.8x%8.8x%8.8x\n", hash[0], hash[1], hash[2], hash[3], hash[4], hash[5], hash[6], hash[7]);
+//    printf(strOut);
+//    OutputDebugStringA(strOut);
+//}
+
 int F2M_ScryptHashSSE(__m128i nonce,  F2M_Work* work, F2M_ScryptDataSSE* data)
 {
     data->inputB[3] = data->inputB2[3] = nonce;
@@ -524,11 +533,28 @@ int F2M_ScryptHashSSE(__m128i nonce,  F2M_Work* work, F2M_ScryptDataSSE* data)
 
     __m128 testVal;
     _mm_store_si128((__m128i*)&testVal, masked);
+    //_mm_store_si128((__m128i*)&testVal, data->output[7]);
     unsigned int* testPtr = (unsigned int*)&testVal;
+    //if( testPtr[3] == 0 || testPtr[2] == 0 || testPtr[1] == 0 || testPtr[0] == 0 )
     if( testPtr[3] == 0 )
     {
         // Full test, one of these 4 looks good
         __m128* memHash = (__m128*)data->output;
+        
+        /*
+        for( int j = 0; j < 4; j++ )
+        {
+            if( data->output[7].m128i_u32[j] == 0 )
+            {
+                unsigned int hash[8];
+                for( int i = 0; i < 8; i++ )
+                    hash[i] = ByteReverse(data->output[i].m128i_u32[j]);
+                PrintHash(hash);
+                PrintHash(work->target);                
+            }
+        }
+        */
+
         for( int j = 0; j < 4; j++ )
         {
             for( int k = 7; k > 0; k-- )

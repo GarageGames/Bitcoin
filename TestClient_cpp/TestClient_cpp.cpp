@@ -35,7 +35,7 @@ int _tmain(int argc, _TCHAR* argv[])
     threadCount = 1;
 #endif
 
-    float gpuPercentage = 0;
+    float gpuPercentage = 50;
 
 #ifdef MINER_DLL
     F2M_Initialize();
@@ -70,7 +70,10 @@ int _tmain(int argc, _TCHAR* argv[])
     F2M_MTM_Destroy(conn);
     F2M_Shutdown();
 #else   // MINER_DLL
-    bool testSuccess = F2M_TestAll();
+    bool std = F2M_Scrypt_TestStandard();
+    bool simd = F2M_Scrypt_TestSSE();
+    bool ocl = F2M_Scrypt_TestOpenCL();
+    printf("std(%d), sse(%d), ocl(%d)\n", std, simd, ocl);
     
     F2M_MiningThreadManager* threadManager = new F2M_MiningThreadManager(threadCount, sse, gpuPercentage);
 

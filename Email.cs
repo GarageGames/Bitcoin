@@ -67,7 +67,7 @@ namespace CentralMine.NET
             MailMessage message = new MailMessage(fromAddress, toAddress);
             message.Subject = subject;
             message.Body = body;
-            //smtp.Send(message);
+            smtp.Send(message);
         }
     }
 }

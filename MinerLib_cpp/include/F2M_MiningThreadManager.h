@@ -24,7 +24,8 @@ protected:
     int                 mThreadCount;
     unsigned int        mHashRate;
     F2M_Timer*          mTimer;
-    F2M_GPUThread*      mGPUThread;
+    int                 mGPUThreadCount;
+    F2M_GPUThread**     mGPUThreads;
     F2M_WorkThread**    mThreads;
     F2M_Work*           mCurrentWork;
 };

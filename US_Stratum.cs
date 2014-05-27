@@ -38,12 +38,16 @@ namespace CentralMine.NET
         int mExtraNOnceSize;
         bool mAuthorized;
 
+        string mSubmitString;
         bool mAwaitingSubmitResult = false;
         bool mSubmitResult = false;
         bool mNewBlockReady = false;
         ulong mServerDiff = 0;
 
         List<JobInfo> mJobs;
+
+        FileStream mLogFile;
+        StreamWriter mLog;
 
         public US_Stratum(ClientManager cm) : base(cm)
         {
@@ -60,12 +64,16 @@ namespace CentralMine.NET
 
             mThread = new Thread(new ThreadStart(ThreadUpdate));
             mThread.Start();
+
+            mLogFile = File.Open("stratum.log", FileMode.Create);
+            mLog = new StreamWriter(mLogFile);
         }
 
         public override void Destroy()
         {
             mThread.Abort();
             Disconnect();
+            mLog.Close();
         }        
 
         public override void SetHost(string url, ushort port)
@@ -107,7 +115,10 @@ namespace CentralMine.NET
             parms[3] = ji.mTimeStr;
             parms[4] = Utils.UIntToHexString(solution);
 
-            Console.WriteLine("Submit Job({0}), Time({1}), Solution({2})", parms[1], parms[3], parms[4]);
+            mSubmitString = String.Format("Submit Job({0}), Time({1}), Solution({2})", parms[1], parms[3], parms[4]) + "\n" + ji.strData + "\n" + ji.strTarget;
+            Console.WriteLine(mSubmitString);
+            mLog.WriteLine(mSubmitString);
+
 
             mAwaitingSubmitResult = true;
             SendRPC("mining.submit", parms);
@@ -148,6 +159,7 @@ namespace CentralMine.NET
             rpc += "]}\n";
 
             Console.WriteLine("SendRPC: " + rpc);
+            mLog.WriteLine("SendRPC: " + rpc);
 
             byte[] data = System.Text.Encoding.ASCII.GetBytes(rpc);
             int bytesSent = mSocket.Send(data, data.Length, SocketFlags.None);
@@ -156,7 +168,7 @@ namespace CentralMine.NET
             return rpcID;
         }
 
-        void MiningSubmit(JObject obj)
+        void MiningSubmit(JObject obj, string json)
         {
             bool? result = obj["result"].Value<bool?>();
             if (result == null)
@@ -270,6 +282,7 @@ namespace CentralMine.NET
             //{"params": [32], "id": null, "method": "mining.set_difficulty"}
             double difficulty = (double)obj["params"][0];
             //difficulty = 32;
+            mLog.WriteLine("Set Difficulty: " + difficulty);
 
             ulong baseDiff = 0x00000000FFFF0000;
             double diff = (double)baseDiff;
@@ -283,6 +296,7 @@ namespace CentralMine.NET
         void ProcessNetworkLine(string line)
         {
             Console.WriteLine(line);
+            mLog.WriteLine(line);
             JObject obj = JsonConvert.DeserializeObject<JObject>(line);
 
             string pendingMethod = null;
@@ -329,7 +343,7 @@ namespace CentralMine.NET
                         MiningNotify(obj);
                         break;
                     case "mining.submit":
-                        MiningSubmit(obj);
+                        MiningSubmit(obj, line);
                         break;
                     case "mining.set_difficulty":
                         MiningSetDifficulty(obj);

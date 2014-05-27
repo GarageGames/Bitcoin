@@ -81,7 +81,7 @@ bool F2M_Scrypt_TestOpenCL()
     memcpy(work.dataFull, sData, sizeof(sData));
     memcpy(work.target, sTarget, sizeof(sTarget));
 
-    F2M_GPUThread* gpu = new F2M_GPUThread(50);
+    F2M_GPUThread* gpu = new F2M_GPUThread(50, 0);
     gpu->StartWork(sNOnce, 128, &work);
 
     while( !gpu->IsWorkDone() )

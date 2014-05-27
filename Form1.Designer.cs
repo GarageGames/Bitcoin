@@ -44,6 +44,8 @@
             this.lblHashrate = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.protocol = new System.Windows.Forms.ComboBox();
+            this.lblSubmitted = new System.Windows.Forms.Label();
+            this.lblAccepted = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -181,11 +183,31 @@
             this.protocol.TabIndex = 5;
             this.protocol.SelectedIndexChanged += new System.EventHandler(this.protocol_SelectedIndexChanged);
             // 
+            // lblSubmitted
+            // 
+            this.lblSubmitted.AutoSize = true;
+            this.lblSubmitted.Location = new System.Drawing.Point(352, 141);
+            this.lblSubmitted.Name = "lblSubmitted";
+            this.lblSubmitted.Size = new System.Drawing.Size(41, 13);
+            this.lblSubmitted.TabIndex = 6;
+            this.lblSubmitted.Text = "Clients:";
+            // 
+            // lblAccepted
+            // 
+            this.lblAccepted.AutoSize = true;
+            this.lblAccepted.Location = new System.Drawing.Point(352, 161);
+            this.lblAccepted.Name = "lblAccepted";
+            this.lblAccepted.Size = new System.Drawing.Size(41, 13);
+            this.lblAccepted.TabIndex = 7;
+            this.lblAccepted.Text = "Clients:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(967, 234);
+            this.Controls.Add(this.lblAccepted);
+            this.Controls.Add(this.lblSubmitted);
             this.Controls.Add(this.protocol);
             this.Controls.Add(this.lblHashrate);
             this.Controls.Add(this.lblProgress);
@@ -219,6 +241,8 @@
         private System.Windows.Forms.Label lblHashrate;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.ComboBox protocol;
+        private System.Windows.Forms.Label lblSubmitted;
+        private System.Windows.Forms.Label lblAccepted;
     }
 }
 

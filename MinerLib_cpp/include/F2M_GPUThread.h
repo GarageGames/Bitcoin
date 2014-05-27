@@ -16,7 +16,7 @@ class F2M_Timer;
 class F2M_GPUThread
 {
 public:
-    F2M_GPUThread(float percentage);
+    F2M_GPUThread(float percentage, int deviceNumber);
     ~F2M_GPUThread();
 
     bool GetSolutionFound()         { return mSolutionFound; }
@@ -30,6 +30,8 @@ public:
     bool IsWorkDone();
     void SignalStop();
 
+    static int GetGPUCount();
+
 private:
     void DoWork();
 
@@ -39,9 +41,12 @@ protected:
     bool                mSolutionFound;
     unsigned int        mSolution;
     unsigned int        mHashRate;
+    unsigned int        mLastHashRate;
+    unsigned int        mGPURate;
     unsigned int        mHashesDone;
 
     unsigned int        mGPUThreadCount;
+    unsigned int        mMaxOutputItems;
     unsigned int*       mOutputArea;
     unsigned int*       mPositivesArea;
 
