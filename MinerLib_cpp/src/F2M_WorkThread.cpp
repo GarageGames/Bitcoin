@@ -99,6 +99,7 @@ void F2M_WorkThread::ScryptHashes_Normal()
         bool success = F2M_ScryptHash((unsigned int)i, mWork, scryptData);
         if( success )
         {
+            F2M_LogHashAttempt("CPU", i, mWork->target, scryptData->output);
             mSolution = (unsigned int)i;
             mSolutionFound = true;
             break;

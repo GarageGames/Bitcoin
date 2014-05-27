@@ -151,7 +151,7 @@ void F2M_GPUThread::SetPercentage(float percentage)
         mOutputArea = outArea;
         mPositivesArea = posArea;
 
-        size_t scratchSize = 128 * 128 * mGPUThreadCount;
+        size_t scratchSize = 128 * 256 * mGPUThreadCount;
         mGPUScratch = clCreateBuffer(mCtx, CL_MEM_READ_WRITE, scratchSize, 0, &ret);
         mGPUOutput = clCreateBuffer(mCtx, CL_MEM_WRITE_ONLY, mGPUThreadCount * 4, 0, &ret);
     }
@@ -266,7 +266,9 @@ bool F2M_GPUThread::IsWorkDone()
             printf("positives: %d\n", positive);
             for( unsigned int i = 0; i < positive; i++ )
             {
-                if( F2M_ScryptHash(mPositivesArea[i], mWork, mScryptData) )
+                bool success = F2M_ScryptHash(mPositivesArea[i], mWork, mScryptData);
+                F2M_LogHashAttempt("GPU", mPositivesArea[i], mWork->target, mScryptData->output);
+                if( success )
                 {
                     mSolutionFound = true;
                     mSolution = mPositivesArea[i];

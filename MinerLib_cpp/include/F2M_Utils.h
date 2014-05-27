@@ -14,4 +14,6 @@ void F2M_FileSave(const char* fileName, void* data, size_t dataSize);
 
 bool F2M_HardwareSupportsSIMD();
 
+void F2M_LogHashAttempt(const char* src, unsigned int nonce, unsigned int* target, unsigned int* hash);
+
 #endif

@@ -1,6 +1,7 @@
 #include "F2M_Work.h"
 #include "F2M_Hash.h"
 #include "F2M_WorkThread.h"
+#include "F2M_Utils.h"
 
 #include <smmintrin.h>
 #include <string.h>
@@ -588,6 +589,10 @@ void F2M_ScryptHashWork_SIMD(F2M_WorkThread* thread)
         thread->mHashesDone += 4;
         if( success >= 0 )
         {
+            unsigned int hash[8];
+            for( int j = 0; j < 8; j++ )
+                hash[j] = scryptData->output[j].m128i_u32[3 - success];
+            F2M_LogHashAttempt("SSE", inonce + success, thread->mWork->target, hash);
             thread->mSolution = inonce + success;
             thread->mSolutionFound = true;
             break;
