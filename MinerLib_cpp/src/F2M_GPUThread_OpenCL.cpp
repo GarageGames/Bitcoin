@@ -9,21 +9,24 @@
 
 int F2M_GPUThread::GetGPUCount()
 {
-    //cl_platform_id  platform;
-    //cl_uint num_devices = 0;
-    //cl_int ret = clGetPlatformIDs(1, &platform, 0);
-    //ret = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 0, 0, &num_devices);
-    //return (int)num_devices;
+    cl_platform_id  platform;
+    cl_uint num_devices = 0;
+    cl_int ret = clGetPlatformIDs(1, &platform, 0);
+    ret = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 0, 0, &num_devices);
+    return (int)num_devices;
 
-    return 1;
+//return 1;
 }
 
 F2M_GPUThread::F2M_GPUThread(float percentage, int deviceNumber)
 {
+    mHashRateWriteIndex = 0;
+    memset(mHashRates, 0, sizeof(mHashRates));
+
     mMaxOutputItems = 0;
     mGPURate = 1;
     mLastHashRate = 0;
-    mHashRate = 128;
+    mHashRate = 5000;
     mTimer = new F2M_Timer();
 
     cl_int ret = clGetPlatformIDs(1, &mPlatform, 0);
@@ -148,7 +151,7 @@ void F2M_GPUThread::SetPercentage(float percentage)
         mOutputArea = outArea;
         mPositivesArea = posArea;
 
-        size_t scratchSize = 64 * 1024 * mGPUThreadCount;
+        size_t scratchSize = 128 * 128 * mGPUThreadCount;
         mGPUScratch = clCreateBuffer(mCtx, CL_MEM_READ_WRITE, scratchSize, 0, &ret);
         mGPUOutput = clCreateBuffer(mCtx, CL_MEM_WRITE_ONLY, mGPUThreadCount * 4, 0, &ret);
     }
@@ -182,6 +185,7 @@ void F2M_GPUThread::DoWork()
     size_t globalItems = mGPUThreadCount;
     size_t localItems = mGPUThreadCount < 128 ? mGPUThreadCount : 128;
     cl_int status = clEnqueueNDRangeKernel(mQ, mKernel, 1, &offset, &globalItems, &localItems, 0, 0, 0);
+    //cl_int status = clEnqueueNDRangeKernel(mQ, mKernel, 1, &offset, &globalItems, 0, 0, 0, 0);
     
     status = clEnqueueReadBuffer(mQ, mGPUOutput, CL_TRUE, 0, mGPUThreadCount * 4, mOutputArea, 0, 0, &mWorkDoneEvent);
     clFlush(mQ);
@@ -205,22 +209,48 @@ bool F2M_GPUThread::IsWorkDone()
         }
         mTimer->Stop();
         mHashRate = (unsigned int)(mGPUThreadCount / mTimer->GetDuration());
-        unsigned int hr = mHashRate & 0xFFFFFF00;
-        if( hr > mLastHashRate )
+
+        mHashRates[mHashRateWriteIndex++] = mHashRate;
+        if( mHashRateWriteIndex >= HR_HISTORY_COUNT )
+            mHashRateWriteIndex = 0;
+        mAvgHashRate = 0;
+        int contrib = 0;
+        for( int i = 0; i < HR_HISTORY_COUNT; i++ )
         {
-            mGPURate++;
-            SetPercentage(0);
-            //printf("setting GPU Rate: %d (%d/%d)\n", mGPURate, hr, mLastHashRate);
+            if( mHashRates[i] > 0 )
+            {
+                mAvgHashRate += mHashRates[i];
+                contrib++;
+            }
         }
-        else if( hr < mLastHashRate)
+        if( contrib > 0 )
+            mAvgHashRate /= contrib;
+
+        if( mHashRateWriteIndex == 0 )
         {
-            mGPURate--;
-            if( mGPURate < 1 )
-                mGPURate = 1;
-            SetPercentage(0);
-            //printf("setting GPU Rate: %d (%d/%d)\n", mGPURate, hr, mLastHashRate);
+            unsigned int hr = mAvgHashRate & 0xFFFFFFFF;            
+            if( hr > mLastHashRate )
+            {
+                unsigned int oldRate = mGPURate;
+                long diff = (long)hr - (long)mLastHashRate;
+                mGPURate += (diff + 511) / 512;
+                SetPercentage(0);
+                printf("setting GPU Rate: %d->%d (%d/%d)\n", oldRate, mGPURate, hr, mLastHashRate);
+            }
+            else if( hr < mLastHashRate)
+            {
+                unsigned int oldRate = mGPURate;
+                
+                long diff = (long)mLastHashRate - (long)hr;
+                mGPURate -= (diff + 511) / 512;
+                //mGPURate--;
+                if( mGPURate < 1 )
+                    mGPURate = 1;
+                SetPercentage(0);
+                printf("setting GPU Rate: %d->%d (%d/%d)\n", oldRate, mGPURate, hr, mLastHashRate);
+            }
+            mLastHashRate = hr;
         }
-        mLastHashRate = hr;
 
         // Check for the end
         mHashesDone += mGPUThreadCount;
@@ -268,4 +298,5 @@ void F2M_GPUThread::SignalStop()
     if( mScryptData )
         F2M_ScryptCleanup(mScryptData);
     mScryptData = 0;
+    mTimer->Stop();
 }

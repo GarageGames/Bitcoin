@@ -42,6 +42,7 @@ DWORD WINAPI HashWorkThread(void* param)
 
             // All done
             int success = SetEvent(td->mWorkDone);
+            tinfo->WorkDone();
             //printf("Thread(%d) done with work\n", tinfo->mThreadId);
         }
 

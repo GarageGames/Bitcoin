@@ -9,17 +9,17 @@
 
 F2M_MiningThreadManager::F2M_MiningThreadManager(int threadCount, bool useSSE, float gpuPercentage)
 {
-    mThreadCount = 0;
-    //mThreadCount = threadCount;
-    //mThreads = new F2M_WorkThread*[threadCount];
-    //for( int i = 0; i < threadCount; i++ )
-    //    mThreads[i] = new F2M_WorkThread(i);
+    mThreadCount = threadCount;
+    mThreads = new F2M_WorkThread*[threadCount];
+    for( int i = 0; i < threadCount; i++ )
+        mThreads[i] = new F2M_WorkThread(i);
 
     mGPUThreadCount = 0;
     mGPUThreads = 0;
     if( gpuPercentage > 0 )
     {
         mGPUThreadCount = F2M_GPUThread::GetGPUCount();
+        printf("setting up %d GPU threads\n", mGPUThreadCount);
         mGPUThreads = new F2M_GPUThread*[mGPUThreadCount];
         for( int i = 0; i < mGPUThreadCount; i++ )
             mGPUThreads[i] = new F2M_GPUThread(gpuPercentage, i);
@@ -139,50 +139,44 @@ void F2M_MiningThreadManager::StartWork(F2M_Work* work)
 
     mCurrentWork = work;
 
+    double currentHR = 0;
+    for( int i = 0; i < mGPUThreadCount; i++ )
+        currentHR += mGPUThreads[i]->GetHashrate();
+    for( int i = 0; i < mThreadCount; i++ )
+        currentHR += mThreads[i]->GetHashrate();
+
     unsigned int hashStart = work->hashStart;
     unsigned int hashCount = work->hashCount;
-
-    int hashesPerGPU = hashCount / mGPUThreadCount;
+    
     for( int i = 0; i < mGPUThreadCount; i++ )
     {
-        unsigned int hashes = hashesPerGPU;
+        double percentage = mGPUThreads[i]->GetHashrate() / currentHR;
+        unsigned int hashes = (unsigned int)(percentage * work->hashCount);
         if( hashes > hashCount )
             hashes = hashCount;
+        if( mThreadCount == 0 && i == (mGPUThreadCount - 1) )
+            hashes = hashCount;     // Last worker gets all remainder
         hashCount -= hashes;
 
         mGPUThreads[i]->StartWork(hashStart, hashes, work);
         hashStart += hashes;
     }
-        
-    /*
-    if( mGPUThread )
-    {
-        // Find out how many hashes the GPU wants to do
-        unsigned int gpuHashes = mGPUThread->GetHashrate() * 4;
-        if( gpuHashes > hashCount )
-            gpuHashes = hashCount;  // GPU wants all of them, limit to half so the server will give us a bigger chunk next time
 
-        // Give the GPU its hashes
-        mGPUThread->StartWork(hashStart, gpuHashes, work);
-        hashCount -= gpuHashes;
-        hashStart += gpuHashes;
+    for( int i = 0; i < mThreadCount; i++ )
+    {
+        double percentage = mThreads[i]->GetHashrate() / currentHR;
+        unsigned int hashes = (unsigned int)(percentage * work->hashCount);
+
+        if( hashes > hashCount )
+            hashes = hashCount;
+        if( i == (mThreadCount - 1) )
+            hashes = hashCount;     // Last worker gets all remainder
+        hashCount -= hashes;
+
+        mThreads[i]->StartWork(hashStart, hashes, work);
+        hashStart += hashes;
     }
     
-    if( mThreadCount > 0 )
-    {
-        unsigned int hashesPerThread = hashCount / mThreadCount;
-        for( int i = 0; i < mThreadCount; i++ )
-        {
-            unsigned int hashes = hashesPerThread;
-            if( hashes > hashCount )
-                hashes = hashCount;
-            hashCount -= hashes;
-
-            mThreads[i]->StartWork(hashStart, hashes, work);
-            hashStart += hashes;
-        }
-    }
-    */
 }
 
 void F2M_MiningThreadManager::StopWork(F2M_MinerConnection* conn)

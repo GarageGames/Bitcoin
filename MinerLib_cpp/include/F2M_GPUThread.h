@@ -12,6 +12,7 @@
 struct F2M_Work;
 class F2M_Timer;
 
+#define HR_HISTORY_COUNT    10
 
 class F2M_GPUThread
 {
@@ -44,6 +45,10 @@ protected:
     unsigned int        mLastHashRate;
     unsigned int        mGPURate;
     unsigned int        mHashesDone;
+
+    unsigned int        mHashRateWriteIndex;
+    unsigned int        mHashRates[HR_HISTORY_COUNT];
+    unsigned int        mAvgHashRate;
 
     unsigned int        mGPUThreadCount;
     unsigned int        mMaxOutputItems;

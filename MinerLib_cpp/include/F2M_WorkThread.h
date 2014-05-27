@@ -2,6 +2,7 @@
 #define _F2M_WORK_THREAD_
 
 struct F2M_Work;
+class F2M_Timer;
 
 class F2M_WorkThread
 {
@@ -13,10 +14,13 @@ public:
 
     bool IsWorkDone();
     void SignalStop();
+    void WorkDone();
     
     void DoubleSHAHashes();
     void ScryptHashes();
     bool WantsThreadStop();
+
+    unsigned int GetHashrate()  { return mHashrate; }
 
 protected:
     void InternalInit(int threadIndex);
@@ -34,10 +38,12 @@ public:     // Members public so they can be accessed by threads directly
     unsigned int    mHashCount;
     unsigned int    mHashesDone;
     unsigned int    mSolution;
-    bool            mSolutionFound;
+    bool            mSolutionFound;    
+    unsigned int    mHashrate;
     
     void*           mThreadData;
     int				mThreadIndex;
+    F2M_Timer*      mTimer;
 };
 
 #endif

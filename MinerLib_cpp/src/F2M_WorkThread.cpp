@@ -2,12 +2,15 @@
 #include "F2M_Work.h"
 #include "F2M_Hash.h"
 #include "F2M_Utils.h"
+#include "F2M_Timer.h"
 
 F2M_WorkThread::F2M_WorkThread(int threadIndex)
 {
+    mTimer = new F2M_Timer();
     mWork = new F2M_Work;
     mHashCount = 0;
     mThreadIndex = threadIndex;
+    mHashrate = 5000;
 
     InternalInit(threadIndex);
 }
@@ -29,6 +32,14 @@ void F2M_WorkThread::StartWork(unsigned int hashStart, unsigned int hashCount, F
     mSolutionFound = false;
 
     InternalStartWork();
+
+    mTimer->Start();
+}
+
+void F2M_WorkThread::WorkDone()
+{
+    mTimer->Stop();
+    mHashrate = (unsigned int)(mHashesDone / mTimer->GetDuration());
 }
 
 void F2M_WorkThread::DoubleSHAHashes()
