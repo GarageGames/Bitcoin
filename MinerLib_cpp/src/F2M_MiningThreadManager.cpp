@@ -130,6 +130,7 @@ bool F2M_MiningThreadManager::Update(F2M_MinerConnection* connection)
     return bDoingWork;
 }
 
+#pragma optimize("", off);
 void F2M_MiningThreadManager::StartWork(F2M_Work* work)
 {
     mTimer->Start();
@@ -148,9 +149,11 @@ void F2M_MiningThreadManager::StartWork(F2M_Work* work)
     unsigned int hashStart = work->hashStart;
     unsigned int hashCount = work->hashCount;
     
+    double gpu = 0;
     for( int i = 0; i < mGPUThreadCount; i++ )
     {
         double percentage = mGPUThreads[i]->GetHashrate() / currentHR;
+        gpu += percentage;
         unsigned int hashes = (unsigned int)(percentage * work->hashCount);
         if( hashes > hashCount )
             hashes = hashCount;
@@ -162,9 +165,11 @@ void F2M_MiningThreadManager::StartWork(F2M_Work* work)
         hashStart += hashes;
     }
 
+    double cpu = 0;
     for( int i = 0; i < mThreadCount; i++ )
     {
         double percentage = mThreads[i]->GetHashrate() / currentHR;
+        cpu += percentage;
         unsigned int hashes = (unsigned int)(percentage * work->hashCount);
 
         if( hashes > hashCount )
@@ -176,7 +181,9 @@ void F2M_MiningThreadManager::StartWork(F2M_Work* work)
         mThreads[i]->StartWork(hashStart, hashes, work);
         hashStart += hashes;
     }
-    
+    if( cpu < 0.05 )
+        printf("");
+    printf("Work Divided - CPU(%f), GPU(%f)\n", cpu, gpu);
 }
 
 void F2M_MiningThreadManager::StopWork(F2M_MinerConnection* conn)

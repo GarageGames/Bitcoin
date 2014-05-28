@@ -30,16 +30,17 @@ void F2M_WorkThread::StartWork(unsigned int hashStart, unsigned int hashCount, F
 
     mHashesDone = 0;
     mSolutionFound = false;
-
-    InternalStartWork();
-
+    
     mTimer->Start();
+    InternalStartWork();
 }
 
 void F2M_WorkThread::WorkDone()
 {
     mTimer->Stop();
     mHashrate = (unsigned int)(mHashesDone / mTimer->GetDuration());
+    if( mHashrate < 256 )
+        mHashrate = 256;
 }
 
 void F2M_WorkThread::DoubleSHAHashes()
