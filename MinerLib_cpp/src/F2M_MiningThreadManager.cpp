@@ -130,7 +130,6 @@ bool F2M_MiningThreadManager::Update(F2M_MinerConnection* connection)
     return bDoingWork;
 }
 
-#pragma optimize("", off);
 void F2M_MiningThreadManager::StartWork(F2M_Work* work)
 {
     mTimer->Start();

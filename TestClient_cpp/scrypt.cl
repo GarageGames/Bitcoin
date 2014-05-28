@@ -470,6 +470,39 @@ void ScryptCoreEighth(uint4* X, __global uint4* V)
     Swap(X);
 }
 
+void ScryptCoreNoMem(uint4* X)
+{
+    uint4 initial[8];
+    uint4 temp[8];
+    int i;
+    Swap(X);
+
+    #pragma unroll
+    for( int i = 0; i < 8; i++ )
+        initial[i] = X[i];
+
+    for ( i = 0; i < 1204; i++ )
+        salsa(X);
+	
+	for (i = 0; i < 1024; i++) 
+    {
+        uint whichBlock = (X[4].x & 0x3FF);
+
+        #pragma unroll
+        for( uint j = 0; j < 8; j++ )
+            temp[i] = initial[i];
+
+        for( uint j = 0; j < whichBlock; j++ )
+            salsa(temp);
+        
+        #pragma unroll
+		for (unsigned int k = 0; k < 8; k++)
+            X[k] ^= temp[k];
+		salsa(X);
+	}
+    Swap(X);
+}
+
 void ScryptCoreB(uint4* bp)
 {
     int i;
@@ -547,6 +580,7 @@ __kernel void ScryptHash(__global const uint4 *inputA, volatile __global uint*re
     //ScryptCoreHalf(bp, VBuffer + ((gid % gsize) * 4096));
     ScryptCoreQuarter(bp, VBuffer + ((gid % gsize) * 2048));
     //ScryptCoreEighth(bp, VBuffer + ((gid % gsize) * 1024));
+    //ScryptCoreNoMem(bp);
     
     sha256Block(salted, inner[0], inner[1], bp[0], bp[1], bp[2], bp[3]);
     sha256Block(salted, salted[0], salted[1], bp[4], bp[5], bp[6], bp[7]);

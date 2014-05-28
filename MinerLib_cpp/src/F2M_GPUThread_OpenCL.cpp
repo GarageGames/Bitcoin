@@ -15,7 +15,7 @@ int F2M_GPUThread::GetGPUCount()
     ret = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 0, 0, &num_devices);
     return (int)num_devices;
 
-//return 1;
+    //return 1;
 }
 
 F2M_GPUThread::F2M_GPUThread(float percentage, int deviceNumber)
@@ -152,7 +152,7 @@ void F2M_GPUThread::SetPercentage(float percentage)
         mOutputArea = outArea;
         mPositivesArea = posArea;
 
-        size_t scratchSize = 128 * 256 * mGPUThreadCount;
+        size_t scratchSize = 128 * 512 * mGPUThreadCount;
         mGPUScratch = clCreateBuffer(mCtx, CL_MEM_READ_WRITE, scratchSize, 0, &ret);
         mGPUOutput = clCreateBuffer(mCtx, CL_MEM_WRITE_ONLY, mGPUThreadCount * 4, 0, &ret);
     }
@@ -185,8 +185,8 @@ void F2M_GPUThread::DoWork()
     size_t offset = (size_t)mHashStart;
     size_t globalItems = mGPUThreadCount;
     size_t localItems = mGPUThreadCount < 128 ? mGPUThreadCount : 128;
-    cl_int status = clEnqueueNDRangeKernel(mQ, mKernel, 1, &offset, &globalItems, &localItems, 0, 0, 0);
-    //cl_int status = clEnqueueNDRangeKernel(mQ, mKernel, 1, &offset, &globalItems, 0, 0, 0, 0);
+    //cl_int status = clEnqueueNDRangeKernel(mQ, mKernel, 1, &offset, &globalItems, &localItems, 0, 0, 0);
+    cl_int status = clEnqueueNDRangeKernel(mQ, mKernel, 1, &offset, &globalItems, 0, 0, 0, 0);
     
     status = clEnqueueReadBuffer(mQ, mGPUOutput, CL_TRUE, 0, mGPUThreadCount * 4, mOutputArea, 0, 0, &mWorkDoneEvent);
     clFlush(mQ);
@@ -227,6 +227,7 @@ bool F2M_GPUThread::IsWorkDone()
         if( contrib > 0 )
             mAvgHashRate /= contrib;
 
+        printf("HR: %d\n", mAvgHashRate);
         if( mHashRateWriteIndex == 0 )
         {
             unsigned int hr = mAvgHashRate;            
@@ -243,7 +244,7 @@ bool F2M_GPUThread::IsWorkDone()
                 unsigned int oldRate = mGPURate;
                 
                 long diff = (long)mLastHashRate - (long)hr;
-                mGPURate -= (diff + 511) / 512;
+                mGPURate -= (diff / 512);
                 //mGPURate--;
                 if( mGPURate < 1 )
                     mGPURate = 1;
