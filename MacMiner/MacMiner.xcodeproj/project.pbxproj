@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6F880A4D190EFFC5008AF623 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F880A4C190EFFC5008AF623 /* OpenCL.framework */; };
+		6F880A5D193532D2008AF623 /* scrypt.cl in Sources */ = {isa = PBXBuildFile; fileRef = 6F880A5C193532D2008AF623 /* scrypt.cl */; };
 		6FAA9D201909E421001DA6EF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6FAA9D1F1909E421001DA6EF /* main.cpp */; };
 		6FAA9D221909E421001DA6EF /* MacMiner.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FAA9D211909E421001DA6EF /* MacMiner.1 */; };
 		6FAA9E2D190AFE9D001DA6EF /* libMinerLib_cpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FAA9E2C190AFE9D001DA6EF /* libMinerLib_cpp.a */; };
@@ -28,6 +29,7 @@
 
 /* Begin PBXFileReference section */
 		6F880A4C190EFFC5008AF623 /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/OpenCL.framework; sourceTree = DEVELOPER_DIR; };
+		6F880A5C193532D2008AF623 /* scrypt.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = scrypt.cl; sourceTree = SOURCE_ROOT; };
 		6FAA9D1C1909E421001DA6EF /* MacMiner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MacMiner; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FAA9D1F1909E421001DA6EF /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		6FAA9D211909E421001DA6EF /* MacMiner.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = MacMiner.1; sourceTree = "<group>"; };
@@ -68,6 +70,7 @@
 		6FAA9D1E1909E421001DA6EF /* MacMiner */ = {
 			isa = PBXGroup;
 			children = (
+				6F880A5C193532D2008AF623 /* scrypt.cl */,
 				6FAA9D1F1909E421001DA6EF /* main.cpp */,
 				6FAA9D211909E421001DA6EF /* MacMiner.1 */,
 			);
@@ -126,6 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6FAA9D201909E421001DA6EF /* main.cpp in Sources */,
+				6F880A5D193532D2008AF623 /* scrypt.cl in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

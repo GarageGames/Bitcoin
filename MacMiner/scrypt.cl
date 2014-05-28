@@ -421,6 +421,55 @@ void ScryptCoreQuarter(uint4* X, __global uint4* V)
     Swap(X);
 }
 
+void ScryptCoreEighth(uint4* X, __global uint4* V)
+{
+    int i;
+    Swap(X);
+
+	for ( i = 0; i < 128; i++) 
+    {
+        V[(i * 8) + 0] = X[0];
+        V[(i * 8) + 1] = X[1];
+        V[(i * 8) + 2] = X[2];
+        V[(i * 8) + 3] = X[3];
+        V[(i * 8) + 4] = X[4];
+        V[(i * 8) + 5] = X[5];
+        V[(i * 8) + 6] = X[6];
+        V[(i * 8) + 7] = X[7];
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+    }
+	for (i = 0; i < 1024; i++) 
+    {
+        uint whichBlock = (X[4].x & 0x3FF);
+        uint storedBlock = whichBlock / 8;
+		uint storedOffset = storedBlock * 8;
+
+        // Get the stored block
+        uint4 temp[8];
+        #pragma unroll
+        for( unsigned int k = 0; k < 8; k++ )
+            temp[k] = V[storedOffset + k];
+
+        // Salsa extra that we may need
+        uint extra = (whichBlock & 7);
+        for( unsigned int k = 0; k < extra; k++ )
+            salsa(temp);
+
+        #pragma unroll
+		for (unsigned int k = 0; k < 8; k++)
+            X[k] ^= temp[k];
+		salsa(X);
+	}
+    Swap(X);
+}
+
 void ScryptCoreB(uint4* bp)
 {
     int i;
@@ -494,9 +543,10 @@ __kernel void ScryptHash(__global const uint4 *inputA, volatile __global uint*re
         sha256Block(&bp[i * 2], outer[0], outer[1], tempHash[0], tempHash[1], (uint4)(0x80000000, 0, 0, 0), (uint4)(0, 0, 0, 0x00000300));
     }
     	
-    //ScryptCore(bp, VBuffer + ((gid % offset) * 8192));
-    ScryptCoreHalf(bp, VBuffer + ((gid % gsize) * 4096));
-    //ScryptCoreQuarter(bp, VBuffer + ((gid % offset) * 2048));
+    //ScryptCore(bp, VBuffer + ((gid % gsize) * 8192));
+    //ScryptCoreHalf(bp, VBuffer + ((gid % gsize) * 4096));
+    ScryptCoreQuarter(bp, VBuffer + ((gid % gsize) * 2048));
+    //ScryptCoreEighth(bp, VBuffer + ((gid % gsize) * 1024));
     
     sha256Block(salted, inner[0], inner[1], bp[0], bp[1], bp[2], bp[3]);
     sha256Block(salted, salted[0], salted[1], bp[4], bp[5], bp[6], bp[7]);

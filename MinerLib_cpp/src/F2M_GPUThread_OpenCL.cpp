@@ -31,7 +31,8 @@ F2M_GPUThread::F2M_GPUThread(float percentage, int deviceNumber)
 
     cl_int ret = clGetPlatformIDs(1, &mPlatform, 0);
     cl_device_id devices[16];
-    ret = clGetDeviceIDs(mPlatform, CL_DEVICE_TYPE_GPU, 16, devices, 0);
+    cl_uint numDevices = 0;
+    ret = clGetDeviceIDs(mPlatform, CL_DEVICE_TYPE_GPU, 16, devices, &numDevices);
     mDevice = devices[deviceNumber];
     mCtx = clCreateContext(0, 1, &mDevice, 0, 0, &ret);    
     
@@ -228,7 +229,7 @@ bool F2M_GPUThread::IsWorkDone()
 
         if( mHashRateWriteIndex == 0 )
         {
-            unsigned int hr = mAvgHashRate & 0xFFFFFFFF;            
+            unsigned int hr = mAvgHashRate;            
             if( hr > mLastHashRate )
             {
                 unsigned int oldRate = mGPURate;

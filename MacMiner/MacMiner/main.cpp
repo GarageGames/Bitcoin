@@ -40,8 +40,8 @@ int GetCPUCount()
 int main(int argc, const char * argv[])
 {
     bool testSuccess = F2M_Scrypt_TestStandard() | F2M_Scrypt_TestSSE();
-    bool gpuSuccess = F2M_Scrypt_TestOpenCL();
-    printf("Unit Test Success: %d,  gpuSuccess: %d\n", testSuccess, gpuSuccess);
+    //bool gpuSuccess = F2M_Scrypt_TestOpenCL();
+    //printf("Unit Test Success: %d,  gpuSuccess: %d\n", testSuccess, gpuSuccess);
     
     int cpus = GetCPUCount();
     int threads = cpus - 1;

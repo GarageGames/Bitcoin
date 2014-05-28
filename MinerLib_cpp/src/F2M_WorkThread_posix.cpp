@@ -44,6 +44,7 @@ void* HashWorkThread(void* param)
             td->mStop = false;
             td->mWorkToDo = false;
             td->mWorkDone = true;
+            tinfo->WorkDone();
         }
 
         //pthread_yield();

@@ -69,11 +69,12 @@ void F2M_FileSave(const char* fileName, void* data, size_t dataSize)
 void F2M_LogHashAttempt(const char* src, unsigned int nonce, unsigned int* target, unsigned int* hash)
 {
     char logStr[1024 * 32];
-    sprintf_s(logStr, sizeof(logStr), "(%s) 0x%8.8x - 0x%8.8x %8.8x %8.8x%8.8x%8.8x%8.8x%8.8x%8.8x < 0x%8.8x %8.8x %8.8x%8.8x%8.8x%8.8x%8.8x%8.8x\n", src, nonce, 
+    sprintf(logStr, "(%s) 0x%8.8x - 0x%8.8x %8.8x %8.8x%8.8x%8.8x%8.8x%8.8x%8.8x < 0x%8.8x %8.8x %8.8x%8.8x%8.8x%8.8x%8.8x%8.8x\n", src, nonce, 
         ByteReverse(hash[7]), ByteReverse(hash[6]), ByteReverse(hash[5]), ByteReverse(hash[4]), ByteReverse(hash[3]), ByteReverse(hash[2]), ByteReverse(hash[1]), ByteReverse(hash[0]), 
         (target[7]), (target[6]), (target[5]), (target[4]), (target[3]), (target[2]), (target[1]), (target[0]));
 
     FILE* logFile = fopen("hashes.log", "ab");
     fwrite(logStr, strlen(logStr), 1, logFile);
     fclose(logFile);
+    printf(logStr);
 }

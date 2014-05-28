@@ -8,11 +8,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "MinerLib_cpp/src/F2M_WorkThread_posix.cpp"
-         timestampString = "422582511.290012"
+         timestampString = "422915954.229486"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "105"
-         endingLineNumber = "105">
+         startingLineNumber = "106"
+         endingLineNumber = "106">
       </FileBreakpoint>
    </FileBreakpoints>
 </Bucket>

@@ -591,7 +591,7 @@ void F2M_ScryptHashWork_SIMD(F2M_WorkThread* thread)
         {
             unsigned int hash[8];
             for( int j = 0; j < 8; j++ )
-                hash[j] = scryptData->output[j].m128i_u32[3 - success];
+                hash[j] = ((unsigned int*)&scryptData->output[j])[3 - success];
             F2M_LogHashAttempt("SSE", inonce + success, thread->mWork->target, hash);
             thread->mSolution = inonce + success;
             thread->mSolutionFound = true;
