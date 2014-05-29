@@ -9,13 +9,13 @@
 
 int F2M_GPUThread::GetGPUCount()
 {
-    cl_platform_id  platform;
-    cl_uint num_devices = 0;
-    cl_int ret = clGetPlatformIDs(1, &platform, 0);
-    ret = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 0, 0, &num_devices);
-    return (int)num_devices;
+    //cl_platform_id  platform;
+    //cl_uint num_devices = 0;
+    //cl_int ret = clGetPlatformIDs(1, &platform, 0);
+    //ret = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 0, 0, &num_devices);
+    //return (int)num_devices;
 
-    //return 1;
+    return 1;
 }
 
 F2M_GPUThread::F2M_GPUThread(float percentage, int deviceNumber)
@@ -27,6 +27,7 @@ F2M_GPUThread::F2M_GPUThread(float percentage, int deviceNumber)
     mGPURate = 1;
     mLastHashRate = 0;
     mHashRate = 5000;
+    mAvgHashRate = 5000;
     mTimer = new F2M_Timer();
 
     cl_int ret = clGetPlatformIDs(1, &mPlatform, 0);
@@ -35,7 +36,7 @@ F2M_GPUThread::F2M_GPUThread(float percentage, int deviceNumber)
     ret = clGetDeviceIDs(mPlatform, CL_DEVICE_TYPE_GPU, 16, devices, &numDevices);
     mDevice = devices[deviceNumber];
     mCtx = clCreateContext(0, 1, &mDevice, 0, 0, &ret);    
-    
+        
     // Create the command queue for this device
     mQ = clCreateCommandQueue(mCtx, mDevice, 0, &ret);
             
@@ -131,6 +132,12 @@ void F2M_GPUThread::SetPercentage(float percentage)
     mGPUThreadCount *= 128;
     if( mGPUThreadCount < 128 )
         mGPUThreadCount = 128;
+        
+    #define BLOCK_SIZE 128
+    #define BLOCK_COUNT 512
+    unsigned int maxGPURate = max_alloc / (BLOCK_SIZE * BLOCK_COUNT * 128);
+    if( mGPURate > maxGPURate )
+        mGPURate = maxGPURate;
 
     mGPUThreadCount = 128 * mGPURate;
 
@@ -152,7 +159,7 @@ void F2M_GPUThread::SetPercentage(float percentage)
         mOutputArea = outArea;
         mPositivesArea = posArea;
 
-        size_t scratchSize = 128 * 512 * mGPUThreadCount;
+        size_t scratchSize = BLOCK_SIZE * BLOCK_COUNT * mGPUThreadCount;
         mGPUScratch = clCreateBuffer(mCtx, CL_MEM_READ_WRITE, scratchSize, 0, &ret);
         mGPUOutput = clCreateBuffer(mCtx, CL_MEM_WRITE_ONLY, mGPUThreadCount * 4, 0, &ret);
     }
@@ -185,8 +192,8 @@ void F2M_GPUThread::DoWork()
     size_t offset = (size_t)mHashStart;
     size_t globalItems = mGPUThreadCount;
     size_t localItems = mGPUThreadCount < 128 ? mGPUThreadCount : 128;
-    //cl_int status = clEnqueueNDRangeKernel(mQ, mKernel, 1, &offset, &globalItems, &localItems, 0, 0, 0);
-    cl_int status = clEnqueueNDRangeKernel(mQ, mKernel, 1, &offset, &globalItems, 0, 0, 0, 0);
+    cl_int status = clEnqueueNDRangeKernel(mQ, mKernel, 1, &offset, &globalItems, &localItems, 0, 0, 0);
+    //cl_int status = clEnqueueNDRangeKernel(mQ, mKernel, 1, &offset, &globalItems, 0, 0, 0, 0);
     
     status = clEnqueueReadBuffer(mQ, mGPUOutput, CL_TRUE, 0, mGPUThreadCount * 4, mOutputArea, 0, 0, &mWorkDoneEvent);
     clFlush(mQ);
@@ -227,7 +234,6 @@ bool F2M_GPUThread::IsWorkDone()
         if( contrib > 0 )
             mAvgHashRate /= contrib;
 
-        printf("HR: %d\n", mAvgHashRate);
         if( mHashRateWriteIndex == 0 )
         {
             unsigned int hr = mAvgHashRate;            

@@ -83,7 +83,6 @@ bool F2M_Scrypt_TestOpenCL()
 
     F2M_GPUThread* gpu = new F2M_GPUThread(50, 0);
     gpu->StartWork(sNOnce, 128, &work);
-    gpu->StartWork(0, 0x7FFFFFFF, &work);
 
     while( !gpu->IsWorkDone() )
     {

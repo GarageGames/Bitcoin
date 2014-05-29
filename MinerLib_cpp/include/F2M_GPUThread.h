@@ -22,7 +22,7 @@ public:
 
     bool GetSolutionFound()         { return mSolutionFound; }
     unsigned int GetSolution()      { return mSolution; }
-    unsigned int GetHashrate()      { return mHashRate; }
+    unsigned int GetHashrate()      { return mAvgHashRate; }
     unsigned int GetHashesDone()    { return mHashesDone; }
 
     void SetPercentage(float percentage);

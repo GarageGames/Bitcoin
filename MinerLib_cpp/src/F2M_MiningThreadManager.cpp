@@ -152,7 +152,7 @@ void F2M_MiningThreadManager::StartWork(F2M_Work* work)
     for( int i = 0; i < mGPUThreadCount; i++ )
     {
         double percentage = mGPUThreads[i]->GetHashrate() / currentHR;
-        gpu += percentage;
+        gpu += mGPUThreads[i]->GetHashrate();
         unsigned int hashes = (unsigned int)(percentage * work->hashCount);
         if( hashes > hashCount )
             hashes = hashCount;
@@ -168,7 +168,7 @@ void F2M_MiningThreadManager::StartWork(F2M_Work* work)
     for( int i = 0; i < mThreadCount; i++ )
     {
         double percentage = mThreads[i]->GetHashrate() / currentHR;
-        cpu += percentage;
+        cpu += mThreads[i]->GetHashrate();
         unsigned int hashes = (unsigned int)(percentage * work->hashCount);
 
         if( hashes > hashCount )

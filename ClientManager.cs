@@ -122,17 +122,31 @@ namespace CentralMine.NET
             pi.mPassword = "x";
             multi.mPools.Add(pi);
             #endregion
+            #region BBQ
+            MiningTarget bbq = new MiningTarget();
+            bbq.mName = "BBQ";
+            bbq.mPOWAlgorithm = HashAlgorithm.Scrypt;
+
+            pi = new PoolInfo();
+            pi.mName = "BBQPool";
+            pi.mAddress = "www.bbqpool.net";
+            pi.mPort = 3333;
+            pi.mUser = "f2mserver.1";
+            pi.mPassword = "x";
+            bbq.mPools.Add(pi);
+            #endregion
             //mMiningTarget = gc;
-            mMiningTarget = bg;
+            //mMiningTarget = bg;
             //mMiningTarget = bc;
             //mMiningTarget = multi;
+            mMiningTarget = bbq;
 
-            mUpstream = new US_Wallet(this);
-            mUpstream.SetHost(mMiningTarget.mWallet.mRPCAddress, mMiningTarget.mWallet.mRPCPort);
-            mUpstream.SetCredentials(mMiningTarget.mWallet.mRPCUser, mMiningTarget.mWallet.mRPCPass);
-            //mUpstream = new US_Stratum(this);
-            //mUpstream.SetHost(mMiningTarget.mPools[0].mAddress, mMiningTarget.mPools[0].mPort);
-            //mUpstream.SetCredentials(mMiningTarget.mPools[0].mUser, mMiningTarget.mPools[0].mPassword);
+            //mUpstream = new US_Wallet(this);
+            //mUpstream.SetHost(mMiningTarget.mWallet.mRPCAddress, mMiningTarget.mWallet.mRPCPort);
+            //mUpstream.SetCredentials(mMiningTarget.mWallet.mRPCUser, mMiningTarget.mWallet.mRPCPass);
+            mUpstream = new US_Stratum(this);
+            mUpstream.SetHost(mMiningTarget.mPools[0].mAddress, mMiningTarget.mPools[0].mPort);
+            mUpstream.SetCredentials(mMiningTarget.mPools[0].mUser, mMiningTarget.mPools[0].mPassword);
 
             //mUpstream = new US_Wallet();
             //mUpstream.SetHost("127.0.0.1", 7332);

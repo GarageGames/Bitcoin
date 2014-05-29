@@ -175,133 +175,99 @@ void sha256Block(uint4* output, const uint4 stateA, const uint4 stateB, const ui
     output[1] = stateB + (uint4)(e, f, g, h);
 }
 
+void salsaPrep(uint4* B)
+{
+	uint4 tmp[4];
+	tmp[0] = (uint4)(B[1].x,B[2].y,B[3].z,B[0].w);
+	tmp[1] = (uint4)(B[2].x,B[3].y,B[0].z,B[1].w);
+	tmp[2] = (uint4)(B[3].x,B[0].y,B[1].z,B[2].w);
+	tmp[3] = (uint4)(B[0].x,B[1].y,B[2].z,B[3].w);
+	
+    #pragma unroll
+	for(uint i=0; i<4; ++i)
+		B[i] = ByteReverse(tmp[i]);
+
+	tmp[0] = (uint4)(B[5].x,B[6].y,B[7].z,B[4].w);
+	tmp[1] = (uint4)(B[6].x,B[7].y,B[4].z,B[5].w);
+	tmp[2] = (uint4)(B[7].x,B[4].y,B[5].z,B[6].w);
+	tmp[3] = (uint4)(B[4].x,B[5].y,B[6].z,B[7].w);
+	
+    #pragma unroll
+	for(uint i=0; i<4; ++i)
+		B[i+4] = ByteReverse(tmp[i]);
+}
+
+void salsaFinalize(uint4* B)
+{
+	uint4 tmp[4];
+	tmp[0] = (uint4)(B[3].x,B[2].y,B[1].z,B[0].w);
+	tmp[1] = (uint4)(B[0].x,B[3].y,B[2].z,B[1].w);
+	tmp[2] = (uint4)(B[1].x,B[0].y,B[3].z,B[2].w);
+	tmp[3] = (uint4)(B[2].x,B[1].y,B[0].z,B[3].w);
+	
+    #pragma unroll
+	for(uint i=0; i<4; ++i)
+		B[i] = ByteReverse(tmp[i]);
+
+	tmp[0] = (uint4)(B[7].x,B[6].y,B[5].z,B[4].w);
+	tmp[1] = (uint4)(B[4].x,B[7].y,B[6].z,B[5].w);
+	tmp[2] = (uint4)(B[5].x,B[4].y,B[7].z,B[6].w);
+	tmp[3] = (uint4)(B[6].x,B[5].y,B[4].z,B[7].w);
+	
+    #pragma unroll
+	for(uint i=0; i<4; ++i)
+		B[i+4] = ByteReverse(tmp[i]);
+}
 
 void salsa(uint4* B)
 {
-	uint x00,x01,x02,x03,x04,x05,x06,x07,x08,x09,x10,x11,x12,x13,x14,x15;
-	int i;
+	uint4 w[4];
 
-	x00 = (B[0].x ^= B[4].x);
-	x01 = (B[0].y ^= B[4].y);
-	x02 = (B[0].z ^= B[4].z);
-	x03 = (B[0].w ^= B[4].w);
-	x04 = (B[1].x ^= B[5].x);
-	x05 = (B[1].y ^= B[5].y);
-	x06 = (B[1].z ^= B[5].z);
-	x07 = (B[1].w ^= B[5].w);
-	x08 = (B[2].x ^= B[6].x);
-	x09 = (B[2].y ^= B[6].y);
-	x10 = (B[2].z ^= B[6].z);
-	x11 = (B[2].w ^= B[6].w);
-	x12 = (B[3].x ^= B[7].x);
-	x13 = (B[3].y ^= B[7].y);
-	x14 = (B[3].z ^= B[7].z);
-	x15 = (B[3].w ^= B[7].w);
+#pragma unroll
+	for(uint i=0; i<4; ++i)
+		w[i] = (B[i]^=B[i+4]);
 
-    #pragma unroll
-	for (i = 0; i < 4; i ++)
-    {
-		x04 ^= ROTATE(x00 + x12,  7);  x09 ^= ROTATE(x05 + x01,  7);
-		x14 ^= ROTATE(x10 + x06,  7);  x03 ^= ROTATE(x15 + x11,  7);
-
-		x08 ^= ROTATE(x04 + x00,  9);  x13 ^= ROTATE(x09 + x05,  9);
-		x02 ^= ROTATE(x14 + x10,  9);  x07 ^= ROTATE(x03 + x15,  9);
-
-		x12 ^= ROTATE(x08 + x04, 13);  x01 ^= ROTATE(x13 + x09, 13);
-		x06 ^= ROTATE(x02 + x14, 13);  x11 ^= ROTATE(x07 + x03, 13);
-
-		x00 ^= ROTATE(x12 + x08, 18);  x05 ^= ROTATE(x01 + x13, 18);
-		x10 ^= ROTATE(x06 + x02, 18);  x15 ^= ROTATE(x11 + x07, 18);		
-
-		x01 ^= ROTATE(x00 + x03,  7);  x06 ^= ROTATE(x05 + x04,  7);
-		x11 ^= ROTATE(x10 + x09,  7);  x12 ^= ROTATE(x15 + x14,  7);
-
-		x02 ^= ROTATE(x01 + x00,  9);  x07 ^= ROTATE(x06 + x05,  9);
-		x08 ^= ROTATE(x11 + x10,  9);  x13 ^= ROTATE(x12 + x15,  9);
-
-		x03 ^= ROTATE(x02 + x01, 13);  x04 ^= ROTATE(x07 + x06, 13);
-		x09 ^= ROTATE(x08 + x11, 13);  x14 ^= ROTATE(x13 + x12, 13);
-
-		x00 ^= ROTATE(x03 + x02, 18);  x05 ^= ROTATE(x04 + x07, 18);
-		x10 ^= ROTATE(x09 + x08, 18);  x15 ^= ROTATE(x14 + x13, 18);
-	}
- 
-	x00 = (B[4].x ^= (B[0].x += x00));
-	x01 = (B[4].y ^= (B[0].y += x01));
-	x02 = (B[4].z ^= (B[0].z += x02));
-	x03 = (B[4].w ^= (B[0].w += x03));
-	x04 = (B[5].x ^= (B[1].x += x04));
-	x05 = (B[5].y ^= (B[1].y += x05));
-	x06 = (B[5].z ^= (B[1].z += x06));
-	x07 = (B[5].w ^= (B[1].w += x07));
-	x08 = (B[6].x ^= (B[2].x += x08));
-	x09 = (B[6].y ^= (B[2].y += x09));
-	x10 = (B[6].z ^= (B[2].z += x10));
-	x11 = (B[6].w ^= (B[2].w += x11));
-	x12 = (B[7].x ^= (B[3].x += x12));
-	x13 = (B[7].y ^= (B[3].y += x13));
-	x14 = (B[7].z ^= (B[3].z += x14));
-	x15 = (B[7].w ^= (B[3].w += x15));
-
-    #pragma unroll
-    for (i = 0; i < 4; i ++)
-    {
-		x04 ^= ROTATE(x00 + x12,  7);  x09 ^= ROTATE(x05 + x01,  7);
-		x14 ^= ROTATE(x10 + x06,  7);  x03 ^= ROTATE(x15 + x11,  7);
-
-		x08 ^= ROTATE(x04 + x00,  9);  x13 ^= ROTATE(x09 + x05,  9);
-		x02 ^= ROTATE(x14 + x10,  9);  x07 ^= ROTATE(x03 + x15,  9);
-
-		x12 ^= ROTATE(x08 + x04, 13);  x01 ^= ROTATE(x13 + x09, 13);
-		x06 ^= ROTATE(x02 + x14, 13);  x11 ^= ROTATE(x07 + x03, 13);
-
-		x00 ^= ROTATE(x12 + x08, 18);  x05 ^= ROTATE(x01 + x13, 18);
-		x10 ^= ROTATE(x06 + x02, 18);  x15 ^= ROTATE(x11 + x07, 18);		
-
-		x01 ^= ROTATE(x00 + x03,  7);  x06 ^= ROTATE(x05 + x04,  7);
-		x11 ^= ROTATE(x10 + x09,  7);  x12 ^= ROTATE(x15 + x14,  7);
-
-		x02 ^= ROTATE(x01 + x00,  9);  x07 ^= ROTATE(x06 + x05,  9);
-		x08 ^= ROTATE(x11 + x10,  9);  x13 ^= ROTATE(x12 + x15,  9);
-
-		x03 ^= ROTATE(x02 + x01, 13);  x04 ^= ROTATE(x07 + x06, 13);
-		x09 ^= ROTATE(x08 + x11, 13);  x14 ^= ROTATE(x13 + x12, 13);
-
-		x00 ^= ROTATE(x03 + x02, 18);  x05 ^= ROTATE(x04 + x07, 18);
-		x10 ^= ROTATE(x09 + x08, 18);  x15 ^= ROTATE(x14 + x13, 18);
+#pragma unroll
+	for(uint i=0; i<4; ++i)
+	{
+		w[0] ^= ROTATE(w[3]     +w[2]     , 7U);
+		w[1] ^= ROTATE(w[0]     +w[3]     , 9U);
+		w[2] ^= ROTATE(w[1]     +w[0]     ,13U);
+		w[3] ^= ROTATE(w[2]     +w[1]     ,18U);
+		w[2] ^= ROTATE(w[3].wxyz+w[0].zwxy, 7U);
+		w[1] ^= ROTATE(w[2].wxyz+w[3].zwxy, 9U);
+		w[0] ^= ROTATE(w[1].wxyz+w[2].zwxy,13U);
+		w[3] ^= ROTATE(w[0].wxyz+w[1].zwxy,18U);
 	}
 
-    B[4].x += x00;
-    B[4].y += x01;
-    B[4].z += x02;
-    B[4].w += x03;
-    B[5].x += x04;
-    B[5].y += x05;
-    B[5].z += x06;
-    B[5].w += x07;
-    B[6].x += x08;
-    B[6].y += x09;
-    B[6].z += x10;
-    B[6].w += x11;
-    B[7].x += x12;
-    B[7].y += x13;
-    B[7].z += x14;
-    B[7].w += x15;
+#pragma unroll
+	for(uint i=0; i<4; ++i)
+		w[i] = (B[i+4]^=(B[i]+=w[i]));
+
+#pragma unroll
+	for(uint i=0; i<4; ++i)
+	{
+		w[0] ^= ROTATE(w[3]     +w[2]     , 7U);
+		w[1] ^= ROTATE(w[0]     +w[3]     , 9U);
+		w[2] ^= ROTATE(w[1]     +w[0]     ,13U);
+		w[3] ^= ROTATE(w[2]     +w[1]     ,18U);
+		w[2] ^= ROTATE(w[3].wxyz+w[0].zwxy, 7U);
+		w[1] ^= ROTATE(w[2].wxyz+w[3].zwxy, 9U);
+		w[0] ^= ROTATE(w[1].wxyz+w[2].zwxy,13U);
+		w[3] ^= ROTATE(w[0].wxyz+w[1].zwxy,18U);
+	}
+
+#pragma unroll
+	for(uint i=0; i<4; ++i)
+		B[i+4] += w[i];
 }
 
-void Swap(uint4* X)
-{
-    #pragma unroll
-	for (int i = 0; i < 8; i++)
-        X[i] = ByteReverse(X[i]);
-}
 
 void ScryptCore(uint4* X, __global uint4* V)
 {
     int i;
-    Swap(X);
+    salsaPrep(X);
 
-    //#pragma unroll
 	for ( i = 0; i < 1024; i++) 
     {
         V[(i * 8) + 0] = X[0];
@@ -315,10 +281,9 @@ void ScryptCore(uint4* X, __global uint4* V)
         salsa(X);
     }
     
-    //#pragma unroll
 	for (i = 0; i < 1024; i++) 
     {        
-		uint j = 8 * (X[4].x & 0x3FF);
+		uint j = 8 * (X[7].x & 0x3FF);
         #pragma unroll
 		for (unsigned int k = 0; k < 8; k++)
         {
@@ -328,13 +293,13 @@ void ScryptCore(uint4* X, __global uint4* V)
 		salsa(X);
 	}
 
-    Swap(X);
+    salsaFinalize(X);
 }
 
 void ScryptCoreHalf(uint4* X, __global uint4* V)
 {
     int i;
-    Swap(X);
+    salsaPrep(X);
 
 	for ( i = 0; i < 512; i++) 
     {
@@ -352,7 +317,7 @@ void ScryptCoreHalf(uint4* X, __global uint4* V)
     
 	for (i = 0; i < 1024; i++) 
     {
-        uint whichBlock = (X[4].x & 0x3FF);
+        uint whichBlock = (X[7].x & 0x3FF);
         uint storedBlock = whichBlock / 2;
 		uint storedOffset = storedBlock * 8;
 
@@ -372,13 +337,13 @@ void ScryptCoreHalf(uint4* X, __global uint4* V)
             X[k] ^= temp[k];
 		salsa(X);
 	}
-    Swap(X);
+    salsaFinalize(X);
 }
 
 void ScryptCoreQuarter(uint4* X, __global uint4* V)
 {
     int i;
-    Swap(X);
+    salsaPrep(X);
 
 	for ( i = 0; i < 256; i++) 
     {
@@ -398,7 +363,7 @@ void ScryptCoreQuarter(uint4* X, __global uint4* V)
     
 	for (i = 0; i < 1024; i++) 
     {
-        uint whichBlock = (X[4].x & 0x3FF);
+        uint whichBlock = (X[7].x & 0x3FF);
         uint storedBlock = whichBlock / 4;
 		uint storedOffset = storedBlock * 8;
 
@@ -418,13 +383,13 @@ void ScryptCoreQuarter(uint4* X, __global uint4* V)
             X[k] ^= temp[k];
 		salsa(X);
 	}
-    Swap(X);
+    salsaFinalize(X);
 }
 
 void ScryptCoreEighth(uint4* X, __global uint4* V)
 {
     int i;
-    Swap(X);
+    salsaPrep(X);
 
 	for ( i = 0; i < 128; i++) 
     {
@@ -447,7 +412,7 @@ void ScryptCoreEighth(uint4* X, __global uint4* V)
     }
 	for (i = 0; i < 1024; i++) 
     {
-        uint whichBlock = (X[4].x & 0x3FF);
+        uint whichBlock = (X[7].x & 0x3FF);
         uint storedBlock = whichBlock / 8;
 		uint storedOffset = storedBlock * 8;
 
@@ -467,7 +432,7 @@ void ScryptCoreEighth(uint4* X, __global uint4* V)
             X[k] ^= temp[k];
 		salsa(X);
 	}
-    Swap(X);
+    salsaFinalize(X);
 }
 
 void ScryptCoreNoMem(uint4* X)
@@ -475,7 +440,7 @@ void ScryptCoreNoMem(uint4* X)
     uint4 initial[8];
     uint4 temp[8];
     int i;
-    Swap(X);
+    salsaPrep(X);
 
     #pragma unroll
     for( int i = 0; i < 8; i++ )
@@ -486,7 +451,7 @@ void ScryptCoreNoMem(uint4* X)
 	
 	for (i = 0; i < 1024; i++) 
     {
-        uint whichBlock = (X[4].x & 0x3FF);
+        uint whichBlock = (X[7].x & 0x3FF);
 
         #pragma unroll
         for( uint j = 0; j < 8; j++ )
@@ -500,45 +465,7 @@ void ScryptCoreNoMem(uint4* X)
             X[k] ^= temp[k];
 		salsa(X);
 	}
-    Swap(X);
-}
-
-void ScryptCoreB(uint4* bp)
-{
-    int i;
-    uint4 X[8];
-    uint4 Base[8];
-
-    #pragma unroll
-	for (i = 0; i < 8; i++)
-        Base[i] = X[i] = ByteReverse(bp[i]);
-
-	for ( i = 0; i < 1024; i++) 
-    {
-        salsa(X);
-    }
-    
-	for (i = 0; i < 1024; i++) 
-    {        
-		uint j = (X[4].x & 0x3FF);
-        
-        uint4 block[8];
-        #pragma unroll
-        for( unsigned int k = 0; k < 8; k++ )
-            block[k] = Base[k];
-
-        for( unsigned int k = 0; k < j; k++ )
-            salsa(block);
-
-        #pragma unroll
-		for (unsigned int k = 0; k < 8; k++)
-            X[k] ^= block[k];
-		salsa(X);
-	}
-
-    #pragma unroll
-    for (i = 0; i < 8; i++)
-        bp[i] = ByteReverse(X[i]);
+    salsaFinalize(X);
 }
 
 __kernel void ScryptHash(__global const uint4 *inputA, volatile __global uint*restrict output, __global uint4* VBuffer, const uint target) 
