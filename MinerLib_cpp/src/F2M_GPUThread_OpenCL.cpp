@@ -22,6 +22,13 @@ F2M_GPUThread::F2M_GPUThread(float percentage, int deviceNumber)
 {
     mHashRateWriteIndex = 0;
     memset(mHashRates, 0, sizeof(mHashRates));
+    
+    mOptimized = false;
+    mBestScryptHR = 0;
+    mBestScryptFunction = 0;
+    mBestScryptMult = 0;
+    mScryptFunction = 0;
+    mScryptMult = 0;
 
     mMaxOutputItems = 0;
     mGPURate = 1;
@@ -36,6 +43,7 @@ F2M_GPUThread::F2M_GPUThread(float percentage, int deviceNumber)
     ret = clGetDeviceIDs(mPlatform, CL_DEVICE_TYPE_GPU, 16, devices, &numDevices);
     mDevice = devices[deviceNumber];
     mCtx = clCreateContext(0, 1, &mDevice, 0, 0, &ret);    
+    ret = clGetDeviceInfo(mDevice, CL_DEVICE_MAX_MEM_ALLOC_SIZE , sizeof(cl_ulong), (void *)&mMaxAlloc, 0);
         
     // Create the command queue for this device
     mQ = clCreateCommandQueue(mCtx, mDevice, 0, &ret);
@@ -83,17 +91,26 @@ F2M_GPUThread::F2M_GPUThread(float percentage, int deviceNumber)
         free(data);
     }
 
-    // Get the kernel function
-    mKernel = clCreateKernel(mProgram, "ScryptHash", &ret);
+    // Get the kernel functions
+    mKernels[0] = clCreateKernel(mProgram, "ScryptHash", &ret);
+    mKernels[1] = clCreateKernel(mProgram, "ScryptHash2", &ret);
+    mKernels[2] = clCreateKernel(mProgram, "ScryptHash4", &ret);
+    mKernels[3] = clCreateKernel(mProgram, "ScryptHash8", &ret);
+    mKernels[4] = clCreateKernel(mProgram, "ScryptHash16", &ret);
 
     // Setup data input area
     mGPUInput = clCreateBuffer(mCtx, CL_MEM_READ_ONLY, 128, 0, &ret);
-    ret = clSetKernelArg(mKernel, 0, sizeof(cl_mem), (void*)&mGPUInput);
+    for( int i = 0; i < NUM_SCRYPT_FUNCTIONS; i++ )
+        ret = clSetKernelArg(mKernels[i], 0, sizeof(cl_mem), (void*)&mGPUInput);
 
     // Setup percentage based variables
     mOutputArea = 0;
-    SetPercentage(percentage);
+    //SetPercentage(percentage);
     mWorkDoneEvent = 0;
+    mGPUOutput = 0;
+
+    // Pick function & thread count
+    Optimize();
 }
 
 F2M_GPUThread::~F2M_GPUThread()
@@ -101,7 +118,8 @@ F2M_GPUThread::~F2M_GPUThread()
     clFlush(mQ);
     clFinish(mQ);
 
-    clReleaseKernel(mKernel);
+    for( int i = 0; i < NUM_SCRYPT_FUNCTIONS; i++ )
+        clReleaseKernel(mKernels[i]);
     clReleaseProgram(mProgram);
     
     clReleaseMemObject(mGPUInput);
@@ -119,6 +137,7 @@ F2M_GPUThread::~F2M_GPUThread()
     delete mTimer;
 }
 
+/*
 void F2M_GPUThread::SetPercentage(float percentage)
 {
     mPercentage = percentage / 100;
@@ -133,13 +152,11 @@ void F2M_GPUThread::SetPercentage(float percentage)
     if( mGPUThreadCount < 128 )
         mGPUThreadCount = 128;
         
-    #define BLOCK_SIZE 128
-    #define BLOCK_COUNT 512
-    unsigned int maxGPURate = max_alloc / (BLOCK_SIZE * BLOCK_COUNT * 128);
+    unsigned int maxGPURate = max_alloc / (SCRYPT_BLOCK_SIZE * mScryptBlockCount * SCRYPT_THREAD_MULT);
     if( mGPURate > maxGPURate )
         mGPURate = maxGPURate;
 
-    mGPUThreadCount = 128 * mGPURate;
+    mGPUThreadCount = SCRYPT_THREAD_MULT * mGPURate;
 
     if( mGPUThreadCount > mMaxOutputItems )
     {
@@ -159,14 +176,15 @@ void F2M_GPUThread::SetPercentage(float percentage)
         mOutputArea = outArea;
         mPositivesArea = posArea;
 
-        size_t scratchSize = BLOCK_SIZE * BLOCK_COUNT * mGPUThreadCount;
+        size_t scratchSize = SCRYPT_BLOCK_SIZE * mScryptBlockCount * mGPUThreadCount;
         mGPUScratch = clCreateBuffer(mCtx, CL_MEM_READ_WRITE, scratchSize, 0, &ret);
         mGPUOutput = clCreateBuffer(mCtx, CL_MEM_WRITE_ONLY, mGPUThreadCount * 4, 0, &ret);
     }
         
-    ret = clSetKernelArg(mKernel, 1, sizeof(cl_mem), (void*)&mGPUOutput);
-    ret = clSetKernelArg(mKernel, 2, sizeof(cl_mem), (void*)&mGPUScratch);
+    ret = clSetKernelArg(mKernels[mScryptFunction], 1, sizeof(cl_mem), (void*)&mGPUOutput);
+    ret = clSetKernelArg(mKernels[mScryptFunction], 2, sizeof(cl_mem), (void*)&mGPUScratch);
 }
+*/
 
 void F2M_GPUThread::StartWork(unsigned int hashStart, unsigned int hashCount, F2M_Work* work)
 {
@@ -181,19 +199,21 @@ void F2M_GPUThread::StartWork(unsigned int hashStart, unsigned int hashCount, F2
     cl_int status = clEnqueueWriteBuffer(mQ, mGPUInput, CL_FALSE, 0, 128, work->dataFull, 0, 0, 0);
 
     cl_uint leTarget = work->target[7];
-    status = clSetKernelArg(mKernel, 3, 4, (void*)&leTarget);
+    status = clSetKernelArg(mKernels[mScryptFunction], 3, 4, (void*)&leTarget);
 
     DoWork();
 }
 
 void F2M_GPUThread::DoWork()
 {
+    //OptimizeStep();
+
     mTimer->Start();
     size_t offset = (size_t)mHashStart;
     size_t globalItems = mGPUThreadCount;
     size_t localItems = mGPUThreadCount < 128 ? mGPUThreadCount : 128;
-    cl_int status = clEnqueueNDRangeKernel(mQ, mKernel, 1, &offset, &globalItems, &localItems, 0, 0, 0);
-    //cl_int status = clEnqueueNDRangeKernel(mQ, mKernel, 1, &offset, &globalItems, 0, 0, 0, 0);
+    //cl_int status = clEnqueueNDRangeKernel(mQ, mKernels[mScryptFunction], 1, &offset, &globalItems, &localItems, 0, 0, 0);
+    cl_int status = clEnqueueNDRangeKernel(mQ, mKernels[mScryptFunction], 1, &offset, &globalItems, 0, 0, 0, 0);
     
     status = clEnqueueReadBuffer(mQ, mGPUOutput, CL_TRUE, 0, mGPUThreadCount * 4, mOutputArea, 0, 0, &mWorkDoneEvent);
     clFlush(mQ);
@@ -216,7 +236,22 @@ bool F2M_GPUThread::IsWorkDone()
                 mPositivesArea[positive++] = mOutputArea[i];
         }
         mTimer->Stop();
-        mHashRate = (unsigned int)(mGPUThreadCount / mTimer->GetDuration());
+        mLastDuration = mTimer->GetDuration();
+        mHashRate = (unsigned int)(mGPUThreadCount / mLastDuration);        
+
+        /*
+        if( !mOptimized )
+        {
+            if( mHashRate > mBestScryptHR )
+            {
+                mBestScryptHR = mHashRate;
+                mBestScryptFunction = mScryptFunction;
+                mBestScryptMult = mScryptMult;
+                printf("Setting Best: (%d, %d)\n", mScryptFunction, mScryptMult);
+            }
+        }
+        */
+
 
         mHashRates[mHashRateWriteIndex++] = mHashRate;
         if( mHashRateWriteIndex >= HR_HISTORY_COUNT )
@@ -234,6 +269,7 @@ bool F2M_GPUThread::IsWorkDone()
         if( contrib > 0 )
             mAvgHashRate /= contrib;
 
+        /*
         if( mHashRateWriteIndex == 0 )
         {
             unsigned int hr = mAvgHashRate;            
@@ -242,7 +278,7 @@ bool F2M_GPUThread::IsWorkDone()
                 unsigned int oldRate = mGPURate;
                 long diff = (long)hr - (long)mLastHashRate;
                 mGPURate += (diff + 511) / 512;
-                SetPercentage(0);
+                //SetPercentage(0);
                 printf("setting GPU Rate: %d->%d (%d/%d)\n", oldRate, mGPURate, hr, mLastHashRate);
             }
             else if( hr < mLastHashRate)
@@ -254,11 +290,12 @@ bool F2M_GPUThread::IsWorkDone()
                 //mGPURate--;
                 if( mGPURate < 1 )
                     mGPURate = 1;
-                SetPercentage(0);
+                //SetPercentage(0);
                 printf("setting GPU Rate: %d->%d (%d/%d)\n", oldRate, mGPURate, hr, mLastHashRate);
             }
             mLastHashRate = hr;
         }
+        */
 
         // Check for the end
         mHashesDone += mGPUThreadCount;
@@ -309,4 +346,161 @@ void F2M_GPUThread::SignalStop()
         F2M_ScryptCleanup(mScryptData);
     mScryptData = 0;
     mTimer->Stop();
+}
+
+/*
+void F2M_GPUThread::SetupMemory()
+{    
+    clFlush(mQ);
+    clFinish(mQ);
+    if( mGPUOutput )
+    {
+        clReleaseMemObject(mGPUOutput);
+        clReleaseMemObject(mGPUScratch);
+    }
+
+    mGPUThreadCount = SCRYPT_THREAD_MULT * mScryptMult;
+    
+    if( mGPUThreadCount > mMaxOutputItems )
+    {
+        // Grow only
+        unsigned int* outArea = (unsigned int*)malloc(mGPUThreadCount * 4);
+        unsigned int* posArea = (unsigned int*)malloc(mGPUThreadCount * 4);
+
+        if( mOutputArea )
+        {
+            memcpy(posArea, mPositivesArea, mMaxOutputItems * 4);
+            free(mOutputArea);
+            free(mPositivesArea);
+        }
+
+        mMaxOutputItems = mGPUThreadCount;
+        mOutputArea = outArea;
+        mPositivesArea = posArea;
+    }
+
+    cl_int ret;
+    mGPUOutput = clCreateBuffer(mCtx, CL_MEM_WRITE_ONLY, mGPUThreadCount * 4, 0, &ret);
+    ret = clSetKernelArg(mKernels[mScryptFunction], 1, sizeof(cl_mem), (void*)&mGPUOutput);
+    
+    // Setup scratch
+    size_t scratchSize = SCRYPT_BLOCK_SIZE * mScryptBlockCount * mGPUThreadCount;
+    mGPUScratch = clCreateBuffer(mCtx, CL_MEM_READ_WRITE, scratchSize, 0, &ret);            
+    ret = clSetKernelArg(mKernels[mScryptFunction], 2, sizeof(cl_mem), (void*)&mGPUScratch);
+}
+
+
+void F2M_GPUThread::OptimizeStep()
+{
+    if( !mOptimized )
+    {
+        mScryptMult++;
+        printf("Optimize Step (%d, %d) - %f\n", mScryptFunction, mScryptMult, mLastDuration);
+
+        const unsigned int counts[NUM_SCRYPT_FUNCTIONS] = {1024, 512, 256, 128, 64};
+        mScryptBlockCount = counts[mScryptFunction];
+
+        unsigned int maxMult = (mMaxAlloc / (SCRYPT_BLOCK_SIZE * mScryptBlockCount * SCRYPT_THREAD_MULT)) / 2;
+        if( mScryptMult > maxMult || mLastDuration > 0.4 )
+        {
+            mScryptMult = 0;
+            mScryptFunction++;
+            if( mScryptFunction == NUM_SCRYPT_FUNCTIONS )
+            {
+                mOptimized = true;
+                mScryptFunction = mBestScryptFunction;
+                mScryptMult = mBestScryptMult;
+                
+                printf("Optimal Best: (%d, %d)\n", mScryptFunction, mScryptMult);
+                SetupMemory();
+            }
+            else
+                OptimizeStep();
+        }
+        else
+        {
+            SetupMemory();
+        }
+    }
+}
+*/
+void F2M_GPUThread::Optimize()
+{
+    unsigned int counts[NUM_SCRYPT_FUNCTIONS] = {1024, 512, 256, 128, 64};
+        
+    cl_uint leTarget = 0;
+    unsigned char workData[128];
+
+    double rates[NUM_SCRYPT_FUNCTIONS];
+
+    for( int i = 0; i < NUM_SCRYPT_FUNCTIONS; i++ )
+    {
+        mScryptFunction = i;
+        mScryptBlockCount = counts[i];
+        unsigned int halfMaxGPURate = (mMaxAlloc / (SCRYPT_BLOCK_SIZE * mScryptBlockCount * SCRYPT_THREAD_MULT)) / 4;
+         
+        cl_int ret = clSetKernelArg(mKernels[i], 3, 4, (void*)&leTarget);
+
+        mGPUThreadCount = SCRYPT_THREAD_MULT * halfMaxGPURate;
+        printf("Testing function %d (%d)", i, halfMaxGPURate);
+
+        size_t outputSize = mGPUThreadCount * 4;
+        unsigned int* outArea = (unsigned int*)malloc(outputSize);
+        cl_mem gpuOutput = clCreateBuffer(mCtx, CL_MEM_WRITE_ONLY, outputSize, 0, &ret);
+        ret = clSetKernelArg(mKernels[i], 1, sizeof(cl_mem), (void*)&gpuOutput);
+        
+        size_t scratchSize = SCRYPT_BLOCK_SIZE * mScryptBlockCount * mGPUThreadCount;
+        cl_mem gpuScratch = clCreateBuffer(mCtx, CL_MEM_READ_WRITE, scratchSize, 0, &ret);            
+        ret = clSetKernelArg(mKernels[i], 2, sizeof(cl_mem), (void*)&gpuScratch);
+
+        double seconds = 0;
+        F2M_Timer t;
+        {
+            t.Start();
+            size_t offset = (size_t)0;
+            size_t globalItems = mGPUThreadCount;
+            cl_int status = clEnqueueNDRangeKernel(mQ, mKernels[i], 1, &offset, &globalItems, 0, 0, 0, 0);
+            status = clEnqueueReadBuffer(mQ, gpuOutput, CL_TRUE, 0, mGPUThreadCount * 4, outArea, 0, 0, &mWorkDoneEvent);
+            clFlush(mQ);
+            clFinish(mQ);
+
+            t.Stop();
+            seconds = t.GetDuration();
+            rates[i] = mGPUThreadCount / seconds;
+        }
+        printf("%f (%f)\n", rates[i], seconds);
+        
+        clReleaseMemObject(gpuScratch);
+        clReleaseMemObject(gpuOutput);
+        free(outArea);
+    }
+
+    int best = 0;
+    double bestHR = rates[0];
+    for( int i = 1; i < NUM_SCRYPT_FUNCTIONS; i++ )
+    {
+        if( rates[i] > bestHR )
+        {
+            bestHR = rates[i];
+            best = i;
+        }
+    }
+
+    printf("Using function: %d\n", best);
+    mScryptFunction = best;
+    mScryptBlockCount = counts[mScryptFunction];
+    unsigned int halfMaxGPURate = (mMaxAlloc / (SCRYPT_BLOCK_SIZE * mScryptBlockCount * SCRYPT_THREAD_MULT)) / 4;
+    mGPUThreadCount = SCRYPT_THREAD_MULT * halfMaxGPURate;
+
+    mOutputArea = (unsigned int*)malloc(mGPUThreadCount * 4);
+    mPositivesArea = (unsigned int*)malloc(mGPUThreadCount * 4);
+
+    cl_int ret;
+    mGPUOutput = clCreateBuffer(mCtx, CL_MEM_WRITE_ONLY, mGPUThreadCount * 4, 0, &ret);
+    ret = clSetKernelArg(mKernels[mScryptFunction], 1, sizeof(cl_mem), (void*)&mGPUOutput);
+    
+    // Setup scratch
+    size_t scratchSize = SCRYPT_BLOCK_SIZE * mScryptBlockCount * mGPUThreadCount;
+    mGPUScratch = clCreateBuffer(mCtx, CL_MEM_READ_WRITE, scratchSize, 0, &ret);            
+    ret = clSetKernelArg(mKernels[mScryptFunction], 2, sizeof(cl_mem), (void*)&mGPUScratch);
 }

@@ -12,7 +12,10 @@
 struct F2M_Work;
 class F2M_Timer;
 
-#define HR_HISTORY_COUNT    10
+#define HR_HISTORY_COUNT        10
+#define NUM_SCRYPT_FUNCTIONS    5
+#define SCRYPT_BLOCK_SIZE       128
+#define SCRYPT_THREAD_MULT      128
 
 class F2M_GPUThread
 {
@@ -25,6 +28,7 @@ public:
     unsigned int GetHashrate()      { return mAvgHashRate; }
     unsigned int GetHashesDone()    { return mHashesDone; }
 
+    void Optimize();
     void SetPercentage(float percentage);
     
     void StartWork(unsigned int hashStart, unsigned int hashCount, F2M_Work* work);
@@ -35,6 +39,8 @@ public:
 
 private:
     void DoWork();
+    void OptimizeStep();
+    void SetupMemory();
 
 protected:
     float mPercentage;
@@ -53,14 +59,26 @@ protected:
     unsigned int        mGPUThreadCount;
     unsigned int        mMaxOutputItems;
     unsigned int*       mOutputArea;
-    unsigned int*       mPositivesArea;
+    unsigned int*       mPositivesArea;    
+
+    unsigned int        mScryptFunction;
+    unsigned int        mScryptMult;
+    unsigned int        mScryptBlockCount;
+
+    bool                mOptimized;
+    unsigned int        mBestScryptHR;
+    unsigned int        mBestScryptFunction;
+    unsigned int        mBestScryptMult;    
+    double              mLastDuration;
 
     cl_platform_id      mPlatform;
     cl_device_id        mDevice;
     cl_context          mCtx;
     cl_command_queue    mQ;
     cl_program          mProgram;
-    cl_kernel           mKernel;
+    cl_ulong            mMaxAlloc;
+
+    cl_kernel           mKernels[NUM_SCRYPT_FUNCTIONS];
 
     cl_mem              mGPUInput;
     cl_mem              mGPUScratch;

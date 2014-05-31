@@ -435,6 +435,63 @@ void ScryptCoreEighth(uint4* X, __global uint4* V)
     salsaFinalize(X);
 }
 
+void ScryptCoreSixteenth(uint4* X, __global uint4* V)
+{
+    int i;
+    salsaPrep(X);
+
+	for ( i = 0; i < 64; i++) 
+    {
+        V[(i * 8) + 0] = X[0];
+        V[(i * 8) + 1] = X[1];
+        V[(i * 8) + 2] = X[2];
+        V[(i * 8) + 3] = X[3];
+        V[(i * 8) + 4] = X[4];
+        V[(i * 8) + 5] = X[5];
+        V[(i * 8) + 6] = X[6];
+        V[(i * 8) + 7] = X[7];
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+        salsa(X);
+    }
+	for (i = 0; i < 1024; i++) 
+    {
+        uint whichBlock = (X[7].x & 0x3FF);
+        uint storedBlock = whichBlock / 16;
+		uint storedOffset = storedBlock * 8;
+
+        // Get the stored block
+        uint4 temp[8];
+        #pragma unroll
+        for( unsigned int k = 0; k < 8; k++ )
+            temp[k] = V[storedOffset + k];
+
+        // Salsa extra that we may need
+        uint extra = (whichBlock & 15);
+        for( unsigned int k = 0; k < extra; k++ )
+            salsa(temp);
+
+        #pragma unroll
+		for (unsigned int k = 0; k < 8; k++)
+            X[k] ^= temp[k];
+		salsa(X);
+	}
+    salsaFinalize(X);
+}
+
 void ScryptCoreNoMem(uint4* X)
 {
     uint4 initial[8];
@@ -468,11 +525,8 @@ void ScryptCoreNoMem(uint4* X)
     salsaFinalize(X);
 }
 
-__kernel void ScryptHash(__global const uint4 *inputA, volatile __global uint*restrict output, __global uint4* VBuffer, const uint target) 
+void ScryptStepOne(uint gid, uint4* bp, uint4* inner, uint4* outer, __global const uint4 *inputA)
 {
-	uint gid = get_global_id(0);
-    uint gsize = get_global_size(0);
-
     const uint4 staticHash0 = (uint4)(0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a);
     const uint4 staticHash1 = (uint4)(0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19);
     uint4 midstate[2];
@@ -480,9 +534,7 @@ __kernel void ScryptHash(__global const uint4 *inputA, volatile __global uint*re
         
     uint4 nonced = inputA[4];
     nonced.w = gid;
-    
-    uint4 inner[2];
-	uint4 outer[2];    
+     
 	sha256Block(inner, midstate[0], midstate[1], nonced, inputA[5], inputA[6], inputA[7]);   
     
     const uint4 c5c = (uint4)(0x5c5c5c5c,0x5c5c5c5c,0x5c5c5c5c,0x5c5c5c5c);    
@@ -495,28 +547,106 @@ __kernel void ScryptHash(__global const uint4 *inputA, volatile __global uint*re
     sha256Block(salted, inner[0], inner[1], inputA[0], inputA[1], inputA[2], inputA[3]);
     
     uint4 tempHash[2];
-    uint4 bp[8];
     #pragma unroll
     for( int i = 0; i < 4; i++ )
     {
         sha256Block(tempHash, salted[0], salted[1], nonced, (uint4)(i + 1, 0x80000000, 0, 0), (uint4)(0, 0, 0, 0), (uint4)(0, 0, 0, 0x000004A0));
         sha256Block(&bp[i * 2], outer[0], outer[1], tempHash[0], tempHash[1], (uint4)(0x80000000, 0, 0, 0), (uint4)(0, 0, 0, 0x00000300));
     }
-    	
-    //ScryptCore(bp, VBuffer + ((gid % gsize) * 8192));
-    //ScryptCoreHalf(bp, VBuffer + ((gid % gsize) * 4096));
-    ScryptCoreQuarter(bp, VBuffer + ((gid % gsize) * 2048));
-    //ScryptCoreEighth(bp, VBuffer + ((gid % gsize) * 1024));
-    //ScryptCoreNoMem(bp);
-    
+}
+
+void ScryptFinish(uint gidx, uint gid, uint4* bp, uint4* inner, uint4* outer, volatile __global uint*restrict output, const uint target)
+{
+    uint4 salted[2];    
     sha256Block(salted, inner[0], inner[1], bp[0], bp[1], bp[2], bp[3]);
     sha256Block(salted, salted[0], salted[1], bp[4], bp[5], bp[6], bp[7]);
     
+    uint4 tempHash[2];
     sha256Block(tempHash, salted[0], salted[1], (uint4)(0x00000001, 0x80000000, 0, 0), (uint4)(0, 0, 0, 0), (uint4)(0, 0, 0, 0), (uint4)(0, 0, 0, 0x00000620));
-    sha256Block(inner, outer[0], outer[1], tempHash[0], tempHash[1], (uint4)(0x80000000, 0, 0, 0), (uint4)(0, 0, 0, 0x00000300)); 
-    
+    sha256Block(inner, outer[0], outer[1], tempHash[0], tempHash[1], (uint4)(0x80000000, 0, 0, 0), (uint4)(0, 0, 0, 0x00000300));     
     
     uint4 test = ByteReverse(inner[1]);
     uint less = test.w <= target;
-    output[gid % gsize] = less * nonced.w;
+    output[gidx] = less * gid;
+}
+
+
+__kernel void ScryptHash(__global const uint4 *inputA, volatile __global uint*restrict output, __global uint4* VBuffer, const uint target) 
+{
+	uint gid = get_global_id(0);
+    uint gsize = get_global_size(0);
+    uint gidx = gid % gsize;
+        
+    uint4 bp[8];
+    uint4 inner[2];
+	uint4 outer[2];   
+    ScryptStepOne(gid, bp, inner, outer, inputA);
+    	
+    ScryptCore(bp, VBuffer + (gidx * 8192));
+    //ScryptCoreHalf(bp, VBuffer + (gidx * 4096));
+    //ScryptCoreQuarter(bp, VBuffer + (gidx * 2048));
+    //ScryptCoreEighth(bp, VBuffer + (gidx * 1024));
+    //ScryptCoreNoMem(bp);
+    
+    ScryptFinish(gidx, gid, bp, inner, outer, output, target);
+}
+
+__kernel void ScryptHash2(__global const uint4 *inputA, volatile __global uint*restrict output, __global uint4* VBuffer, const uint target) 
+{
+	uint gid = get_global_id(0);
+    uint gsize = get_global_size(0);
+    uint gidx = gid % gsize;
+        
+    uint4 bp[8];
+    uint4 inner[2];
+	uint4 outer[2];   
+    ScryptStepOne(gid, bp, inner, outer, inputA);
+    	
+    ScryptCoreHalf(bp, VBuffer + (gidx * 4096));
+    
+    ScryptFinish(gidx, gid, bp, inner, outer, output, target);
+}
+
+__kernel void ScryptHash4(__global const uint4 *inputA, volatile __global uint*restrict output, __global uint4* VBuffer, const uint target) 
+{
+	uint gid = get_global_id(0);
+    uint gsize = get_global_size(0);
+    uint gidx = gid % gsize;
+        
+    uint4 bp[8];
+    uint4 inner[2];
+	uint4 outer[2];   
+    ScryptStepOne(gid, bp, inner, outer, inputA);
+    	
+    ScryptCoreQuarter(bp, VBuffer + (gidx * 2048));
+    
+    ScryptFinish(gidx, gid, bp, inner, outer, output, target);
+}
+
+__kernel void ScryptHash8(__global const uint4 *inputA, volatile __global uint*restrict output, __global uint4* VBuffer, const uint target) 
+{
+	uint gid = get_global_id(0);
+    uint gsize = get_global_size(0);
+    uint gidx = gid % gsize;
+        
+    uint4 bp[8];
+    uint4 inner[2];
+	uint4 outer[2];   
+    ScryptStepOne(gid, bp, inner, outer, inputA);
+    ScryptCoreEighth(bp, VBuffer + (gidx * 1024));    
+    ScryptFinish(gidx, gid, bp, inner, outer, output, target);
+}
+
+__kernel void ScryptHash16(__global const uint4 *inputA, volatile __global uint*restrict output, __global uint4* VBuffer, const uint target) 
+{
+	uint gid = get_global_id(0);
+    uint gsize = get_global_size(0);
+    uint gidx = gid % gsize;
+        
+    uint4 bp[8];
+    uint4 inner[2];
+	uint4 outer[2];   
+    ScryptStepOne(gid, bp, inner, outer, inputA);    	
+    ScryptCoreSixteenth(bp, VBuffer + (gidx * 512));    
+    ScryptFinish(gidx, gid, bp, inner, outer, output, target);
 }

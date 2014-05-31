@@ -22,7 +22,9 @@ F2M_MiningThreadManager::F2M_MiningThreadManager(int threadCount, bool useSSE, f
         printf("setting up %d GPU threads\n", mGPUThreadCount);
         mGPUThreads = new F2M_GPUThread*[mGPUThreadCount];
         for( int i = 0; i < mGPUThreadCount; i++ )
+        {
             mGPUThreads[i] = new F2M_GPUThread(gpuPercentage, i);
+        }
     }
 
     mCurrentWork = 0;
@@ -180,8 +182,6 @@ void F2M_MiningThreadManager::StartWork(F2M_Work* work)
         mThreads[i]->StartWork(hashStart, hashes, work);
         hashStart += hashes;
     }
-    if( cpu < 0.05 )
-        printf("");
     printf("Work Divided - CPU(%f), GPU(%f)\n", cpu, gpu);
 }
 
