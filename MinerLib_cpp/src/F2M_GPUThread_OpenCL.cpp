@@ -96,7 +96,7 @@ F2M_GPUThread::F2M_GPUThread(float percentage, int deviceNumber)
     mKernels[1] = clCreateKernel(mProgram, "ScryptHash2", &ret);
     mKernels[2] = clCreateKernel(mProgram, "ScryptHash4", &ret);
     mKernels[3] = clCreateKernel(mProgram, "ScryptHash8", &ret);
-    mKernels[4] = clCreateKernel(mProgram, "ScryptHash16", &ret);
+    //mKernels[4] = clCreateKernel(mProgram, "ScryptHash16", &ret);
 
     // Setup data input area
     mGPUInput = clCreateBuffer(mCtx, CL_MEM_READ_ONLY, 128, 0, &ret);
@@ -426,7 +426,7 @@ void F2M_GPUThread::OptimizeStep()
 */
 void F2M_GPUThread::Optimize()
 {
-    unsigned int counts[NUM_SCRYPT_FUNCTIONS] = {1024, 512, 256, 128, 64};
+    unsigned int counts[5] = {1024, 512, 256, 128, 64};
         
     cl_uint leTarget = 0;
     unsigned char workData[128];

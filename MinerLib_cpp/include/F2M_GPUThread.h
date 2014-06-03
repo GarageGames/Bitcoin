@@ -13,7 +13,7 @@ struct F2M_Work;
 class F2M_Timer;
 
 #define HR_HISTORY_COUNT        10
-#define NUM_SCRYPT_FUNCTIONS    5
+#define NUM_SCRYPT_FUNCTIONS    4
 #define SCRYPT_BLOCK_SIZE       128
 #define SCRYPT_THREAD_MULT      128
 
