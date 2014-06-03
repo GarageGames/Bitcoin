@@ -27,9 +27,14 @@ namespace HashrateCalculator
         double mBTCValue = 0;
         const string currencyDir = "Currencies/";
 
+        CryptoIRC.CryptoIRC mIRC;
+
         public Form1()
         {
-            InitializeComponent();         
+            InitializeComponent();
+
+            mIRC = new CryptoIRC.CryptoIRC();
+            mIRC.SubscribeCurrency("Argentum", new CryptoIRC.PeerDiscoveredCB(ArgentumPeer));
    
 
             mCurrencies = new Dictionary<string, Currency>();
@@ -37,6 +42,11 @@ namespace HashrateCalculator
             LoadCurrencies();
             mUpdateThread = new Thread(new ThreadStart(UpdateThreadFunc));
             mUpdateThread.Start();
+        }
+
+        void ArgentumPeer(string peerName)
+        {
+            Console.WriteLine("Found argentum peer: " + peerName);
         }
 
         void UpdateThreadFunc()

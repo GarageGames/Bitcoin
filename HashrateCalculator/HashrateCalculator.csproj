@@ -98,6 +98,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CryptoIRC\CryptoIRC.csproj">
+      <Project>{F5090BA5-9E35-46D4-A59D-1F0842596F08}</Project>
+      <Name>CryptoIRC</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MinerLib_cs\MinerLib_cs.csproj">
       <Project>{B6133F1D-10EF-4BF9-8F88-51C6070FC47C}</Project>
       <Name>MinerLib_cs</Name>
