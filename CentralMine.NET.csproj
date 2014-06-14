@@ -74,7 +74,6 @@
     <Compile Include="Unhash.cs" />
     <Compile Include="Upstream.cs" />
     <Compile Include="US_Wallet.cs" />
-    <Compile Include="Utils.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -101,6 +100,10 @@
     <ProjectReference Include="..\bitnet-code\Bitnet.Client\Bitnet.Client.csproj">
       <Project>{90D3E431-02DF-432F-9F09-ED6E934BACD2}</Project>
       <Name>Bitnet.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="BCNet\BCNet.csproj">
+      <Project>{D4AAEDA7-206B-43C4-AA38-8C9CF3F43D17}</Project>
+      <Name>BCNet</Name>
     </ProjectReference>
     <ProjectReference Include="MinerLib_cs\MinerLib_cs.csproj">
       <Project>{B6133F1D-10EF-4BF9-8F88-51C6070FC47C}</Project>

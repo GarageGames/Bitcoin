@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinerLib_cs", "MinerLib_cs\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoIRC", "CryptoIRC\CryptoIRC.csproj", "{F5090BA5-9E35-46D4-A59D-1F0842596F08}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BCNet", "BCNet\BCNet.csproj", "{D4AAEDA7-206B-43C4-AA38-8C9CF3F43D17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,16 @@ Global
 		{F5090BA5-9E35-46D4-A59D-1F0842596F08}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{F5090BA5-9E35-46D4-A59D-1F0842596F08}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{F5090BA5-9E35-46D4-A59D-1F0842596F08}.Release|x86.ActiveCfg = Release|Any CPU
+		{D4AAEDA7-206B-43C4-AA38-8C9CF3F43D17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4AAEDA7-206B-43C4-AA38-8C9CF3F43D17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4AAEDA7-206B-43C4-AA38-8C9CF3F43D17}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D4AAEDA7-206B-43C4-AA38-8C9CF3F43D17}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D4AAEDA7-206B-43C4-AA38-8C9CF3F43D17}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D4AAEDA7-206B-43C4-AA38-8C9CF3F43D17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4AAEDA7-206B-43C4-AA38-8C9CF3F43D17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4AAEDA7-206B-43C4-AA38-8C9CF3F43D17}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D4AAEDA7-206B-43C4-AA38-8C9CF3F43D17}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D4AAEDA7-206B-43C4-AA38-8C9CF3F43D17}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

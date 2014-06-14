@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading;
 using System.IO;
+using BCNet;
 
 namespace CentralMine.NET
 {

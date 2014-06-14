@@ -138,7 +138,7 @@ namespace CryptoIRC
         void ProcessPacket(byte[] packet)
         {
             string str = System.Text.Encoding.ASCII.GetString(packet);
-            Console.WriteLine(str);
+            //Console.WriteLine(str);
 
             try
             {
@@ -149,6 +149,11 @@ namespace CryptoIRC
                 }
                 else if (pieces[1] == "PART")
                 {
+                }
+                else if (pieces[0] == "PING")
+                {
+                    string server = pieces[1].Substring(1);
+                    SendString("PONG " + server);
                 }
                 else
                 {
@@ -176,6 +181,7 @@ namespace CryptoIRC
             }
             catch (Exception ex)
             {
+                Console.WriteLine(str);
                 Console.WriteLine("CryptoIRC::ProcessPacket - " + ex.Message);
             }
             
@@ -208,7 +214,15 @@ namespace CryptoIRC
         {
             string send = str + "\r\n";
             byte[] data = System.Text.Encoding.ASCII.GetBytes(send);
-            mSocket.Send(data);
+            try
+            {
+                mSocket.Send(data);
+            }
+            catch (Exception ex)
+            {
+                mSocket.Close();
+                mState = ConnectionState.Disconnected;
+            }
         }
 
         void UpdateConnected()
